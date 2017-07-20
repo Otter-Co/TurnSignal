@@ -72,12 +72,17 @@ public class Twister : MonoBehaviour
 
 		arms = new Twister_Arm[armCount];
 
-		for(int i = 0; i < armCount; i++)
+		Pchild.transform.parent = transform;
+		Pchild.name = "child_arm";
+		arms[0] = Pchild.gameObject.GetComponent<Twister_Arm>();
+
+		for(int i = 1; i < armCount; i++)
 		{
 			var arm = Instantiate(Pchild, transform.position, transform.rotation);
 			arms[i] = arm.GetComponent<Twister_Arm>();
 
 			arm.transform.parent = transform;
+			arm.name = "child_arm";
 		}
 	}
 

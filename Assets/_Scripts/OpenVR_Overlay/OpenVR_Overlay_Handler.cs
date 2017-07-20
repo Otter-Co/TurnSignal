@@ -24,12 +24,7 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 		right = transform.Find("Right").gameObject;
 		left = transform.Find("Left").gameObject;
 	}
-
-	void CollectOverlays()
-	{
-
-	}
-
+	
 	void Update()
 	{
 		if(handler != null)

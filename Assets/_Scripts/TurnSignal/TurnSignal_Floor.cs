@@ -3,15 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TurnSignal : MonoBehaviour 
+public class TurnSignal_Floor : MonoBehaviour 
 {
-	public enum TurnDirection
-	{
-		Middle,
-		Right,
-		Left
-	}
-
 	public Twister turnObj;
 
 	[Space(10)]
@@ -61,10 +54,8 @@ public class TurnSignal : MonoBehaviour
 
 		float diff = curRotation - lastRotation;
 
-		if(diff > 350f)
-			diff = curRotation - (360f - lastRotation);
-		else if(diff < -350f)
-			diff = curRotation - (360f + lastRotation);
+		if(diff > 350f || diff < -350f)
+			return;
 
 		rawTurns += diff;
 
@@ -76,5 +67,14 @@ public class TurnSignal : MonoBehaviour
 	void UpdateTurnObj()
 	{
 		turnObj.twist = rawTurns / (maxTurns * 360f);
+	}
+
+	public void ResetRotationTracking()
+	{
+		rawTurns = 0f;
+		lastDiff = 0f;
+		initialRotation = 0f;
+
+		Debug.Log("test!");
 	}
 }

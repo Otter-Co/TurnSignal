@@ -26,6 +26,7 @@ public class OpenVR_Overlay : MonoBehaviour
 
 	[Space(10)]
 	public Vector4 uvOffset = new Vector4(0, 0, 1, 1);
+
 	[Tooltip("Static or Render Texture to Display")]
 	public Texture texture;
 
@@ -34,7 +35,6 @@ public class OpenVR_Overlay : MonoBehaviour
 
 	[Space(10)]
 
-	[HideInInspector()]
 	public bool highQualityOverlay = false;
 	[Range(0, 1.0f)]
 	public float opacity = 1.0f;
@@ -67,7 +67,69 @@ public class OpenVR_Overlay : MonoBehaviour
 	private VREvent_t pEvent;
 	private float lastPEventTime = 0f;
 
-	public void Start()
+	void Start()
+	{
+		CreateOverlay();
+	}
+
+	public void SetOpacity(float opacity)
+	{
+		if(opacity > 1f)
+			opacity = 1f;
+
+		if(opacity < 0f)
+			opacity = 0f;
+
+		this.opacity = opacity;
+	}
+
+	public void ToggleEnable()
+	{
+		gameObject.SetActive(!gameObject.activeSelf);
+	}
+
+	// And God Asked why it was Tenth, but actually added a 100th,
+	// And he Said because the events names were already set.
+	public void AddTenthOpacity()
+	{
+		opacity += 0.01f;
+		if(opacity > 1f)
+			opacity = 1f;
+	}
+
+	public void SubTenthOpacity()
+	{
+		opacity -= 0.01f;
+		if(opacity < 0.0f)
+			opacity = 0.0f;
+	}
+
+	void OnEnable()
+	{
+		_enabled = true;
+	}
+
+	void OnDisable()
+	{
+		_enabled = false;
+	}
+	void OnDestroy()
+	{
+		DestroyOverlay();
+	}
+
+	void DestroyOverlay()
+	{
+		var overlay = OpenVR.Overlay;
+
+		if(handle == OpenVR.k_ulOverlayHandleInvalid || overlay == null)
+			return;
+
+		overlay.DestroyOverlay(handle);
+		handle = OpenVR.k_ulOverlayHandleInvalid;
+	}
+
+	void CreateOverlay()
 	{
 		var overlay = OpenVR.Overlay;
 
@@ -100,30 +162,6 @@ public class OpenVR_Overlay : MonoBehaviour
 				overlay.SetOverlayFromFile(thumbHandle, Application.dataPath + "\\_Res\\icon.png");
 			}				
 		}
-
-		PollNextEvent(ref pEvent);
-	}
-
-	void OnDestroy()
-	{
-		var overlay = OpenVR.Overlay;
-
-		if(handle == OpenVR.k_ulOverlayHandleInvalid || overlay == null)
-			return;
-
-		overlay.DestroyOverlay(handle);
-
-		handle = OpenVR.k_ulOverlayHandleInvalid;
-	}
-
-	void OnEnable()
-	{
-		_enabled = true;
-	}
-
-	void OnDisable()
-	{
-		_enabled = false;
 	}
 
 	public void UpdateOverlay(Transform origin, ETrackingUniverseOrigin trackingSpace)
@@ -185,12 +223,10 @@ public class OpenVR_Overlay : MonoBehaviour
 
 		overlay.SetOverlayFlag(handle, VROverlayFlags.ShowTouchPadScrollWheel, enableScroller);
 
-		if(pEvent.eventAgeSeconds != lastPEventTime)
+		while(PollNextEvent(ref pEvent))
 		{
 			EventHandler(pEvent);
-
-			PollNextEvent(ref pEvent);
-		}
+		}				
 	}
 
 	public bool PollNextEvent(ref VREvent_t pEvent)
