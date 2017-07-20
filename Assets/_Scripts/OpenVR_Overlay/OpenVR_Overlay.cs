@@ -65,7 +65,6 @@ public class OpenVR_Overlay : MonoBehaviour
 	private bool _enabled = false;
 
 	private VREvent_t pEvent;
-	private float lastPEventTime = 0f;
 
 	void Start()
 	{

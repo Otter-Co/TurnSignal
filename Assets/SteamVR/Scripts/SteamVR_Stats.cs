@@ -9,7 +9,7 @@ using Valve.VR;
 
 public class SteamVR_Stats : MonoBehaviour
 {
-	public GUIText text;
+	public UnityEngine.UI.Text text;
 
 	public Color fadeColor = Color.black;
 	public float fadeDuration = 1.0f;
@@ -18,7 +18,7 @@ public class SteamVR_Stats : MonoBehaviour
 	{
 		if (text == null)
 		{
-			text = GetComponent<GUIText>();
+			text = GetComponent<UnityEngine.UI.Text>();
 			text.enabled = false;
 		}
 

@@ -22,10 +22,6 @@ public class OpenVR_Handler : System.IDisposable
 	}
 
     public OpenVR_Pose_Handler pose_handler;
-	private CVRSystem hmd;
-	private CVRCompositor compositor;
-	private CVROverlay overlay;
-
 	public ETextureType textureType;
 
 	OpenVR_Handler()
@@ -35,10 +31,6 @@ public class OpenVR_Handler : System.IDisposable
 			SafeDispose();
 			return;
 		}
-
-		hmd = OpenVR.System;
-		compositor = OpenVR.Compositor;
-		overlay = OpenVR.Overlay;
 
         pose_handler = new OpenVR_Pose_Handler();
 

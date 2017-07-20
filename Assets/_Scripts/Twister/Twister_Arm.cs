@@ -20,8 +20,6 @@ public class Twister_Arm : MonoBehaviour
 
 	public GameObject[] pointObjs = new GameObject[0];
 
-
-	private bool pointsObjMoved = false;
 	private float lastProgress = 1.0f;
 	private bool lastReverse = true;
 

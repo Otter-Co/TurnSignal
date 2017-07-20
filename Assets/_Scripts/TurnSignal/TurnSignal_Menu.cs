@@ -17,12 +17,7 @@ public class TurnSignal_Menu : MonoBehaviour
 	private Vector2 lastMouse = Vector2.zero;
 
 	private Vector3 mouseScreenCoords = new Vector3(0f, 0f, 0f);
-	private bool hasTarget = false;
-	private RaycastResult target;
 	private PointerEventData pD;
-
-	List<RaycastResult> hits = new List<RaycastResult>();
-	List<RaycastResult> oldHits = new List<RaycastResult>();
 
 	private HashSet<UI_Base> enterTargets = new HashSet<UI_Base>();
 	private HashSet<UI_Base> downTargets = new HashSet<UI_Base>();
