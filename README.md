@@ -3,6 +3,11 @@ TurnSignal
 A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrapping/Tangling in SteamVR.
 
 ---
+## ScreenShots
+
+Coming Very Soon - when I figure out how to take good gifs/stills of the dashboard/overlays in the compositor.
+
+---
 ## Download:
 
 [Click here to go to releases!](https://github.com/benotter/TurnSignal/releases)
