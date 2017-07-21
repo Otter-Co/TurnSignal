@@ -5,7 +5,11 @@ A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrappi
 ---
 ## ScreenShots
 
-Coming Very Soon - when I figure out how to take good gifs/stills of the dashboard/overlays in the compositor.
+[How It Looks](https://gfycat.com/InsecureShamelessFlycatcher)
+
+[How It Works](https://gfycat.com/gifs/detail/EllipticalHiddenFulmar)
+
+[The Menu](https://gfycat.com/gifs/detail/VariableAmbitiousFieldspaniel)
 
 ---
 ## Download:
