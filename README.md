@@ -7,9 +7,9 @@ A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrappi
 
 [How It Looks](https://gfycat.com/InsecureShamelessFlycatcher)
 
-[How It Works](https://gfycat.com/gifs/detail/EllipticalHiddenFulmar)
+[How It Works](https://gfycat.com/EllipticalHiddenFulmar)
 
-[The Menu](https://gfycat.com/gifs/detail/VariableAmbitiousFieldspaniel)
+[The Menu](https://gfycat.com/VariableAmbitiousFieldspaniel)
 
 ---
 ## Download:
