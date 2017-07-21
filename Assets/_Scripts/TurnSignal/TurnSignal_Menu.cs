@@ -29,6 +29,12 @@ public class TurnSignal_Menu : MonoBehaviour
 	{
 		pD = new PointerEventData(EventSystem.current);
 
+		float opacity = PlayerPrefs.GetFloat("opacity", 0.03f);
+		floorOverlay.opacity = opacity;
+	}
+	void OnApplicationQuit()
+	{
+		PlayerPrefs.SetFloat("opacity", floorOverlay.opacity);
 	}
 	// Update is called once per frame
 	void Update () 
