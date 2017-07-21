@@ -4,7 +4,7 @@ A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrappi
 
 ---
 ## Usage:
- > To use this utility, download the 'latest' release, extract from the .zip file, and run TurnSignal.exe!
+ > To use this utility, download the 'latest' release from [here](https://github.com/benotter/TurnSignal/releases), extract from the .zip file, and run TurnSignal.exe!
 
 ---
 ## Manual:
