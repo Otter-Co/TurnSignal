@@ -51,6 +51,10 @@ public class TurnSignal_Menu : MonoBehaviour
 
 	private bool firstGen = true;
 
+	private bool prefsLoaded = false;
+
+	private bool tryHide = false;
+
 	void Start () 
 	{
 		hideWin = gameObject.AddComponent<HeadlessScript>();
@@ -72,36 +76,48 @@ public class TurnSignal_Menu : MonoBehaviour
 
 
 		if(this.startOnBoot = (startOnBoot == "true"))
-			AddToStartup();		
+			AddToStartup();
 		else
 			RemoveFromStartup();
 			
 
-
 		if(this.hideWindow = (hideWindow == "true"))
-			hideWin.ShowUnityWindow();		
+			if(!hideWin.HideUnityWindow())
+				tryHide = true;
 		else
-			hideWin.HideUnityWindow();
-
+			hideWin.ShowUnityWindow();		
 			
-		Debug.Log(this.startOnBoot);
-		Debug.Log(this.hideWindow);
+
+		Debug.Log("Start On Boot: " + this.startOnBoot);
+		Debug.Log("Hide Window: " + this.hideWindow);
 
 		autoStartToggle.isOn = this.startOnBoot;
 		hideWindowToggle.isOn = this.hideWindow;
+
+		prefsLoaded = true;
 	}
+
 	void OnApplicationQuit()
+	{
+		SavePrefs();
+	}
+
+	public void SavePrefs()
 	{
 		PlayerPrefs.SetFloat("opacity", floorOverlay.opacity);
 		PlayerPrefs.SetFloat("scale", floorOverlay.scale);
 
-		PlayerPrefs.SetInt("maxturns", floorRig.maxTurns);
+		PlayerPrefs.SetInt("maxTurns", floorRig.maxTurns);
 
 		PlayerPrefs.SetString("startOnBoot", (startOnBoot) ? "true" : "false");
 		PlayerPrefs.SetString("hideWindow", (hideWindow) ? "true" : "false");
 	}
+
 	void Update()
 	{
+		if(tryHide && hideWin.HideUnityWindow())
+			tryHide = false;
+	
 		if((!overlay.hasFocus) && !firstGen)
 			return;
 
@@ -272,48 +288,70 @@ public class TurnSignal_Menu : MonoBehaviour
 
 	public void ToggleAutoStart()
 	{
+		if(!prefsLoaded)
+			return;
+
 		bool enable = autoStartToggle.isOn;
+		startOnBoot = enable;
+		SavePrefs();
 
 		if(enable)
 			AddToStartup();
 		else
 			RemoveFromStartup();
-
-		startOnBoot = enable;
-	}
-
-	public void AddToStartup(bool x = false)
-	{
-#if !(UNITY_EDITOR)
-		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-		string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-		regK.SetValue("TurnSignal", exePath);
-#else
-		Debug.Log("AutoStart Enabled!");
-#endif
-	}
-
-	public void RemoveFromStartup(bool x = false)
-	{
-#if !(UNITY_EDITOR)
-		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-		regK.DeleteValue("TurnSignal");
-#else
-		Debug.Log("AutoStart Disabled!");
-
-#endif
 	}
 
 	public void ToggleHideWindow()
 	{
+		if(!prefsLoaded)
+			return;
+
 		bool enable = hideWindowToggle.isOn;
+		hideWindow = enable;
+		SavePrefs();
 
 		if(enable)
 			hideWin.HideUnityWindow();
 		else
 			hideWin.ShowUnityWindow();
-
-		hideWindow = enable;
 	}
+
+// I Really Hate compile-ation macros, I hate hate hate them,
+// They look ugly as fuck, make code hard to read, and have often uncertain effects,
+// They should be phased out in place of safe, run everywhere, NO STUPID HALF-SIDE FEATURES, Code.
+	public void AddToStartup(bool x = false)
+	{
+
+#if !(UNITY_EDITOR)
+
+		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+		string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+		regK.SetValue("TurnSignal", exePath);
+
+#else
+
+		Debug.Log("AutoStart Enabled!");
+
+#endif
+	}
+
+	public void RemoveFromStartup(bool x = false)
+	{
+
+#if !(UNITY_EDITOR)
+
+		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+		if(regK.GetValue("TurnSignal") != null)
+			regK.DeleteValue("TurnSignal");
+
+#else
+
+		Debug.Log("AutoStart Disabled!");
+
+#endif
+	}
+
+	
 }
 

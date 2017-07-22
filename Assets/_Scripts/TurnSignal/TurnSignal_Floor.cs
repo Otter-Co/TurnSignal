@@ -74,8 +74,6 @@ public class TurnSignal_Floor : MonoBehaviour
 		rawTurns = 0f;
 		lastDiff = 0f;
 		initialRotation = 0f;
-
-		Debug.Log("test!");
 	}
 
 	public void AddMaxTurn()

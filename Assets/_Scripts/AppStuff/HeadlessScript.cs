@@ -52,13 +52,17 @@ public class HeadlessScript : MonoBehaviour
 
 #endif
 
-    public void HideUnityWindow()
+    public bool HideUnityWindow()
     {
-        ShowWindow(winHandle, (uint) 0);
+        bool res = ShowWindow(winHandle, (uint) 0);
+        Debug.Log("Try Hide Window: " + res);
+        return res;
     }
 
-    public void ShowUnityWindow()
+    public bool ShowUnityWindow()
     {
-        ShowWindow(winHandle, (uint) 5);
+        bool res = ShowWindow(winHandle, (uint) 5);
+        Debug.Log("Try Show Window: " + res);
+        return res;
     }
 }
