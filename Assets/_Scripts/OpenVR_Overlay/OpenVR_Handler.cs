@@ -24,9 +24,13 @@ public class OpenVR_Handler : System.IDisposable
     public OpenVR_Pose_Handler pose_handler;
 	public ETextureType textureType;
 
-	OpenVR_Handler()
+	public bool openVRInit = false;
+
+	public EVRApplicationType appType = EVRApplicationType.VRApplication_Overlay;
+
+	public void Setup()
 	{
-		if(!OpenVR_Setup())
+		if( !(openVRInit = OpenVR_Setup()) )
 		{
 			SafeDispose();
 			return;
@@ -44,7 +48,7 @@ public class OpenVR_Handler : System.IDisposable
 	{
 		EVRInitError error = EVRInitError.None;
 
-		OpenVR.Init(ref error, EVRApplicationType.VRApplication_Overlay);
+		OpenVR.Init(ref error, appType);
 
 		if(!CheckErr(error))
 			return false;
@@ -108,6 +112,7 @@ public class OpenVR_Handler : System.IDisposable
 	private void Dispose(bool disposing)
 	{
 		_instance = null;
+		OpenVR.Shutdown();
 	}
 
 	// Use this interface to avoid accidentally creating the instance in the process of attempting to dispose of it.
@@ -115,6 +120,11 @@ public class OpenVR_Handler : System.IDisposable
 	{
 		if (_instance != null)
 			_instance.Dispose();
+	}
+
+	void OnApplicationExit()
+	{
+		Dispose(true);
 	}
 }
 

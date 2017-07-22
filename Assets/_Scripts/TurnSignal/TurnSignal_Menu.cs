@@ -12,10 +12,16 @@ public class TurnSignal_Menu : MonoBehaviour
 	
 	[Space(10)]
 	public OpenVR_Overlay floorOverlay;
+	public TurnSignal_Floor floorRig;
+
+
+	[Space(10)]
 	public Text opacityText;
+	public Text scaleText;
+	public Text turnText;
+
 
 	private Vector2 lastMouse = Vector2.zero;
-
 	private Vector3 mouseScreenCoords = new Vector3(0f, 0f, 0f);
 	private PointerEventData pD;
 
@@ -25,21 +31,49 @@ public class TurnSignal_Menu : MonoBehaviour
 	private float leftMouseDragTime = 0f;
 	private bool inDrag = false;
 
+	private float lastOpat = 0f;
+	private float lastScale = 0f;
+
+	private int lastMaxTurns = 0;
+
 	void Start () 
 	{
 		pD = new PointerEventData(EventSystem.current);
 
 		float opacity = PlayerPrefs.GetFloat("opacity", 0.03f);
+		float scale = PlayerPrefs.GetFloat("scale", 2f);
+		int maxTurns = PlayerPrefs.GetInt("maxturns", 10);
+
 		floorOverlay.opacity = opacity;
+		floorOverlay.scale = scale;
+		floorRig.maxTurns = maxTurns;
 	}
 	void OnApplicationQuit()
 	{
 		PlayerPrefs.SetFloat("opacity", floorOverlay.opacity);
+		PlayerPrefs.SetFloat("scale", floorOverlay.scale);
+		PlayerPrefs.SetInt("maxturns", floorRig.maxTurns);
 	}
-	// Update is called once per frame
-	void Update () 
+	
+	void Update()
 	{
-		opacityText.text = (int) (floorOverlay.opacity * 100f) + "%";
+		if(lastOpat != floorOverlay.opacity)
+		{
+			opacityText.text = (int) (floorOverlay.opacity * 100f) + "%";
+			lastOpat = floorOverlay.opacity;
+		}
+		
+		if(lastScale != floorOverlay.scale)
+		{
+			scaleText.text = (floorOverlay.scale).ToString("N1");
+			lastScale = floorOverlay.scale;
+		}
+
+		if(lastMaxTurns != floorRig.maxTurns)
+		{
+			turnText.text = "" + floorRig.maxTurns;
+			lastMaxTurns = floorRig.maxTurns;
+		}
 
 		if(lastMouse != overlay.mousePos)
 		{
@@ -54,8 +88,17 @@ public class TurnSignal_Menu : MonoBehaviour
 			lastMouse = overlay.mousePos;
 		}
 
-		pD.Reset();
+		if( overlay.mousePos.x < 0f || 
+			overlay.mousePos.x > 1 || 
+			overlay.mousePos.y < 0f || 
+			overlay.mousePos.y > 1 )
+		{
+			return;
+		}
 
+		// Reuse pointer event data object, no need for new mem every frame.
+		pD.Reset();
+		// Ignore this in lew (lou? liu?) of above
 		pD.position = new Vector2(mouseScreenCoords.x, mouseScreenCoords.y);		
 		pD.button = PointerEventData.InputButton.Left;
 		pD.clickCount = 1;

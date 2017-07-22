@@ -8,6 +8,13 @@ using Valve.VR;
 
 public class OpenVR_Overlay_Handler : MonoBehaviour 
 {
+	public EVRApplicationType appType = EVRApplicationType.VRApplication_Overlay;
+	public bool pollSteamVRForStart = true;
+	public float steamVRPollRate = 0.5f;
+
+	[Space(10)]
+
+	[Space(10)]
 	public OpenVR_Overlay [] overlays;
 
 	private OpenVR_Handler handler;
@@ -16,6 +23,8 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 	private GameObject right;
 	private GameObject left;
 
+	private float lastPollTime = 0f;
+
 	void Start()
 	{
 		handler = OpenVR_Handler.instance;
@@ -23,11 +32,24 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 		head = transform.Find("Head").gameObject;
 		right = transform.Find("Right").gameObject;
 		left = transform.Find("Left").gameObject;
+
+		handler.appType = appType;
+		handler.Setup();
 	}
 	
 	void Update()
 	{
-		if(handler != null)
+		lastPollTime += Time.deltaTime;
+
+		if(!handler.openVRInit && lastPollTime >= steamVRPollRate)
+		{
+			handler.Setup();
+			lastPollTime = 0f;
+		}
+
+		if(!handler.openVRInit)
+			return;
+		else
 			handler.pose_handler.UpdatePoses();
 
 		var pose = handler.pose_handler;
@@ -64,8 +86,12 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 
 		foreach(var ol in overlays)
 			if(ol)
+			{
+				if(!ol.overlayInit)
+					ol.CreateOverlay();
+
 				ol.UpdateOverlay(transform, handler.pose_handler.trackingSpace);
-	
+			}
 	}
 }
 

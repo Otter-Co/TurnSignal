@@ -62,6 +62,8 @@ public class OpenVR_Overlay : MonoBehaviour
 	[HideInInspector()]
 	public ulong thumbHandle = 0;
 
+	public bool overlayInit = false;
+
 	private bool _enabled = false;
 
 	private VREvent_t pEvent;
@@ -69,38 +71,6 @@ public class OpenVR_Overlay : MonoBehaviour
 	void Start()
 	{
 		CreateOverlay();
-	}
-
-	public void SetOpacity(float opacity)
-	{
-		if(opacity > 1f)
-			opacity = 1f;
-
-		if(opacity < 0f)
-			opacity = 0f;
-
-		this.opacity = opacity;
-	}
-
-	public void ToggleEnable()
-	{
-		gameObject.SetActive(!gameObject.activeSelf);
-	}
-
-	// And God Asked why it was Tenth, but actually added a 100th,
-	// And he Said because the events names were already set.
-	public void AddTenthOpacity()
-	{
-		opacity += 0.01f;
-		if(opacity > 1f)
-			opacity = 1f;
-	}
-
-	public void SubTenthOpacity()
-	{
-		opacity -= 0.01f;
-		if(opacity < 0.0f)
-			opacity = 0.0f;
 	}
 
 	void OnEnable()
@@ -128,7 +98,7 @@ public class OpenVR_Overlay : MonoBehaviour
 		handle = OpenVR.k_ulOverlayHandleInvalid;
 	}
 
-	void CreateOverlay()
+	public void CreateOverlay()
 	{
 		var overlay = OpenVR.Overlay;
 
@@ -159,7 +129,9 @@ public class OpenVR_Overlay : MonoBehaviour
 			if(type == OverlayType.DashboardOverlay)
 			{
 				overlay.SetOverlayFromFile(thumbHandle, Application.dataPath + "\\_Res\\icon.png");
-			}				
+			}
+
+			overlayInit = true;			
 		}
 	}
 
@@ -284,5 +256,54 @@ public class OpenVR_Overlay : MonoBehaviour
 				}
 			break;
 		}
+	}
+
+	private void SetOpacity(float opacity)
+	{
+		if(opacity > 1f)
+			opacity = 1f;
+
+		if(opacity < 0f)
+			opacity = 0f;
+
+		this.opacity = opacity;
+	}
+
+	private void SetScale(float scale)
+	{
+		if(scale > 3f)
+			scale = 3f;
+		
+		if(scale < 0f)
+			scale = 0f;
+
+		this.scale = scale;
+	}
+
+	// These Methods are for easy value manipulation using Unity UI
+	// Use these as events for things.
+	public void ToggleEnable()
+	{
+		gameObject.SetActive(!gameObject.activeSelf);
+	}
+
+	public void AddHundrethOpacity()
+	{
+		SetOpacity(opacity + 0.01f);
+	}
+
+	public void SubHundrethOpacity()
+	{
+		SetOpacity(opacity - 0.01f);
+	}
+
+	public void AddTenthScale()
+	{
+		SetScale(scale + 0.1f);
+	}
+
+	public void SubTenthScale()
+	{
+		SetScale(scale - 0.1f);
 	}
 }

@@ -77,4 +77,15 @@ public class TurnSignal_Floor : MonoBehaviour
 
 		Debug.Log("test!");
 	}
+
+	public void AddMaxTurn()
+	{
+		maxTurns += 1;
+	}
+
+	public void SubMaxTurn()
+	{
+		if(maxTurns - 1 > 0)
+			maxTurns -= 1;
+	}
 }
