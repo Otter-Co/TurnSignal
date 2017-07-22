@@ -28,11 +28,11 @@ After launching the program, feel free to minimize the black-box window.
 
 The settings menu should be included in your SteamVR Dashboard as an Overlay, and the utility itself should be projected onto the floor of your environment.
 
-The settings menu includes a toggle to enable/disable the tool, an opacity setting, and a button to reset rotation. Opacity is a saved setting, and shouldn't need to be set every time.
+The settings menu includes a toggle to enable/disable the tool, an opacity setting, a scale setting, a setting for manipulating the twist speed (max turns), a toggle to auto-start with windows, a toggle to hide the main unity window, and a button to reset rotation. All settings are saved between app sessions, and shouldn't need to be set every time its launched.
 
-As a feature, the utility will still track rotations whenever running, even when its toggled off from the dashboard menu, so if/when its turned back on, it will still show turns as if was left on.
+As a feature, the utility will still track rotations whenever running (if steamVR is running), even when its toggled off from the dashboard menu, so if/when its turned back on, it will still show turns as if was left on.
 
--- Note -- The ammount of rotation on the floor is actually measured from 0 - 10 turns in either direction, and given as a 0.0 - 1.0 floating point, with 10 turns used as 'max', but it can exceed this without problem, resulting in 'fun' floor shapes that have higher then 1.0 twist values. Just an FYI.
+-- Note -- The ammount of rotation on the floor is actually measured from 0 - 10 (now user set Max) turns in either direction, and given as a 0.0 - 1.0 floating point, with 10 turns used as 'max', but it can exceed this without problem, resulting in 'fun' floor shapes that have higher then 1.0 twist values. Just an FYI.
 
 ---
 ## About:
