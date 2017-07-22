@@ -1,8 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+
+using Microsoft.Win32;
 
 public class TurnSignal_Menu : MonoBehaviour 
 {
@@ -19,6 +23,15 @@ public class TurnSignal_Menu : MonoBehaviour
 	public Text opacityText;
 	public Text scaleText;
 	public Text turnText;
+	public Toggle autoStartToggle;
+	public Toggle hideWindowToggle;
+
+	[Space(10)]
+	
+	public bool startOnBoot = false;
+	public bool hideWindow = false;
+
+	private HeadlessScript hideWin;
 
 
 	private Vector2 lastMouse = Vector2.zero;
@@ -36,27 +49,65 @@ public class TurnSignal_Menu : MonoBehaviour
 
 	private int lastMaxTurns = 0;
 
+	private bool firstGen = true;
+
 	void Start () 
 	{
+		hideWin = gameObject.AddComponent<HeadlessScript>();
+
 		pD = new PointerEventData(EventSystem.current);
 
 		float opacity = PlayerPrefs.GetFloat("opacity", 0.03f);
 		float scale = PlayerPrefs.GetFloat("scale", 2f);
-		int maxTurns = PlayerPrefs.GetInt("maxturns", 10);
+
+		int maxTurns = PlayerPrefs.GetInt("maxTurns", 10);
+
+		string startOnBoot = PlayerPrefs.GetString("startOnBoot", "false");
+		string hideWindow = PlayerPrefs.GetString("hideWindow", "false");
 
 		floorOverlay.opacity = opacity;
 		floorOverlay.scale = scale;
+		
 		floorRig.maxTurns = maxTurns;
+
+
+		if(this.startOnBoot = (startOnBoot == "true"))
+			AddToStartup();		
+		else
+			RemoveFromStartup();
+			
+
+
+		if(this.hideWindow = (hideWindow == "true"))
+			hideWin.ShowUnityWindow();		
+		else
+			hideWin.HideUnityWindow();
+
+			
+		Debug.Log(this.startOnBoot);
+		Debug.Log(this.hideWindow);
+
+		autoStartToggle.isOn = this.startOnBoot;
+		hideWindowToggle.isOn = this.hideWindow;
 	}
 	void OnApplicationQuit()
 	{
 		PlayerPrefs.SetFloat("opacity", floorOverlay.opacity);
 		PlayerPrefs.SetFloat("scale", floorOverlay.scale);
+
 		PlayerPrefs.SetInt("maxturns", floorRig.maxTurns);
+
+		PlayerPrefs.SetString("startOnBoot", (startOnBoot) ? "true" : "false");
+		PlayerPrefs.SetString("hideWindow", (hideWindow) ? "true" : "false");
 	}
-	
 	void Update()
 	{
+		if((!overlay.hasFocus) && !firstGen)
+			return;
+
+		if(firstGen)
+			firstGen = false;
+
 		if(lastOpat != floorOverlay.opacity)
 		{
 			opacityText.text = (int) (floorOverlay.opacity * 100f) + "%";
@@ -217,6 +268,52 @@ public class TurnSignal_Menu : MonoBehaviour
 	{
 		foreach(UI_Base b in t)
 			b.OnUp(pD);
+	}
+
+	public void ToggleAutoStart()
+	{
+		bool enable = autoStartToggle.isOn;
+
+		if(enable)
+			AddToStartup();
+		else
+			RemoveFromStartup();
+
+		startOnBoot = enable;
+	}
+
+	public void AddToStartup(bool x = false)
+	{
+#if !(UNITY_EDITOR)
+		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+		string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+		regK.SetValue("TurnSignal", exePath);
+#else
+		Debug.Log("AutoStart Enabled!");
+#endif
+	}
+
+	public void RemoveFromStartup(bool x = false)
+	{
+#if !(UNITY_EDITOR)
+		RegistryKey regK = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+		regK.DeleteValue("TurnSignal");
+#else
+		Debug.Log("AutoStart Disabled!");
+
+#endif
+	}
+
+	public void ToggleHideWindow()
+	{
+		bool enable = hideWindowToggle.isOn;
+
+		if(enable)
+			hideWin.HideUnityWindow();
+		else
+			hideWin.ShowUnityWindow();
+
+		hideWindow = enable;
 	}
 }
 

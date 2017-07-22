@@ -4,7 +4,10 @@ using System.Runtime.InteropServices;
 
 public class HeadlessScript : MonoBehaviour
 {
+    public bool hide = false;
+
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+
     [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
     static extern IntPtr FindWindowByCaption(IntPtr zeroOnly, string lpWindowName);
 
@@ -24,20 +27,38 @@ public class HeadlessScript : MonoBehaviour
     private const int GWL_EXSTYLE = -0x14;
     private const int WS_EX_TOOLWINDOW = 0x0080;
 
+    private IntPtr winHandle;
+
     // Use this for initialization
     void Start()
     {
         // Find the application's Window
-        var handle = FindWindowByCaption(IntPtr.Zero, Application.productName);
-        if (handle == IntPtr.Zero) return;
+        winHandle = FindWindowByCaption(IntPtr.Zero, Application.productName);
 
-        // Move the Window Off Screen
-        SetWindowPos(handle, 0, -720, 0, 720, 480, 0);
-
-        // Remove the Window from the Taskbar
-        ShowWindow(handle, (uint)0);
-        SetWindowLong(handle, GWL_EXSTYLE, GetWindowLong(handle, GWL_EXSTYLE) | WS_EX_TOOLWINDOW);
-        ShowWindow(handle, (uint)5);
+        if (winHandle == IntPtr.Zero) 
+            return;
     }
+
+#else
+    private IntPtr winHandle;
+    private static bool ShowWindow(IntPtr hWnd, uint nCmdShow)
+    {
+        return true;
+    }
+    void Start()
+    {
+        winHandle = IntPtr.Zero;
+    }
+
 #endif
+
+    public void HideUnityWindow()
+    {
+        ShowWindow(winHandle, (uint) 0);
+    }
+
+    public void ShowUnityWindow()
+    {
+        ShowWindow(winHandle, (uint) 5);
+    }
 }

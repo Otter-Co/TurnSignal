@@ -31,7 +31,7 @@ public class OpenVR_Overlay : MonoBehaviour
 	public Texture texture;
 
 	[Tooltip("Thumbnail for Dashboard Overlay")]
-	public Texture thumbnailIcon;
+	public string thumbnailPath  = "\\_Res\\icon.png";
 
 	[Space(10)]
 
@@ -43,6 +43,9 @@ public class OpenVR_Overlay : MonoBehaviour
 	[Space(10)]
 	
 	public VROverlayInputMethod inputMethod = VROverlayInputMethod.None;
+
+	[Space(10)]
+
 	public Vector2 mouseScale = new Vector2(1f, 1f);
 	public bool enableScroller = true;
 
@@ -55,6 +58,11 @@ public class OpenVR_Overlay : MonoBehaviour
 	public bool leftMouseDown = false;
 	public bool middleMouseDown = false;
 
+	[Space(10)]
+
+	public bool hasFocus = false;
+	public bool isVisible = true;
+
 
 	[HideInInspector()]
 	public ulong handle = 0;
@@ -62,9 +70,13 @@ public class OpenVR_Overlay : MonoBehaviour
 	[HideInInspector()]
 	public ulong thumbHandle = 0;
 
+	[HideInInspector()]
 	public bool overlayInit = false;
 
 	private bool _enabled = false;
+
+	private bool dontDraw = false;
+	private bool dontUpdate = false;
 
 	private VREvent_t pEvent;
 
@@ -83,6 +95,11 @@ public class OpenVR_Overlay : MonoBehaviour
 		_enabled = false;
 	}
 	void OnDestroy()
+	{
+		DestroyOverlay();
+	}
+
+	void OnApplicationExit()
 	{
 		DestroyOverlay();
 	}
@@ -128,7 +145,7 @@ public class OpenVR_Overlay : MonoBehaviour
 		{
 			if(type == OverlayType.DashboardOverlay)
 			{
-				overlay.SetOverlayFromFile(thumbHandle, Application.dataPath + "\\_Res\\icon.png");
+				overlay.SetOverlayFromFile(thumbHandle, Application.dataPath + thumbnailPath);
 			}
 
 			overlayInit = true;			
@@ -142,22 +159,32 @@ public class OpenVR_Overlay : MonoBehaviour
 		if(overlay == null)
 			return;
 
-		if(!_enabled)
-		{
-			overlay.HideOverlay(handle);
-			return;
-		}
-		else
-		{
-			var error = EVROverlayError.None;
-
+		var error = EVROverlayError.None;
 			error = overlay.ShowOverlay(handle);
 
 			if (error == EVROverlayError.InvalidHandle || error == EVROverlayError.UnknownOverlay)
-			{
 				if (overlay.FindOverlay(overlayKey, ref handle) != EVROverlayError.None)
+				{
+					CreateOverlay();
 					return;
-			}
+				}
+
+		while(PollNextEvent(ref pEvent))
+			EventHandler(ref pEvent);
+
+		if(!_enabled || !isVisible)
+			dontDraw = true;
+
+		if(dontDraw)
+		{
+			overlay.HideOverlay(handle);
+			dontDraw = false;
+			return;
+		}
+		else if (dontUpdate)
+		{
+			dontUpdate = false;
+			return;
 		}
 
 		var tex = new Texture_t();
@@ -193,11 +220,6 @@ public class OpenVR_Overlay : MonoBehaviour
 		overlay.SetOverlayInputMethod(handle, inputMethod);
 
 		overlay.SetOverlayFlag(handle, VROverlayFlags.ShowTouchPadScrollWheel, enableScroller);
-
-		while(PollNextEvent(ref pEvent))
-		{
-			EventHandler(pEvent);
-		}				
 	}
 
 	public bool PollNextEvent(ref VREvent_t pEvent)
@@ -210,7 +232,7 @@ public class OpenVR_Overlay : MonoBehaviour
 		return overlay.PollNextOverlayEvent(handle, ref pEvent, size);
 	}
 
-	void EventHandler(VREvent_t pEvent)
+	void EventHandler(ref VREvent_t pEvent)
 	{
 		var mouseD = pEvent.data.mouse;
 
@@ -254,6 +276,22 @@ public class OpenVR_Overlay : MonoBehaviour
 						middleMouseDown = false;
 					break;
 				}
+			break;
+
+			case EVREventType.VREvent_FocusEnter:
+				hasFocus = true;
+			break;
+
+			case EVREventType.VREvent_FocusLeave:
+				hasFocus = false;
+			break;
+
+			case EVREventType.VREvent_OverlayShown:
+				isVisible = true;
+			break;
+
+			case EVREventType.VREvent_OverlayHidden:
+				isVisible = false;
 			break;
 		}
 	}
@@ -307,3 +345,4 @@ public class OpenVR_Overlay : MonoBehaviour
 		SetScale(scale - 0.1f);
 	}
 }
+

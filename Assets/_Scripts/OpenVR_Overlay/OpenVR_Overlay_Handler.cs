@@ -41,6 +41,12 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 	{
 		lastPollTime += Time.deltaTime;
 
+		if(handler == null)
+		{
+			handler = OpenVR_Handler.instance;
+			return;
+		}
+
 		if(!handler.openVRInit && lastPollTime >= steamVRPollRate)
 		{
 			handler.Setup();
@@ -50,7 +56,7 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 		if(!handler.openVRInit)
 			return;
 		else
-			handler.pose_handler.UpdatePoses();
+			handler.FullUpdate();
 
 		var pose = handler.pose_handler;
 
@@ -82,7 +88,6 @@ public class OpenVR_Overlay_Handler : MonoBehaviour
 		}
 		else if(left.activeSelf)
 			left.SetActive(false);
-		
 
 		foreach(var ol in overlays)
 			if(ol)
