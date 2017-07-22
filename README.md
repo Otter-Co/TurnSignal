@@ -41,7 +41,7 @@ I had the idea for the utility (which originally used large arrows and a counter
 
 Every time, when action got intense, the cord would inevitably get wrapped up and tangled, and get caught on legs, the controller, the like.
 
-I figured it couldn't hurt to have a visual, in-game tool, to subtley alert you to your ammount of turns, without pausing to dashboard. It was also a very simple idea, with a very fixed feature set to complete it, so why not, eh?
+I figured it couldn't hurt to have a visual, in-game tool, to subtly alert you to your ammount of turns, without pausing to dashboard. It was also a very simple idea, with a very fixed feature set to complete it, so why not, eh?
 
 ---
 ## About - OpenVR Overlays in Newest Version of Unity
