@@ -4,46 +4,6 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using Valve.VR;
 
-public class OVR_Overlay_Handler
-{
-    private static OVR_Overlay_Handler _instance;
-    public static OVR_Overlay_Handler instance 
-    {
-        get 
-        { 
-            if(_instance == null)
-                _instance = new OVR_Overlay_Handler();
-
-            return _instance;
-        }
-    }
-
-    private HashSet<OVR_Overlay> overlays = new HashSet<OVR_Overlay>();
-
-    public OVR_Overlay_Handler()
-    {
-
-    }
-
-    public bool RegisterOverlay(OVR_Overlay overlay)
-    {
-        return overlays.Add(overlay);
-    }
-
-    public bool DeregisterOverlay(OVR_Overlay overlay)
-    {
-        return overlays.Remove(overlay);
-    }
-
-    public void DestroyAllOverlays()
-    {
-        foreach(OVR_Overlay overlay in overlays)
-        {
-            overlay.DestroyOverlay();
-        }
-    }
-}
-
 public class OVR_Overlay 
 {    
     public string overlayName 
@@ -59,6 +19,7 @@ public class OVR_Overlay
         set { _overlayKey = value; }
     }
     private string _overlayKey = "open_vr_overlay";
+
 
     public ulong overlayHandle { get { return _overlayHandle; } }
     private ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
@@ -80,16 +41,8 @@ public class OVR_Overlay
     private EVROverlayError error;
     private VREvent_t pEvent;
 
-    public OVR_Overlay()
-    {
-        var ovrOverlayHandler = OVR_Overlay_Handler.instance;
-        ovrOverlayHandler.RegisterOverlay(this);
-    }
-
     ~OVR_Overlay()
     {
-        var ovrOverlayHandler = OVR_Overlay_Handler.instance;
-        ovrOverlayHandler.DeregisterOverlay(this);
         DestroyOverlay();
     }
 

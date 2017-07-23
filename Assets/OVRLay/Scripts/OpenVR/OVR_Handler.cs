@@ -18,7 +18,6 @@ public class OVR_Handler : System.IDisposable
     }
 
     public OVR_Pose_Handler poseHandler;
-    public OVR_Overlay_Handler overlayHandler;
 
     public OVR_Handler()
     {
