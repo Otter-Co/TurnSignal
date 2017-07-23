@@ -20,11 +20,12 @@ public class OpenVR_Handler : System.IDisposable
 			return _instance;
 		} 
 	}
+	public EVRApplicationType appType = EVRApplicationType.VRApplication_Overlay;
+
     public OpenVR_Pose_Handler pose_handler;
 	public ETextureType textureType;
 
 	public bool openVRInit = false;
-	public EVRApplicationType appType = EVRApplicationType.VRApplication_Overlay;
 
 	private VREvent_t pEvent;
 
@@ -150,4 +151,10 @@ public class OpenVR_Handler : System.IDisposable
 	{
 		Dispose(true);
 	}
+}
+
+public struct OpenVR_Stats 
+{
+	public bool hasOpenVRConnection;
+	public ETextureType textureType;
 }
