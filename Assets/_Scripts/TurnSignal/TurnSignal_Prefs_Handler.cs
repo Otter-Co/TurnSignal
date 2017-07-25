@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unity_Dashboard_Overlay : Unity_Overlay {
+public class TurnSignal_Prefs_Handler : MonoBehaviour {
 
+	// Use this for initialization
 	void Start () {
 		
 	}
 	
+	// Update is called once per frame
 	void Update () {
 		
 	}

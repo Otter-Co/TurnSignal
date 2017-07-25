@@ -34,6 +34,11 @@ public class TurnSignal_Floor : MonoBehaviour
 
 	void Update()
 	{
+		UpdateFloor();
+	}
+
+	public void UpdateFloor()
+	{
 		UpdateHMDRotation();
 		UpdateTurnObj();
 	}

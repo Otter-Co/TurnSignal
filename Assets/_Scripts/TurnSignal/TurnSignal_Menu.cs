@@ -115,6 +115,9 @@ public class TurnSignal_Menu : MonoBehaviour
 
 	void Update()
 	{
+		if(!overlay)
+			return;
+			
 		if(tryHide && hideWin.HideUnityWindow())
 			tryHide = false;
 	

@@ -1964,7 +1964,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &114821384422240748
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2099,7 +2099,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &114895630113413642
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2302,7 +2302,7 @@ MonoBehaviour:
   scaleText: {fileID: 114006421235162636}
   turnText: {fileID: 114713245194630890}
   autoStartToggle: {fileID: 114794446523148066}
-  hideWindowToggle: {fileID: 0}
+  hideWindowToggle: {fileID: 114863750247905234}
   startOnBoot: 0
   hideWindow: 0
 --- !u!114 &114959190025310616
