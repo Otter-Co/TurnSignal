@@ -57,7 +57,6 @@ public class Unity_Overlay : MonoBehaviour
 	[Space(10)]
 	public bool simulateUnityMouseInput = false;
 	public GraphicRaycaster canvasGraphicsCaster;
-	public float mouseDragStartDelay = 0.1f;
 
 
 	protected OVR_Handler ovrHandler = OVR_Handler.instance;
@@ -76,11 +75,15 @@ public class Unity_Overlay : MonoBehaviour
 	private HashSet<Selectable> enterTargets = new HashSet<Selectable>();
 	private HashSet<Selectable> downTargets = new HashSet<Selectable>();
 
-	protected bool mouseDown = false;
-	protected bool mouseDragging = false;
-	protected float mouseDownTime = 0f;
+	public bool mouseDown = false;
+	public bool mouseDragging = false;
+	public float mouseDownTime = 0f;
+
+	public Vector2 mousePos = new Vector2();
 
 	protected Unity_Overlay_UI_Handler uiHandler = new Unity_Overlay_UI_Handler();
+
+	public float reverseAspect = 0f;
 
 
 	void Start () 
@@ -90,7 +93,7 @@ public class Unity_Overlay : MonoBehaviour
 		if(cameraForTexture != null)
 		{
 			int width = (int) (cameraForTexture.pixelWidth);
-			int height = (int) (cameraForTexture.pixelHeight * 2);
+			int height = (int) (cameraForTexture.pixelHeight);
 
 			Debug.Log("Width: " + width);
 			Debug.Log("Height: " + height);
@@ -98,9 +101,12 @@ public class Unity_Overlay : MonoBehaviour
 			cameraTexture = new RenderTexture(width, height, 24);
 			cameraForTexture.targetTexture = cameraTexture;
 			cameraForTexture.enabled = false;
-		}
-		
 
+			overlayTexture = cameraTexture;
+		}
+
+		Debug.Log("Width: " + overlayTexture.width);
+		Debug.Log("Height: " + overlayTexture.height);
 
 		overlay.overlayTextureType = SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL") ? ETextureType.OpenGL : ETextureType.DirectX;
 		
@@ -155,65 +161,71 @@ public class Unity_Overlay : MonoBehaviour
 		UpdateTexture();
 		UpdateMouse();
 
-		if(simulateUnityMouseInput && _mainTex)
+		if(enableSimulatedMouse && overlayTexture)
 		{
 			var mPos = overlay.overlayMousePosition;
 			if(mPos.x < 0f || mPos.x > 1f || mPos.y < 0f || mPos.y > 1f)
 				return;
+	
+			mousePos.x = overlayTexture.width * mPos.x;
+			mousePos.y = overlayTexture.height * ( 1f - (mPos.y / reverseAspect) );
 
-			var pd = uiHandler.pD;
-
-			if(mouseDown && !mouseDragging)
+			if(simulateUnityMouseInput)
 			{
-				pd.Reset();
-				pd.clickCount = 1;
-			}
-			else if(mouseDown && mouseDragging)
-			{
-				pd.clickCount = 0;
-				pd.clickTime += mouseDownTime;
-				pd.dragging = true;
-			}
+				var pd = uiHandler.pD;
 
-			pd.button = PointerEventData.InputButton.Left;
-			pd.position = new Vector2(mPos.x * _mainTex.width,(1f - mPos.y) * _mainTex.height);
+				pd.position = mousePos;
+				pd.button = PointerEventData.InputButton.Left;
 
-			var nTargs = uiHandler.GetUITargets(cameraForTexture, canvasGraphicsCaster, pd);
-
-			uiHandler.EnterTargets(nTargs);
-
-			foreach(Selectable ub in nTargs)
-				if(enterTargets.Contains(ub))
-					enterTargets.Remove(ub);
-
-			uiHandler.ExitTargets(enterTargets);
-			enterTargets = nTargs;
-
-			if(mouseDown)
-			{
-				if(!mouseDragging)
+				if(mouseDown && !mouseDragging)
 				{
-					foreach(Selectable sel in nTargs)
-						downTargets.Add(sel);
+					pd.Reset();
+					pd.clickCount = 1;
+				}
+				else if(mouseDown && mouseDragging)
+				{
+					pd.clickCount = 0;
+					pd.clickTime += mouseDownTime;
+					pd.dragging = true;
+				}
 
-					uiHandler.SubmitTargets(downTargets);
-					uiHandler.StartDragTargets(downTargets);
-					uiHandler.DownTargets(downTargets);
+				var nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
+
+				uiHandler.EnterTargets(nTargs);
+
+				foreach(Selectable ub in nTargs)
+					if(enterTargets.Contains(ub))
+						enterTargets.Remove(ub);
+
+				uiHandler.ExitTargets(enterTargets);
+				enterTargets = nTargs;
+
+				if(mouseDown)
+				{
+					if(!mouseDragging)
+					{
+						foreach(Selectable sel in nTargs)
+							downTargets.Add(sel);
+
+						uiHandler.SubmitTargets(downTargets);
+						uiHandler.StartDragTargets(downTargets);
+						uiHandler.DownTargets(downTargets);
+					}
+					else
+					{
+						uiHandler.MoveTargets(downTargets);
+						uiHandler.DragTargets(downTargets);
+						uiHandler.DownTargets(downTargets);
+					}
 				}
 				else
 				{
-					uiHandler.MoveTargets(downTargets);
-					uiHandler.DragTargets(downTargets);
-					uiHandler.DownTargets(downTargets);
-				}
-			}
-			else
-			{
-				uiHandler.UpTargets(downTargets);
-				uiHandler.EndDragTargets(downTargets);
-				uiHandler.DropTargets(downTargets);
+					uiHandler.UpTargets(downTargets);
+					uiHandler.EndDragTargets(downTargets);
+					uiHandler.DropTargets(downTargets);
 
-				downTargets.Clear();
+					downTargets.Clear();
+				}
 			}
 		}
 	}
@@ -239,35 +251,39 @@ public class Unity_Overlay : MonoBehaviour
 
 	void UpdateTexture()
 	{
-		overlay.overlayTextureBounds = textureBounds;
-		
 		if(cameraForTexture)
-		{
-			RenderTexture.active = cameraTexture;
 			cameraForTexture.Render();
-			
-			_mainTex = cameraTexture;
-		}
-		else if(overlayTexture)
-			_mainTex = overlayTexture;
-		else
-			_mainTex = null;
 
-		if(_mainTex != null)
+		if(!overlayTexture)
+			return;
+
+		float width = overlayTexture.width;
+		float height = overlayTexture.height;
+
+		textureBounds.uMin = 0;
+		textureBounds.vMin = 1;
+
+		textureBounds.uMax = 1;
+		textureBounds.vMax = 0;
+
+		overlay.overlayTextureBounds = textureBounds;
+
+		overlay.overlayTexture = overlayTexture;
+		overlay.overlayWidthInMeters = widthInMeters;
+		
+		reverseAspect = (float) overlayTexture.height / (float) overlayTexture.width;
+
+		mouseScale.y = mouseScale_t.v1 = reverseAspect;
+		overlay.overlayMouseScale = mouseScale_t;
+			
+		if(isDashboardOverlay && isDashboardOverlay)
 		{
-			float texWidth = (float)_mainTex.width / (float)_mainTex.height;
+			overlay.overlayThumbnailTextureBounds = textureBounds;
+			overlay.overlayThumbnailTexture = thumbNailTexture;
 
-			textureBounds.uMin = 0;
-			textureBounds.vMin = 1;
-			textureBounds.uMax = texWidth;
-			textureBounds.vMax = 0;
-
-			overlay.overlayTexture = _mainTex;
+			
 		}
 			
-
-		if(isDashboardOverlay)
-			overlay.overlayThumbnailTexture = thumbNailTexture;
 	}
 
 	void UpdateOpts()
@@ -400,10 +416,10 @@ public class Unity_Overlay_UI_Handler
 	public PointerEventData pD = new PointerEventData(EventSystem.current);
 	public AxisEventData aD = new AxisEventData(EventSystem.current);
 
-	public HashSet<Selectable> GetUITargets(Camera camA, GraphicRaycaster gRay, PointerEventData pD)
+	public HashSet<Selectable> GetUITargets(GraphicRaycaster gRay, PointerEventData pD)
 	{
-		if(cam != camA)
-			cam = camA;
+		if(cam != gRay.eventCamera)
+			cam = gRay.eventCamera;
 
 		aD.Reset();
 		aD.moveVector = (this.pD.position - pD.position);
@@ -441,8 +457,6 @@ public class Unity_Overlay_UI_Handler
 
 		if(hits.Count > 0)
 			pD.pointerCurrentRaycast = pD.pointerPressRaycast = hits[0];
-
-		Debug.Log(pD.enterEventCamera);
 
 		for(int i = 0; i < hits.Count; i++)
 		{

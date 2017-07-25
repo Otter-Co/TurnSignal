@@ -143,7 +143,7 @@ public class OVR_Handler : System.IDisposable
         switch(type)
         {
             case EVREventType.VREvent_QuitAcknowledged:
-                ShutDownOpenVR();
+                // ShutDownOpenVR();
             break;
 
             default:

@@ -136,4 +136,17 @@ public class Twister : MonoBehaviour
 
 		return new Vector3(x, 0f, y);
 	}
+
+	Vector3 BezierN(Vector3 [] pN, float prog)
+	{
+		if(pN.Length == 1)
+			return pN[0];
+
+		Vector3[] nextP = new Vector3[pN.Length - 1];
+
+		for(int i = 0; i < pN.Length - 1; i++)
+			nextP[i] = Vector3.Lerp(pN[i], pN[i + 1], prog);
+		
+		return BezierN(nextP, prog);
+	}
 }

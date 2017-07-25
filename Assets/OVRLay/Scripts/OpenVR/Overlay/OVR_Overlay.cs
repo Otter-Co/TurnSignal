@@ -162,6 +162,64 @@ public class OVR_Overlay
         }
     }
 
+    protected VRTextureBounds_t _overlayThumbnailTextureBounds = new VRTextureBounds_t();
+    public VRTextureBounds_t overlayThumbnailTextureBounds 
+    {
+        get 
+        {
+            if(OverlayExists && validHandle)
+                Overlay.GetOverlayTextureBounds(_overlayThumbnailHandle, ref _overlayThumbnailTextureBounds);
+                
+            return _overlayThumbnailTextureBounds;
+        }
+        set 
+        {
+            _overlayThumbnailTextureBounds = value;
+
+            if(OverlayExists && validHandle)
+                Overlay.SetOverlayTextureBounds(_overlayThumbnailHandle, ref _overlayThumbnailTextureBounds);
+        }
+    }
+
+    private float _overlayTexelAspect = 1f;
+    public float overlayTexelAspect 
+    {
+        get 
+        {
+            if(OverlayExists && validHandle)
+                Overlay.GetOverlayTexelAspect(_overlayHandle, ref _overlayTexelAspect);
+
+            return _overlayTexelAspect;
+        }
+
+        set 
+        {
+            _overlayTexelAspect = value;
+            if(OverlayExists && validHandle)
+                Overlay.SetOverlayTexelAspect(_overlayHandle, _overlayTexelAspect);
+        }
+    }
+
+    private uint [] _overlaySize = new uint[2] {0, 0};
+    public uint [] overlaySize 
+    {
+        get 
+        {
+            uint width = _overlaySize[0];
+            uint height = _overlaySize[1];
+            
+            
+            if(OverlayExists && validHandle)
+                Overlay.GetOverlayImageData(_overlayHandle, System.IntPtr.Zero, 0, ref width, ref height);
+            
+            _overlaySize[0] = width;
+            _overlaySize[1] = height;
+
+            return _overlaySize;
+        }
+    }
+
+
     protected ETrackingUniverseOrigin _overlayTransformAbsoluteTrackingOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding;
     public ETrackingUniverseOrigin overlayTransformAbsoluteTrackingOrigin 
     {
@@ -356,10 +414,7 @@ public class OVR_Overlay
     public Texture overlayThumbnailTexture 
     {
         set 
-        {   
-            if(!_overlayIsDashboard || !value)
-                return;
-                
+        {
             _overlayThumbnailTexture = value;
 
             _overlayThumbnailTexture_t.handle = _overlayThumbnailTexture.GetNativeTexturePtr();
