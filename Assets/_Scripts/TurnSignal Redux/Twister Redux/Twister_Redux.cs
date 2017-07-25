@@ -51,13 +51,17 @@ public class Twister_Redux : MonoBehaviour
 
 		if(!lineHolder)
 		{
-			lineHolder = transform.Find("LineHolder").gameObject;
-			if(!lineHolder)
+			Transform t = transform.Find("LineHolder"); 
+			if(!t)
 			{
 				lineHolder = new GameObject("LineHolder");
 				lineHolder.transform.parent = transform;
 				lineHolder.transform.localPosition = Vector3.zero;
+
+				lastArmCount = 0;
 			}
+			else
+				lineHolder = t.gameObject;
 		}
 			
 		if(lastArmCount != armCount || lastArmPoints != armPointCount || lastArmRes != armResolution)
@@ -70,6 +74,7 @@ public class Twister_Redux : MonoBehaviour
 		{
 			SaveChange();
 			UpdateArms();
+
 		}
 	}
 
@@ -101,6 +106,12 @@ public class Twister_Redux : MonoBehaviour
 	{
 		for(int i = 0; i < armLines.Length; i++)
 		{
+			if(i >= points.Length)
+			{
+				lastArmPoints = 0;
+				return;
+			}
+
 			GameObject armO = armObjs[i];
 			LineRenderer arm = armLines[i];
 			Vector3[] armPoints = points[i];
@@ -121,6 +132,7 @@ public class Twister_Redux : MonoBehaviour
 
 	void UpdateArmPoints(Vector3 [] armPoints, float prog, Vector3 origin)
 	{
+		armPoints[0] = Vector3.zero;
 		for(int x = 1; x < armPoints.Length - 1; x++)
 		{
 			float armProg = (float) x / (float) armPoints.Length;
@@ -138,7 +150,7 @@ public class Twister_Redux : MonoBehaviour
 	void UpdateLinePoints(Vector3 [] linePoint, Vector3 [] armPoints)
 	{
 		for(int i = 0; i < linePoint.Length; i++)
-			linePoint[i] = BezierN(armPoints, ( (float) i / (float) linePoint.Length ) );
+			linePoint[i] = BezierNOpt(armPoints, ( (float) i / (float) linePoint.Length ) );
 	}
 
 	void UpdateArmCount()
@@ -237,6 +249,24 @@ public class Twister_Redux : MonoBehaviour
 			nextP[i] = Vector3.Lerp(pN[i], pN[i + 1], prog);
 		
 		return BezierN(nextP, prog);
+	}
+
+	Vector3 BezierNOpt(Vector3 [] pN, float prog, Vector3 [] wrkCpy = null, int indOff = -1)
+	{
+		if(wrkCpy == null)
+		{
+			indOff = pN.Length;
+			wrkCpy = new Vector3[pN.Length];
+			pN.CopyTo(wrkCpy, 0);	
+		}
+
+		if(indOff == 1)
+			return wrkCpy[0];
+
+		for(int i = 0; i < indOff - 1; i++)
+			wrkCpy[i] = Vector3.Lerp(wrkCpy[i], wrkCpy[i + 1], prog);
+		
+		return BezierNOpt(null, prog, wrkCpy, indOff - 1);
 	}
 
 	T CopyComponent<T>(T original, GameObject destination) where T : Component
