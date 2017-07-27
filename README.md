@@ -4,16 +4,32 @@ A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrappi
 
 ---
 
-### NOTE: TurnSignal 2.x Has better coding conventions, uses proper SteamVR startup, and is much better Optimized! Please Upgrade if you have not!
+### Please Note (!):
+ TurnSignal 2.0 (and up) is a much needed optimization upgrade, it uses proper SteamVR auto-startup, less CPU cycles, and is all around better! Please Upgrade if you have not!
 
 ---
-## ScreenShots - (Slightly Outdated Menu, but functionality is same!)
+## ScreenShots - Updated for 2.0!
 
-[How It Looks](https://gfycat.com/InsecureShamelessFlycatcher)
+[How It Looks](https://gfycat.com/ImpressiveUnnaturalAmericansaddlebred)
 
-[How It Works](https://gfycat.com/EllipticalHiddenFulmar)
+[How It Works](https://gfycat.com/DemandingAdorableAntbear)
 
-[The Menu](https://gfycat.com/VariableAmbitiousFieldspaniel)
+[The Menu](https://gfycat.com/EarlySnoopyChihuahua)
+
+['Scale' Setting](https://gfycat.com/WhichSnoopyKite)
+
+['Opacity' Setting](https://gfycat.com/GleamingGivingArchaeopteryx)
+
+['Twist Rate' Setting](https://gfycat.com/FrequentHeartfeltAsianwaterbuffalo)
+
+['Pedals' Setting](https://gfycat.com/CompetentPlainCormorant)
+
+['Use Chaperone Color' Setting](https://gfycat.com/ContentBlueBlueshark) 
+(This one got straight up BORK'ed by the video compression, but the color, it really does match, I promise, if you could see it. Really.)
+
+['Link Opacity and Twist' Setting](https://gfycat.com/HeartfeltLimpGoitered)
+
+[Some Fun Stuff ;3](https://gfycat.com/ThoroughThunderousAmurminnow)
 
 ---
 ## Download:
@@ -28,7 +44,7 @@ To 'Install', please download the 'latest' release from [here](https://github.co
  It should automatically register itself to start with SteamVR, and auto start/close with it from first launch on, but this is a toggle-able option, and can be freely disabled from the Dashboard Menu!
 
 ---
-## Usage Manual:
+## Usage:
 
 After launching the program, the window should be minimized automatically, if not, you can minimize it at your liking!
 
@@ -41,11 +57,13 @@ The Newest Settings menu includes:
 - An Opacity Setting 
 - A Scale Setting 
 - A Twist Rate Setting for manipulating the twist-i-ness levels 
-- A toggle to auto-starting and closing the utility with SteamVR 
+- A Toggle to auto-starting and closing the utility with SteamVR
+- A Toggle to use Chaperone Color instead of white (real time too!) 
+- A Toggle To Link Opacity and Twist'ed-ness together, so it shows clearer the more wrapped up your cord is.
 
 All settings are saved between app sessions, and shouldn't need to be set every time its launched.
 
-As a feature, the utility will still track rotations even when its toggled off from the dashboard menu, (But not closed) so if/when its toggled back on, it will still show turns as if was left on, with the turns intact.
+The utility will still track rotations even when its toggled off from the dashboard menu, so if/when its toggled back on, it will still show turns as if was left on, with the turns intact.
 
 -- Note -- The way Twist Rate affects the ammount of rotation the floor reacts to is actually measured from 0 - 10 (now user set Max) turns in either direction, and given as a 0.0 - 1.0 floating point, with 10 (or user number) turns used as 'max', but it can exceed this without problem, resulting in 'fun' floor shapes that have higher then 1.0 twist values. Just an FYI.
 
@@ -79,6 +97,8 @@ For the UI interaction in the Menu, I wrote a generic UnityUI handler that takes
 
 ---
 
-I think thats that, Credit/CopyRight to Valve for OpenVR/SteamVR stuff.
+I think thats that, Credit/CopyRight to Valve for OpenVR/SteamVR stuff. 
+
+Thanks, and credit, to my friend Mason for some Icon assets I will end up using next release or so! (to replace the butt-ugly ones I made from a screen-snip of the unity window).
 
 Feel free to message me for any questions/comments/feature-requests!
