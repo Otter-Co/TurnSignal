@@ -2364,7 +2364,7 @@ Prefab:
         type: 2}
       propertyPath: thumbNailTexture
       value: 
-      objectReference: {fileID: 2800000, guid: 3b627caaded74c54194e9f08626e21dc, type: 3}
+      objectReference: {fileID: 2800000, guid: e4124a36ab01d1149b72a8405de30844, type: 3}
     - target: {fileID: 114333705838659940, guid: fd42ae69af8a708458be19b5a132b4a9,
         type: 2}
       propertyPath: widthInMeters
