@@ -160,7 +160,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4390720530980658, guid: 37daf2361fe68524a893eb63ceab464f, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 2.35
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4390720530980658, guid: 37daf2361fe68524a893eb63ceab464f, type: 2}
       propertyPath: m_LocalRotation.x
@@ -878,7 +878,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 175333449}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LineHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
