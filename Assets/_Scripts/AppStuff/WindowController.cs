@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 
 public class WindowController : MonoBehaviour
 {
+
+
     public bool minimizeOnStart = false;
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR

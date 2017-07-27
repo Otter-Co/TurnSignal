@@ -21,6 +21,11 @@ public class TurnSignal_Director : MonoBehaviour
 	public TurnSignal_Floor_Redux floorRig;
 	public TurnSignal_Menu_Redux menuRig;
 
+	[Space(10)]
+
+	public int windowWidth = 800;
+    public int windowHeight = 600;
+
 	private TurnSignal_Prefs_Handler prefs;
 
 	private OVR_Handler handler;
@@ -36,10 +41,6 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private bool twistTied = false;
 
-	void Awake()
-	{
-		Screen.SetResolution(800, 600, false);
-	}
 	void Start () 
 	{
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
@@ -56,6 +57,7 @@ public class TurnSignal_Director : MonoBehaviour
 	{
 		onUpdate.Invoke();
 		DirectorUpdate();
+		SetWindowSize();
 	}
 
 	void DirectorUpdate()
@@ -123,4 +125,14 @@ public class TurnSignal_Director : MonoBehaviour
 
 		return e;
 	}
+
+	public void SetWindowSize(int lvl = 0, int maxLvl = 5)
+    {
+		if(Screen.width != windowWidth || Screen.height != windowHeight)
+        	Screen.SetResolution(windowWidth, windowHeight, false);
+
+        if(Screen.width != windowWidth || Screen.height != windowHeight)
+            if(lvl < maxLvl)
+                SetWindowSize(lvl + 1, maxLvl);
+    }
 }
