@@ -15,6 +15,8 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 
 	[Space(10)]
 
+	public bool autoUpdate = true;
+
 	public UnityEvent onSteamVRConnect = new UnityEvent();
 	public UnityEvent onSteamVRDisconnect = new UnityEvent();
 
@@ -26,12 +28,13 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 
 	private float lastSteamVRPollTime = 0f;
 
-	void Start()
+	void Update() 
 	{
-
+		if(autoUpdate)
+			UpdateHandler();
 	}
 
-	void Update () 
+	public void UpdateHandler()
 	{
 		if(!SteamVRStartup())
 			return;

@@ -335,7 +335,12 @@ public class OVR_Overlay
 
             if(OverlayExists && validHandle)
                 if(value)
+                {
                     Overlay.ShowOverlay(_overlayHandle);
+                    if(_overlayIsDashboard)
+                        Overlay.ShowOverlay(_overlayThumbnailHandle);
+                }
+                    
                 else
                     Overlay.HideOverlay(_overlayHandle);
         }
@@ -421,7 +426,7 @@ public class OVR_Overlay
             _overlayThumbnailTexture_t.eType = overlayTextureType;
             _overlayThumbnailTexture_t.eColorSpace = EColorSpace.Auto;
 
-            if(OverlayExists && validHandle)
+            if(OverlayExists && validHandle && overlayIsDashboard)
                 Overlay.SetOverlayTexture(_overlayThumbnailHandle, ref _overlayThumbnailTexture_t);
         }
     }
@@ -478,14 +483,9 @@ public class OVR_Overlay
             return true;   
 
         error = Overlay.DestroyOverlay(_overlayHandle);
+        _created = false;
 
-        if(!ErrorCheck(error))
-        {
-            _created = false;
-            return true;
-        }
-        else
-            return false;
+        return _created;
     }
 
     public bool UpdateCurrentOverlay()
@@ -528,6 +528,14 @@ public class OVR_Overlay
         return !ErrorCheck(error);
     }
 
+    public bool ClearOverlayThumbnailTexture()
+    {
+        if(OverlayExists && validHandle && overlayIsDashboard)
+            error = Overlay.ClearOverlayTexture(_overlayThumbnailHandle);
+
+        return !ErrorCheck(error);
+    }
+
     protected bool PollNextOverlayEvent(ref VREvent_t pEvent)
     {
 		if (!OverlayExists)
@@ -564,7 +572,7 @@ public class OVR_Overlay
             break;
 
             default:
-                Debug.Log("Overlay - " + overlayName + " - : " + eventType);
+                // Debug.Log("Overlay - " + overlayName + " - : " + eventType);
             break;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Valve.VR;
 
 public class TurnSignal_Director : MonoBehaviour 
@@ -24,22 +25,40 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private OVR_Handler handler;
 
+	[Space(10)]
+
+	public int targetFPS = 90;
+
+	[Space(10)]
+	public UnityEvent onUpdate = new UnityEvent();
 
 	private string manifestPath;
 
-	public bool twistTied = false;
-	public float twistOpat = 0f;
+	private bool twistTied = false;
 
+	void Awake()
+	{
+		Screen.SetResolution(800, 600, false);
+	}
 	void Start () 
 	{
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
 
 		handler = OVR_Handler.instance;
+		manifestPath = Application.dataPath + "\\appmanifest.vrmanifest";
 
-		manifestPath = Application.persistentDataPath + "appmanifest.vrmanifest";
+		Debug.Log(manifestPath);
+
+		Application.targetFrameRate = targetFPS;
 	}
 
-	void Update () 
+	void Update() 
+	{
+		onUpdate.Invoke();
+		DirectorUpdate();
+	}
+
+	void DirectorUpdate()
 	{
 		if(twistTied)
 		{
@@ -65,35 +84,43 @@ public class TurnSignal_Director : MonoBehaviour
 
 	public void AddVRManifest()
 	{
-		if(handler == null && handler.Applications == null)
+		if(handler == null || handler.Applications == null)
 			return;
-
-		string manifestText = appManifest.text;
 
 		if(handler.Applications.IsApplicationInstalled(appKey))
 			Debug.Log("App Manifest Already Added!");
-		else if(Application.isEditor)
-			Debug.Log("Added Vr Manifest: " + manifestText);
-		else
+		else 
 		{
+			string manifestText = appManifest.text;
+
 			if(!System.IO.File.Exists(manifestPath))
 				System.IO.File.WriteAllText(manifestPath, manifestText);
+
+			EVRApplicationError error = EVRApplicationError.None;
 			
-			handler.Applications.AddApplicationManifest(manifestPath, false);
-			handler.Applications.SetApplicationAutoLaunch(appKey, true);
+			error = handler.Applications.AddApplicationManifest(manifestPath, false);
+			ErrorCheck(error);
+
+			error = handler.Applications.SetApplicationAutoLaunch(appKey, true);
+			ErrorCheck(error);
 		}
 	}
 
 	public void RemVRManifest()
 	{
-		if(handler.Applications == null)
+		if(handler == null || handler.Applications == null)
 			return;
 
-		if(Application.isEditor)	
-			Debug.Log("Removed Vr Manifest!");
-		else 
-		{
-			handler.Applications.RemoveApplicationManifest(manifestPath);
-		}
+		handler.Applications.RemoveApplicationManifest(manifestPath);
+	}
+
+	bool ErrorCheck(EVRApplicationError err)
+	{
+		bool e = err != EVRApplicationError.None;
+
+		if(e)
+			Debug.Log("App Error: " + handler.Applications.GetApplicationsErrorNameFromEnum(err));
+
+		return e;
 	}
 }

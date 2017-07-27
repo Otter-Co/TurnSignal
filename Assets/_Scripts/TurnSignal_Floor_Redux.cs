@@ -8,6 +8,10 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	public Twister_Redux turnObj;
 
 	[Space(10)]
+
+	public bool autoUpdate = true;
+
+	[Space(10)]
 	public GameObject hmd;
 
 	[Space(10)]
@@ -62,7 +66,8 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 	void Update()
 	{
-		UpdateFloor();
+		if(autoUpdate)
+			UpdateFloor();
 	}
 
 	public void UpdateFloor()

@@ -30,8 +30,13 @@ public class Unity_Overlay : MonoBehaviour
 
 	public Texture overlayTexture;
 	public Camera cameraForTexture;
-
 	public Texture thumbNailTexture;
+
+	[Space(10)]
+	public bool highQualityRenderTex = true;
+	public int renderTexWidthOverride = 0;
+	public int renderTexHeightOverride = 0;
+	
 
 	[Space(10)]
 
@@ -85,8 +90,8 @@ public class Unity_Overlay : MonoBehaviour
 
 	private float reverseAspect = 0f;
 
-	private Color originalColor = Color.white;
-
+	private bool useChapColor = false;
+	private Color lastColor = Color.black;
 
 	// Some methods to make UI stuff easier
 	public void ToggleEnable()
@@ -106,11 +111,7 @@ public class Unity_Overlay : MonoBehaviour
 
 	public void SetToChaperoneColor(bool setToChapColor)
 	{
-		Debug.Log("Use Chap Color: " + setToChapColor);
-		if(setToChapColor)
-			overlay.overlayColor = GetChaperoneColor();
-		else
-			overlay.overlayColor = colorTint;
+		useChapColor = setToChapColor;
 	}
 
 	void Start () 
@@ -119,13 +120,19 @@ public class Unity_Overlay : MonoBehaviour
 
 		if(cameraForTexture != null)
 		{
-			int width = (int) (cameraForTexture.pixelWidth);
-			int height = (int) (cameraForTexture.pixelHeight);
+			int width = renderTexWidthOverride != 0 ? renderTexWidthOverride : (int) (cameraForTexture.pixelWidth);
+			int height = renderTexHeightOverride != 0 ? renderTexHeightOverride : (int) (cameraForTexture.pixelHeight);
 
-			cameraTexture = new RenderTexture(width, height, 24);
-			cameraForTexture.targetTexture = cameraTexture;
 			cameraForTexture.enabled = false;
+			cameraTexture = new RenderTexture(width, height, 24);
 
+			if(highQualityRenderTex)
+			{
+				cameraTexture.antiAliasing = 8;
+				cameraTexture.filterMode = FilterMode.Trilinear;
+			}
+
+			cameraForTexture.targetTexture = cameraTexture;
 			overlayTexture = cameraTexture;
 		}
 
@@ -136,6 +143,12 @@ public class Unity_Overlay : MonoBehaviour
 
 		if(isDashboardOverlay)
 			overlay.overlayIsDashboard = true;
+
+		textureBounds.uMin = 0;
+		textureBounds.vMin = 1;
+
+		textureBounds.uMax = 1;
+		textureBounds.vMax = 0;
 	}
 
 	void OnDestroy()
@@ -166,89 +179,43 @@ public class Unity_Overlay : MonoBehaviour
 	{
 		if(!ovrHandler.OpenVRConnected)
 			return;
-
-		if(ovrHandler.OpenVRConnected && !overlay.created)
+		
+		if(!overlay.created)
 		{
 			if(!overlay.CreateOverlay())
 			{
 				Debug.Log("Failed to create overlay!");
 				return;
 			}
-			else
-				Debug.Log("Created Overlay!");
+			
+			Debug.Log("Created Overlay!");
 		}
-		
-		UpdateOpts();
-		UpdateTexture();
-		UpdateMouse();
 
-		if(enableSimulatedMouse && overlayTexture)
+		if(useChapColor)
 		{
-			var mPos = overlay.overlayMousePosition;
-			if(mPos.x < 0f || mPos.x > 1f || mPos.y < 0f || mPos.y > 1f)
-				return;
-	
-			mousePos.x = overlayTexture.width * mPos.x;
-			mousePos.y = overlayTexture.height * ( 1f - (mPos.y / reverseAspect) );
-
-			if(simulateUnityMouseInput)
+			Color chapCol = GetChaperoneColor();
+			if(chapCol != lastColor)
 			{
-				var pd = uiHandler.pD;
-
-				pd.position = mousePos;
-				pd.button = PointerEventData.InputButton.Left;
-
-				if(mouseDown && !mouseDragging)
-				{
-					pd.Reset();
-					pd.clickCount = 1;
-				}
-				else if(mouseDown && mouseDragging)
-				{
-					pd.clickCount = 0;
-					pd.clickTime += mouseDownTime;
-					pd.dragging = true;
-				}
-
-				var nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
-
-				uiHandler.EnterTargets(nTargs);
-
-				foreach(Selectable ub in nTargs)
-					if(enterTargets.Contains(ub))
-						enterTargets.Remove(ub);
-
-				uiHandler.ExitTargets(enterTargets);
-				enterTargets = nTargs;
-
-				if(mouseDown)
-				{
-					if(!mouseDragging)
-					{
-						foreach(Selectable sel in nTargs)
-							downTargets.Add(sel);
-
-						uiHandler.SubmitTargets(downTargets);
-						uiHandler.StartDragTargets(downTargets);
-						uiHandler.DownTargets(downTargets);
-					}
-					else
-					{
-						uiHandler.MoveTargets(downTargets);
-						uiHandler.DragTargets(downTargets);
-						uiHandler.DownTargets(downTargets);
-					}
-				}
-				else
-				{
-					uiHandler.UpTargets(downTargets);
-					uiHandler.EndDragTargets(downTargets);
-					uiHandler.DropTargets(downTargets);
-
-					downTargets.Clear();
-				}
+				overlay.overlayColor = chapCol;
+				lastColor = chapCol;
 			}
 		}
+		else if (lastColor != Color.black)
+		{
+			overlay.overlayColor = colorTint;
+			lastColor = Color.black;
+		}
+
+		UpdateOpts();
+
+		DrawOverlayThumbnail();
+		UpdateTexture();
+
+		if(enableSimulatedMouse)
+			UpdateMouse();
+
+		if(enableSimulatedMouse && simulateUnityMouseInput)
+				UpdateUnityMouseSim();
 	}
 
 	void UpdateMouse()
@@ -268,43 +235,107 @@ public class Unity_Overlay : MonoBehaviour
 			mouseDragging = false;
 			mouseDownTime = 0f;
 		}
+
+		if(overlayTexture)
+		{
+			var mPos = overlay.overlayMousePosition;
+			if(mPos.x < 0f || mPos.x > 1f || mPos.y < 0f || mPos.y > 1f)
+				return;
+
+			mousePos.x = overlayTexture.width * mPos.x;
+			mousePos.y = overlayTexture.height * ( 1f - (mPos.y / reverseAspect) );
+		}
+	}
+
+	void UpdateUnityMouseSim()
+	{
+		var pd = uiHandler.pD;
+
+		pd.position = mousePos;
+		pd.button = PointerEventData.InputButton.Left;
+
+		if(mouseDown && !mouseDragging)
+		{
+			pd.Reset();
+			pd.clickCount = 1;
+		}
+		else if(mouseDown && mouseDragging)
+		{
+			pd.clickCount = 0;
+			pd.clickTime += mouseDownTime;
+			pd.dragging = true;
+		}
+
+		var nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
+
+		uiHandler.EnterTargets(nTargs);
+
+		foreach(Selectable ub in nTargs)
+			if(enterTargets.Contains(ub))
+				enterTargets.Remove(ub);
+
+		uiHandler.ExitTargets(enterTargets);
+		enterTargets = nTargs;
+
+		if(mouseDown)
+		{
+			if(!mouseDragging)
+			{
+				foreach(Selectable sel in nTargs)
+					downTargets.Add(sel);
+
+				uiHandler.SubmitTargets(downTargets);
+				uiHandler.StartDragTargets(downTargets);
+				uiHandler.DownTargets(downTargets);
+			}
+			else
+			{
+				uiHandler.MoveTargets(downTargets);
+				uiHandler.DragTargets(downTargets);
+				uiHandler.DownTargets(downTargets);
+			}
+		}
+		else
+		{
+			uiHandler.UpTargets(downTargets);
+			uiHandler.EndDragTargets(downTargets);
+			uiHandler.DropTargets(downTargets);
+
+			downTargets.Clear();
+		}
 	}
 
 	void UpdateTexture()
 	{
+		if(!overlay.created)
+			return;
+
 		if(cameraForTexture)
 			cameraForTexture.Render();
 
 		if(!overlayTexture)
 			return;
 
-		float width = overlayTexture.width;
-		float height = overlayTexture.height;
-
-		textureBounds.uMin = 0;
-		textureBounds.vMin = 1;
-
-		textureBounds.uMax = 1;
-		textureBounds.vMax = 0;
-
+		DrawOverlayThumbnail();
+		
+		overlay.overlayWidthInMeters = widthInMeters;
 		overlay.overlayTextureBounds = textureBounds;
+		overlay.overlayMouseScale = mouseScale_t;
+
+		reverseAspect = (float) overlayTexture.height / (float) overlayTexture.width;
+		mouseScale.y = mouseScale_t.v1 = reverseAspect;
 
 		overlay.overlayTexture = overlayTexture;
-		overlay.overlayWidthInMeters = widthInMeters;
-		
-		reverseAspect = (float) overlayTexture.height / (float) overlayTexture.width;
 
-		mouseScale.y = mouseScale_t.v1 = reverseAspect;
-		overlay.overlayMouseScale = mouseScale_t;
-			
-		if(isDashboardOverlay && isDashboardOverlay)
+	}
+
+	void DrawOverlayThumbnail()
+	{
+		if(isDashboardOverlay && thumbNailTexture)
 		{
 			overlay.overlayThumbnailTextureBounds = textureBounds;
 			overlay.overlayThumbnailTexture = thumbNailTexture;
-
-			
 		}
-			
 	}
 
 	void UpdateOpts()

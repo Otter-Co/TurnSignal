@@ -5,6 +5,9 @@ using UnityEngine;
 [ExecuteInEditMode()]
 public class Twister_Redux : MonoBehaviour 
 {
+	public bool autoUpdate = true;
+
+	[Space(10)]
 	public int armCount = 6;
 	public int armPointCount = 15;
 	public int armResolution = 25;
@@ -45,6 +48,12 @@ public class Twister_Redux : MonoBehaviour
 		armCount = pedals;
 	}
 	void Update() 
+	{
+		if(autoUpdate)
+			UpdateTwister();
+	}
+
+	public void UpdateTwister()
 	{
 		if(!baseLine)
 			baseLine = transform.Find("Line").gameObject;
