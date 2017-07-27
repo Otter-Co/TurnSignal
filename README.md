@@ -1,5 +1,7 @@
 TurnSignal (New 2.0!)
 =
+
+![TurnSignal Icon](/Assets/_Res/turnsignal-v2.png)
 A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrapping/Tangling in SteamVR.
 
 ---
@@ -99,7 +101,7 @@ For the UI interaction in the Menu, I wrote a generic UnityUI handler that takes
 
 I think thats that, Credit/CopyRight to Valve for OpenVR/SteamVR stuff. 
 
-Thanks, and credit, to my friend Mason for some Icon assets I will end up using next release or so! (to replace the butt-ugly ones I made from a screen-snip of the unity window).
+Thanks and credit to my friend Mason Halstead (141art) for The Icon asset!
 
 Special thanks to [matzman666](https://github.com/matzman666) for giving me super-helpful resources for the SteamVR AutoStart App-Manifest, and Chaperone Color Retrivial Stuff, which he posted [Here!](https://www.reddit.com/r/Vive/comments/6oqspt/turnsignal_a_small_ingame_vr_utility_i_built_to/dkn6pj7/)
 
