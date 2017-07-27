@@ -101,4 +101,6 @@ I think thats that, Credit/CopyRight to Valve for OpenVR/SteamVR stuff.
 
 Thanks, and credit, to my friend Mason for some Icon assets I will end up using next release or so! (to replace the butt-ugly ones I made from a screen-snip of the unity window).
 
+Special thanks to [matzman666](https://github.com/matzman666) for giving me super-helpful resources for the SteamVR AutoStart App-Manifest, and Chaperone Color Retrivial Stuff, which he posted [Here!](https://www.reddit.com/r/Vive/comments/6oqspt/turnsignal_a_small_ingame_vr_utility_i_built_to/dkn6pj7/)
+
 Feel free to message me for any questions/comments/feature-requests!
