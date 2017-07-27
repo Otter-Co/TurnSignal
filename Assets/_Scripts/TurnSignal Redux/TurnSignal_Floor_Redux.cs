@@ -32,6 +32,34 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	public float initialRotation = 0f;
 	public float curRotation = 0f;
 
+	public float turnProgress = 0f;
+
+
+	// Methods to make UI easier;
+	public void ResetRotationTracking()
+	{
+		rawTurns = 0f;
+		lastDiff = 0f;
+		initialRotation = 0f;
+	}
+
+	public void AddMaxTurn()
+	{
+		maxTurns += 1;
+	}
+
+	public void SubMaxTurn()
+	{
+		if(maxTurns - 1 > 0)
+			maxTurns -= 1;
+	}
+
+	public void SetMaxTurns(float t)
+	{
+		int turns = (int) t;
+		maxTurns = turns;
+	}
+
 	void Update()
 	{
 		UpdateFloor();
@@ -65,6 +93,7 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		rawTurns += diff;
 
 		turns = (int) ( ( Mathf.Abs(rawTurns) + turnTolerance ) / 360f );
+		turnProgress = Mathf.Abs(rawTurns) / (float) (maxTurns * 360f);
 
 		lastDiff = diff;
 	}
@@ -72,23 +101,5 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	void UpdateTurnObj()
 	{
 		turnObj.twist = rawTurns / (maxTurns * 360f);
-	}
-
-	public void ResetRotationTracking()
-	{
-		rawTurns = 0f;
-		lastDiff = 0f;
-		initialRotation = 0f;
-	}
-
-	public void AddMaxTurn()
-	{
-		maxTurns += 1;
-	}
-
-	public void SubMaxTurn()
-	{
-		if(maxTurns - 1 > 0)
-			maxTurns -= 1;
 	}
 }

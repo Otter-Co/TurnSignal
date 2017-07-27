@@ -594,7 +594,7 @@ public class OVR_Overlay
     {
         bool err = (error != EVROverlayError.None);
 
-        if(OverlayExists)
+        if(err)
             Debug.Log("Error: " + Overlay.GetOverlayErrorNameFromEnum(error));
 
         return err;

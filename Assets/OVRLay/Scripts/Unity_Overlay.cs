@@ -83,8 +83,35 @@ public class Unity_Overlay : MonoBehaviour
 
 	protected Unity_Overlay_UI_Handler uiHandler = new Unity_Overlay_UI_Handler();
 
-	public float reverseAspect = 0f;
+	private float reverseAspect = 0f;
 
+	private Color originalColor = Color.white;
+
+
+	// Some methods to make UI stuff easier
+	public void ToggleEnable()
+	{
+		gameObject.SetActive(!gameObject.activeSelf);
+	}
+
+	public void SetOpacity(float o)
+	{
+		opacity = o;
+	}
+
+	public void SetScale(float s)
+	{
+		widthInMeters = s;
+	}
+
+	public void SetToChaperoneColor(bool setToChapColor)
+	{
+		Debug.Log("Use Chap Color: " + setToChapColor);
+		if(setToChapColor)
+			overlay.overlayColor = GetChaperoneColor();
+		else
+			overlay.overlayColor = colorTint;
+	}
 
 	void Start () 
 	{
@@ -95,18 +122,12 @@ public class Unity_Overlay : MonoBehaviour
 			int width = (int) (cameraForTexture.pixelWidth);
 			int height = (int) (cameraForTexture.pixelHeight);
 
-			Debug.Log("Width: " + width);
-			Debug.Log("Height: " + height);
-
 			cameraTexture = new RenderTexture(width, height, 24);
 			cameraForTexture.targetTexture = cameraTexture;
 			cameraForTexture.enabled = false;
 
 			overlayTexture = cameraTexture;
 		}
-
-		Debug.Log("Width: " + overlayTexture.width);
-		Debug.Log("Height: " + overlayTexture.height);
 
 		overlay.overlayTextureType = SystemInfo.graphicsDeviceVersion.StartsWith("OpenGL") ? ETextureType.OpenGL : ETextureType.DirectX;
 		
@@ -390,6 +411,30 @@ public class Unity_Overlay : MonoBehaviour
 			opts.mouseScale = mouseScale;
 		}
 	}
+
+	public Color GetChaperoneColor()
+	{
+		Color ret = new Color(1,1,1,1);
+
+		if(ovrHandler.Settings == null)
+			return ret;
+
+		var collSec = OpenVR.k_pch_CollisionBounds_Section;
+		var error = EVRSettingsError.None;
+
+		int r = 255, g = 255, b = 255, a = 255;
+		r = ovrHandler.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaR_Int32, ref error);
+		g = ovrHandler.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaG_Int32, ref error);
+		b = ovrHandler.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaB_Int32, ref error);
+		a = ovrHandler.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaA_Int32, ref error);
+
+		ret.r = (float) r / 255;
+		ret.g = (float) g / 255;
+		ret.b = (float) b / 255;
+		ret.a = (float) a / 255;
+
+		return ret;
+	}
 }
 
 public struct Unity_Overlay_Opts 
@@ -476,9 +521,6 @@ public class Unity_Overlay_UI_Handler
 	{
 		Selectable sel = go.GetComponentInParent<Selectable>();
 
-		if(sel)
-			Debug.Log(sel.gameObject.name);
-
 		return sel;
 	}
 
@@ -541,4 +583,6 @@ public class Unity_Overlay_UI_Handler
 		foreach(Selectable b in t)
 			ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.dropHandler);
 	}
+
+
 }

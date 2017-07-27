@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Unity_SteamVR_Handler : MonoBehaviour 
 {
@@ -11,6 +12,12 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 	public GameObject hmdObject;
 	public GameObject rightTrackerObj;
 	public GameObject leftTrackerObj;
+
+	[Space(10)]
+
+	public UnityEvent onSteamVRConnect = new UnityEvent();
+	public UnityEvent onSteamVRDisconnect = new UnityEvent();
+
 
 	private OVR_Handler ovrHandler = OVR_Handler.instance;
 
@@ -71,6 +78,9 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 			else
 			{
 				Debug.Log("Connected to SteamVR!");
+				
+				onSteamVRConnect.Invoke();
+
 				return true;
 			}		
 		}

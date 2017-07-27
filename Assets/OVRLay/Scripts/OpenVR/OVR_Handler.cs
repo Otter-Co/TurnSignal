@@ -83,23 +83,12 @@ public class OVR_Handler : System.IDisposable
     }
     public void GetOpenVRExistingInterfaces()
     {
-        // _VRSystem = OpenVR.System;
         _Compositor = OpenVR.Compositor;
         _Chaperone = OpenVR.Chaperone;
         _ChaperoneSetup = OpenVR.ChaperoneSetup;
         _Overlay = OpenVR.Overlay;
         _Settings = OpenVR.Settings;
         _Applications = OpenVR.Applications;
-
-        HmdColor_t chapColor = new HmdColor_t();
-        HmdColor_t outputColor = new HmdColor_t();
-
-        chapColor.r = 0f;
-
-        Chaperone.GetBoundsColor(ref chapColor, 6, 0f, ref outputColor);
-
-        Debug.Log(new Color(chapColor.r, chapColor.g, chapColor.b, chapColor.a));
-        Debug.Log(new Color(outputColor.r, outputColor.g, outputColor.b, outputColor.a));
     }
 
     public bool ShutDownOpenVR()
@@ -147,7 +136,7 @@ public class OVR_Handler : System.IDisposable
             break;
 
             default:
-                Debug.Log(type);        
+                Debug.Log("OVR_Handler Event: " + type);        
             break;
         }
     }
