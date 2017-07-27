@@ -4,7 +4,7 @@ A minimalistic intuitive visual IN-GAME utility for keeping track of Cord Wrappi
 
 ---
 
-### !! NOTE: TurnSignal 2.x Has better coding conventions, uses proper SteamVR startup, and is much better Optimized! Please Upgrade if you have not !!
+### NOTE: TurnSignal 2.x Has better coding conventions, uses proper SteamVR startup, and is much better Optimized! Please Upgrade if you have not!
 
 ---
 ## ScreenShots - (Slightly Outdated Menu, but functionality is same!)
