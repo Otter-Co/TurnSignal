@@ -1947,6 +1947,23 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1260339189}
   m_Script: {fileID: 11500000, guid: 0137c220a4bdf984ebf4bf02b6d1c7f8, type: 3}
+--- !u!1 &1643321438 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1079058165180284, guid: 8e8fae0b7aab48e46aee903bd9e8fd84,
+    type: 2}
+  m_PrefabInternal: {fileID: 1260339189}
+--- !u!114 &1643321439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1643321438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fc0146618a841041b7cc4419ba6ece9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minimizeOnStart: 1
 --- !u!4 &1829930776 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4390720530980658, guid: 37daf2361fe68524a893eb63ceab464f,

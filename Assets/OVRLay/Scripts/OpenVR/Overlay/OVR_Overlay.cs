@@ -18,7 +18,7 @@ public class OVR_Overlay
     public bool overlayIsDashboard 
     {
         get { return _overlayIsDashboard; }
-        set { _overlayIsDashboard = true; }
+        set { _overlayIsDashboard = value; }
     }
 
     protected bool validHandle
@@ -27,11 +27,12 @@ public class OVR_Overlay
         {
             return _overlayHandle != OpenVR.k_ulOverlayHandleInvalid;
         } 
-}
+    }
+
     protected ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
     public ulong overlayHandle { get { return _overlayHandle; } }
 
-    private ulong _overlayThumbnailHandle = 0;
+    private ulong _overlayThumbnailHandle = OpenVR.k_ulOverlayHandleInvalid;
     private ulong overlayThumbnailHandle { get { return _overlayThumbnailHandle; } }
 
     protected string _overlayName = "OpenVR Overlay";
@@ -426,7 +427,7 @@ public class OVR_Overlay
             _overlayThumbnailTexture_t.eType = overlayTextureType;
             _overlayThumbnailTexture_t.eColorSpace = EColorSpace.Auto;
 
-            if(OverlayExists && validHandle && overlayIsDashboard)
+            if(OverlayExists && overlayIsDashboard)
                 Overlay.SetOverlayTexture(_overlayThumbnailHandle, ref _overlayThumbnailTexture_t);
         }
     }

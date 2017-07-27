@@ -190,6 +190,8 @@ public class Unity_Overlay : MonoBehaviour
 			
 			Debug.Log("Created Overlay!");
 		}
+		
+		DrawOverlayThumbnail();
 
 		if(useChapColor)
 		{
@@ -207,8 +209,6 @@ public class Unity_Overlay : MonoBehaviour
 		}
 
 		UpdateOpts();
-
-		DrawOverlayThumbnail();
 		UpdateTexture();
 
 		if(enableSimulatedMouse)

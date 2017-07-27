@@ -2,9 +2,9 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-public class HeadlessScript : MonoBehaviour
+public class WindowController : MonoBehaviour
 {
-    public bool hide = false;
+    public bool minimizeOnStart = false;
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
 
@@ -37,6 +37,8 @@ public class HeadlessScript : MonoBehaviour
 
         if (winHandle == IntPtr.Zero) 
             return;
+        else if(minimizeOnStart)
+            MinimizeUnityWindow();
     }
 
 #else
@@ -63,6 +65,12 @@ public class HeadlessScript : MonoBehaviour
     {
         bool res = ShowWindow(winHandle, (uint) 5);
         Debug.Log("Try Show Window: " + res);
+        return res;
+    }
+
+    public bool MinimizeUnityWindow()
+    {
+        bool res = ShowWindow(winHandle, (uint) 6);
         return res;
     }
 }
