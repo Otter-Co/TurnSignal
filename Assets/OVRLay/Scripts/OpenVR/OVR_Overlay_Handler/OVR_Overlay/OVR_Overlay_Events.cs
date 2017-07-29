@@ -99,7 +99,7 @@ public partial class OVR_Overlay
                 else
                 {
                     System.Text.StringBuilder txtB = new System.Text.StringBuilder(1024);
-                    uint size = Overlay.GetKeyboardText(txtB, 1024);
+                    Overlay.GetKeyboardText(txtB, 1024);
                     txt = txtB.ToString();
                 }
 

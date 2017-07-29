@@ -9,7 +9,6 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     {
         get 
         {
-            
             _Scale = PlayerPrefs.GetFloat("scale", 2f);
             return _Scale;
         }
@@ -49,6 +48,17 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             PlayerPrefs.SetInt("twistrate", _TwistRate);
         }
     }
+    public float TwistRateF
+    {
+        get 
+        {
+            return (float) TwistRate;
+        }
+        set 
+        {
+            TwistRate = (int) value;
+        }
+    }
 
     private int _Pedals = 6;
     public int Pedals 
@@ -64,7 +74,17 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             PlayerPrefs.SetInt("pedalcount", value);
         }
     }
-
+    public float PedalsF
+    {
+        get 
+        {
+            return (float) Pedals;
+        }
+        set 
+        {
+            Pedals = (int) value;
+        }
+    }
     private bool _StartWithSteamVR = true;
     public bool StartWithSteamVR
     {
@@ -108,6 +128,21 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         {
             _LinkOpacityWithTwist = value;
             PlayerPrefs.SetInt("linktwistalpha", _LinkOpacityWithTwist ? 1 : 0);
+        }
+    }
+
+    private bool _OnlyShowInDashboard = false;
+    public bool OnlyShowInDashboard 
+    {
+        get 
+        {
+            _OnlyShowInDashboard = (PlayerPrefs.GetInt("onlyshowindash", 0) == 1);
+            return _OnlyShowInDashboard;
+        }
+        set 
+        {
+            _OnlyShowInDashboard = value;
+            PlayerPrefs.SetInt("onlyshowindash", (_OnlyShowInDashboard ? 1 : 0));
         }
     }
 

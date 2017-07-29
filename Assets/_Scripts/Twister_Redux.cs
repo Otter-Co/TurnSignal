@@ -11,7 +11,7 @@ public class Twister_Redux : MonoBehaviour
 	public int armCount = 6;
 	public int armPointCount = 15;
 	public int armResolution = 25;
-
+	
 
 	[Space(10)]
 	public float outerDiameter = 1f;
