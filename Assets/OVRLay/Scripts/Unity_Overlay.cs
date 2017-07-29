@@ -21,6 +21,7 @@ public class Unity_Overlay : MonoBehaviour
 	public string overlayKey = "unity_overlay";
 
 	public bool isDashboardOverlay = false;
+	public bool onlyShowInDashboard = false;
 
 	[Space(10)]
 
@@ -75,7 +76,7 @@ public class Unity_Overlay : MonoBehaviour
 
 	protected VRTextureBounds_t textureBounds = new VRTextureBounds_t();
 	protected HmdVector2_t mouseScale_t = new HmdVector2_t();
-	protected SteamVR_Utils.RigidTransform matrixConverter;
+	protected OVR_Utils.RigidTransform matrixConverter;
 
 	private HashSet<Selectable> enterTargets = new HashSet<Selectable>();
 	private HashSet<Selectable> downTargets = new HashSet<Selectable>();
@@ -116,7 +117,7 @@ public class Unity_Overlay : MonoBehaviour
 
 	void Start () 
 	{
-		matrixConverter = new SteamVR_Utils.RigidTransform(transform);
+		matrixConverter = new OVR_Utils.RigidTransform(transform);
 
 		if(cameraForTexture != null)
 		{
