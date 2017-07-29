@@ -42,10 +42,10 @@ public class Twister_Redux : MonoBehaviour
 	private Vector3 [][] points = new Vector3[0][];
 	private Vector3 [][] linePoints = new Vector3[0][];
 
-	public void SetPedals(float p)
+	public void SetPetals(float p)
 	{
-		int pedals = (int) p;
-		armCount = pedals;
+		int petals = (int) p;
+		armCount = petals;
 	}
 	void Update() 
 	{

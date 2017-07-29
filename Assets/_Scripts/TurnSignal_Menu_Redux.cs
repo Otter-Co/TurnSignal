@@ -13,7 +13,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	public Slider scaleSlider;
 	public Slider opacitySlider;
 	public Slider twistRateSlider;
-	public Slider pedalSlider;
+	public Slider petalSlider;
 
 	[Space(5)]
 
@@ -27,12 +27,12 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		SetUIValues();
 	}
 
-	void SetUIValues()
+	public void SetUIValues()
 	{	
 		scaleSlider.value = prefs.Scale;
 		opacitySlider.value = prefs.Opacity;
 		twistRateSlider.value = prefs.TwistRate;
-		pedalSlider.value = prefs.Pedals;
+		petalSlider.value = prefs.Petals;
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;

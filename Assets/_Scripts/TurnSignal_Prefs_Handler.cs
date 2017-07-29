@@ -60,29 +60,29 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    private int _Pedals = 6;
-    public int Pedals 
+    private int _Petals = 6;
+    public int Petals 
     {
         get 
         {
-            _Pedals = PlayerPrefs.GetInt("pedalcount", 6);
-            return _Pedals;
+            _Petals = PlayerPrefs.GetInt("petalcount", 6);
+            return _Petals;
         }
         set 
         {
-            _Pedals = value;
-            PlayerPrefs.SetInt("pedalcount", value);
+            _Petals = value;
+            PlayerPrefs.SetInt("petalcount", value);
         }
     }
-    public float PedalsF
+    public float PetalsF
     {
         get 
         {
-            return (float) Pedals;
+            return (float) Petals;
         }
         set 
         {
-            Pedals = (int) value;
+            Petals = (int) value;
         }
     }
     private bool _StartWithSteamVR = true;
