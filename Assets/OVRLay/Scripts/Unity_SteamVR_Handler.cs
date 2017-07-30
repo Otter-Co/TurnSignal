@@ -32,6 +32,17 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 	{
 		// Will always do a check on start first, then use timer for polling
 		lastSteamVRPollTime = steamVRPollTime + 1f;
+		ovrHandler.onOpenVRChange += OnOpenVRChange;
+	}
+
+	void OnOpenVRChange(bool connected) 
+	{
+		if(!connected)
+		{
+			onSteamVRDisconnect.Invoke();
+			ovrHandler.ShutDownOpenVR();
+		}
+			
 	}
 
 	void Update() 
