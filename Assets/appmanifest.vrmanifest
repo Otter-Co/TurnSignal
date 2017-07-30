@@ -1,0 +1,18 @@
+{
+    "source": "builtin",
+    "applications": [
+        {
+            "app_key": "otterco.TurnSignal",
+            "launch_type": "binary",
+            "binary_path_windows": "../TurnSignal.exe",
+            "is_dashboard_overlay": true,
+
+            "strings": {
+                "en_us": {
+                    "name": "TurnSignal",
+                    "description": "TurnSignal, an Anti-Cord-Twist Utility."
+                }
+            }
+        }
+    ]
+}
