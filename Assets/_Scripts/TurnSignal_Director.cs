@@ -26,36 +26,39 @@ public class TurnSignal_Director : MonoBehaviour
 	public int windowWidth = 800;
     public int windowHeight = 600;
 
-	private TurnSignal_Prefs_Handler prefs;
-
-	private OVR_Handler handler;
-
 	[Space(10)]
 
 	public int targetFPS = 90;
 
 	[Space(10)]
-	public UnityEvent onUpdate = new UnityEvent();
+
+
+	private TurnSignal_Prefs_Handler prefs;
+
+	private OVR_Handler handler;
 
 	private string manifestPath;
 
 	private bool twistTied = false;
 
+	// Methods for Easy UI.
+	public void LinkOpacityWithTwist(bool linked)
+	{
+		twistTied = linked;
+	}
+
 	void Start () 
 	{
-		prefs = GetComponent<TurnSignal_Prefs_Handler>();
-
-		handler = OVR_Handler.instance;
-		manifestPath = Application.dataPath + "\\appmanifest.vrmanifest";
-
-		Debug.Log(manifestPath);
-
 		Application.targetFrameRate = targetFPS;
+
+		prefs = GetComponent<TurnSignal_Prefs_Handler>();
+		handler = OVR_Handler.instance;
+
+		manifestPath = Application.dataPath + "\\appmanifest.vrmanifest";
 	}
 
 	void Update() 
 	{
-		onUpdate.Invoke();
 		DirectorUpdate();
 		SetWindowSize();
 	}
@@ -70,50 +73,70 @@ public class TurnSignal_Director : MonoBehaviour
 		else if(floorOverlay.opacity != prefs.Opacity)
 			floorOverlay.opacity = prefs.Opacity;
 	}
+	public void SetWindowSize(int lvl = 0, int maxLvl = 5)
+    {
+		if(Screen.width != windowWidth || Screen.height != windowHeight)
+        	Screen.SetResolution(windowWidth, windowHeight, false);
 
-	public void LinkOpacityWithTwist(bool linked)
-	{
-		twistTied = linked;
-	}
+        if(Screen.width != windowWidth || Screen.height != windowHeight)
+            if(lvl < maxLvl)
+                SetWindowSize(lvl + 1, maxLvl);
+    }
 
-	public void StartWithSteamVR(bool enableStart)
+	public void OnSteamVRConnect()
 	{
-		if(enableStart)
-			AddVRManifest();
+		if(CreateVRManifest() && AddVRManifest())
+			Debug.Log("Successfully Installed App to SteamVR");
 		else
-			RemVRManifest();
-	}
-
-	public void AddVRManifest()
-	{
-		if(handler == null || handler.Applications == null)
-			return;
-
-		if(handler.Applications.IsApplicationInstalled(appKey))
-			Debug.Log("App Manifest Already Added!");
-		else 
 		{
-			string manifestText = appManifest.text;
-
-			if(!System.IO.File.Exists(manifestPath))
-				System.IO.File.WriteAllText(manifestPath, manifestText);
-
-			EVRApplicationError error = EVRApplicationError.None;
-			
-			error = handler.Applications.AddApplicationManifest(manifestPath, false);
-			ErrorCheck(error);
-
-			error = handler.Applications.SetApplicationAutoLaunch(appKey, true);
-			ErrorCheck(error);
+			Debug.Log("Error Installing App to SteamVR!");
+			return;
 		}
+
+		prefs.StartWithSteamVR = GetManifestAutoLaunch();
+		menuRig.SetUIValues();
 	}
 
-	public void RemVRManifest()
+	public bool CreateVRManifest()
+	{
+		string manifestText = appManifest.text;
+		System.IO.File.WriteAllText(manifestPath, manifestText);
+
+		return System.IO.File.Exists(manifestPath);
+	}
+
+	public bool AddVRManifest()
 	{
 		if(handler == null || handler.Applications == null)
-			return;
+			return false;
+
+		EVRApplicationError error = EVRApplicationError.None;
+		error = handler.Applications.AddApplicationManifest(manifestPath, false);
+		if(ErrorCheck(error))
+			return false;
+
+		return handler.Applications.IsApplicationInstalled(appKey);
+	}
+
+	public void SetManifestAutoLaunch(bool autoLaunch)
+	{
+		if(handler != null && handler.Applications != null)
+			handler.Applications.SetApplicationAutoLaunch(appKey, autoLaunch);
+	}
+
+	public bool GetManifestAutoLaunch()
+	{
+		return (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false; 
+	}
+
+	public bool RemoveVRManifest()
+	{
+		if(handler == null || handler.Applications == null)
+			return false;
 
 		handler.Applications.RemoveApplicationManifest(manifestPath);
+
+		return !handler.Applications.IsApplicationInstalled(appKey);
 	}
 
 	bool ErrorCheck(EVRApplicationError err)
@@ -125,14 +148,4 @@ public class TurnSignal_Director : MonoBehaviour
 
 		return e;
 	}
-
-	public void SetWindowSize(int lvl = 0, int maxLvl = 5)
-    {
-		if(Screen.width != windowWidth || Screen.height != windowHeight)
-        	Screen.SetResolution(windowWidth, windowHeight, false);
-
-        if(Screen.width != windowWidth || Screen.height != windowHeight)
-            if(lvl < maxLvl)
-                SetWindowSize(lvl + 1, maxLvl);
-    }
 }

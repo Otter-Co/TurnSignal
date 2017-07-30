@@ -21,6 +21,7 @@ public class Unity_Overlay : MonoBehaviour
 	public string overlayKey = "unity_overlay";
 
 	public bool isDashboardOverlay = false;
+	public bool onlyShowInDashboard = false;
 
 	[Space(10)]
 
@@ -75,7 +76,7 @@ public class Unity_Overlay : MonoBehaviour
 
 	protected VRTextureBounds_t textureBounds = new VRTextureBounds_t();
 	protected HmdVector2_t mouseScale_t = new HmdVector2_t();
-	protected SteamVR_Utils.RigidTransform matrixConverter;
+	protected OVR_Utils.RigidTransform matrixConverter;
 
 	private HashSet<Selectable> enterTargets = new HashSet<Selectable>();
 	private HashSet<Selectable> downTargets = new HashSet<Selectable>();
@@ -92,6 +93,11 @@ public class Unity_Overlay : MonoBehaviour
 
 	private bool useChapColor = false;
 	private Color lastColor = Color.black;
+
+	public bool lastVisible = false;
+
+
+	private bool isDashboardOpen = true;
 
 	// Some methods to make UI stuff easier
 	public void ToggleEnable()
@@ -113,10 +119,27 @@ public class Unity_Overlay : MonoBehaviour
 	{
 		useChapColor = setToChapColor;
 	}
+	public void SetOnlyShowInDashboard(bool enble)
+	{
+		onlyShowInDashboard = enble;
+	}
+
+	// Event Callbac...Err... Delegates.
+	void OnVisChange(bool visible)
+	{
+		isVisible = visible;
+		Debug.Log("Is Visible: " + visible);
+	}
+
+	void OnDashBoardChange(bool open)
+	{
+		isDashboardOpen = open;
+		Debug.Log("Dashboard Open: " + open);
+	}
 
 	void Start () 
 	{
-		matrixConverter = new SteamVR_Utils.RigidTransform(transform);
+		matrixConverter = new OVR_Utils.RigidTransform(transform);
 
 		if(cameraForTexture != null)
 		{
@@ -149,24 +172,31 @@ public class Unity_Overlay : MonoBehaviour
 
 		textureBounds.uMax = 1;
 		textureBounds.vMax = 0;
+
+		// Testing out some event based stuff
+		overlay.onVisibilityChange += OnVisChange;
+		ovrHandler.onDashboardChange += OnDashBoardChange;
 	}
 
 	void OnDestroy()
 	{
 		overlay.DestroyOverlay();
-		Debug.Log("Overlay Destroyed: " + !overlay.created);
 	}
 
 	void OnEnable()
 	{
-		overlay.ShowOverlay();
-		Debug.Log("Overlay Shown!");
+		if(lastVisible)
+		{
+			isVisible = true;
+			overlay.ShowOverlay();
+		}
+			
 	}
 
 	void OnDisable()
 	{
+		lastVisible = isVisible;
 		overlay.HideOverlay();
-		Debug.Log("Overlay Hidden!");
 	}
 	
 	void Update() 
@@ -187,11 +217,30 @@ public class Unity_Overlay : MonoBehaviour
 				Debug.Log("Failed to create overlay!");
 				return;
 			}
-			
-			Debug.Log("Created Overlay!");
+
+			isDashboardOpen = ovrHandler.Overlay.IsDashboardVisible();
 		}
-		
+
+		if(onlyShowInDashboard && !isDashboardOpen)
+		{
+			if(isVisible)
+				isVisible = false;
+		}
+		else if (onlyShowInDashboard && isDashboardOpen)
+		{
+			if(!isVisible)
+				isVisible = true;
+		} 
+
+		UpdateOpts();
+
+		if(!enabled)
+			return;
+
 		DrawOverlayThumbnail();
+
+		if(!isVisible)
+			return;		
 
 		if(useChapColor)
 		{
@@ -208,7 +257,6 @@ public class Unity_Overlay : MonoBehaviour
 			lastColor = Color.black;
 		}
 
-		UpdateOpts();
 		UpdateTexture();
 
 		if(enableSimulatedMouse)

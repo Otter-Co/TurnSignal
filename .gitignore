@@ -31,5 +31,5 @@ sysinfo.txt
 
 # Builds
 *.apk
-*.unitypackage
+Exports/*.unitypackage
 .vscode/launch.json

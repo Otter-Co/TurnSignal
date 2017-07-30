@@ -9,7 +9,6 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     {
         get 
         {
-            
             _Scale = PlayerPrefs.GetFloat("scale", 2f);
             return _Scale;
         }
@@ -49,22 +48,43 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             PlayerPrefs.SetInt("twistrate", _TwistRate);
         }
     }
-
-    private int _Pedals = 6;
-    public int Pedals 
+    public float TwistRateF
     {
         get 
         {
-            _Pedals = PlayerPrefs.GetInt("pedalcount", 6);
-            return _Pedals;
+            return (float) TwistRate;
         }
         set 
         {
-            _Pedals = value;
-            PlayerPrefs.SetInt("pedalcount", value);
+            TwistRate = (int) value;
         }
     }
 
+    private int _Petals = 6;
+    public int Petals 
+    {
+        get 
+        {
+            _Petals = PlayerPrefs.GetInt("petalcount", 6);
+            return _Petals;
+        }
+        set 
+        {
+            _Petals = value;
+            PlayerPrefs.SetInt("petalcount", value);
+        }
+    }
+    public float PetalsF
+    {
+        get 
+        {
+            return (float) Petals;
+        }
+        set 
+        {
+            Petals = (int) value;
+        }
+    }
     private bool _StartWithSteamVR = true;
     public bool StartWithSteamVR
     {
@@ -108,6 +128,21 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         {
             _LinkOpacityWithTwist = value;
             PlayerPrefs.SetInt("linktwistalpha", _LinkOpacityWithTwist ? 1 : 0);
+        }
+    }
+
+    private bool _OnlyShowInDashboard = false;
+    public bool OnlyShowInDashboard 
+    {
+        get 
+        {
+            _OnlyShowInDashboard = (PlayerPrefs.GetInt("onlyshowindash", 0) == 1);
+            return _OnlyShowInDashboard;
+        }
+        set 
+        {
+            _OnlyShowInDashboard = value;
+            PlayerPrefs.SetInt("onlyshowindash", (_OnlyShowInDashboard ? 1 : 0));
         }
     }
 

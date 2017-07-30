@@ -28,6 +28,12 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 
 	private float lastSteamVRPollTime = 0f;
 
+	void Start()
+	{
+		// Will always do a check on start first, then use timer for polling
+		lastSteamVRPollTime = steamVRPollTime + 1f;
+	}
+
 	void Update() 
 	{
 		if(autoUpdate)
@@ -71,6 +77,13 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 		{
 			lastSteamVRPollTime = 0f;
 
+			Debug.Log("Checking to see if SteamVR Is Running...");
+			if(System.Diagnostics.Process.GetProcessesByName("vrserver").Length <= 0)
+			{
+				Debug.Log("VRServer not Running!");
+				return false;
+			}
+
 			Debug.Log("Starting Up SteamVR Connection...");
 
 			if( !ovrHandler.StartupOpenVR() )
@@ -81,7 +94,7 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 			else
 			{
 				Debug.Log("Connected to SteamVR!");
-				
+
 				onSteamVRConnect.Invoke();
 
 				return true;

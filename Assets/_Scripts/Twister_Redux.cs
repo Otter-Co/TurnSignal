@@ -11,7 +11,7 @@ public class Twister_Redux : MonoBehaviour
 	public int armCount = 6;
 	public int armPointCount = 15;
 	public int armResolution = 25;
-
+	
 
 	[Space(10)]
 	public float outerDiameter = 1f;
@@ -42,10 +42,10 @@ public class Twister_Redux : MonoBehaviour
 	private Vector3 [][] points = new Vector3[0][];
 	private Vector3 [][] linePoints = new Vector3[0][];
 
-	public void SetPedals(float p)
+	public void SetPetals(float p)
 	{
-		int pedals = (int) p;
-		armCount = pedals;
+		int petals = (int) p;
+		armCount = petals;
 	}
 	void Update() 
 	{
