@@ -23,7 +23,10 @@ public partial class OVR_Handler : System.IDisposable
         bool result = !ErrorCheck(error);
         
         if(result)
+        {
             GetOpenVRExistingInterfaces();
+            onOpenVRChange.Invoke(true);
+        }
         else
             ShutDownOpenVR(); // GetOpenVRInterfaces();
 

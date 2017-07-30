@@ -29,7 +29,9 @@ public partial class OVR_Handler
         EVREventType type = (EVREventType) pEvent.eventType;
         switch(type)
         {
-            case EVREventType.VREvent_QuitAcknowledged:
+            case EVREventType.VREvent_Quit:
+                
+                onOpenVRChange(false);
             break;
             
             case EVREventType.VREvent_DashboardActivated:

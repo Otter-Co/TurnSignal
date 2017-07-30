@@ -28,10 +28,9 @@ public class TurnSignal_Director : MonoBehaviour
 
 	[Space(10)]
 
-	public int targetFPS = 90;
-
-	[Space(10)]
-
+	public int runningFPS = 90;
+	public int idleFPS = 5;
+	
 
 	private TurnSignal_Prefs_Handler prefs;
 
@@ -41,6 +40,10 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private bool twistTied = false;
 
+
+	private int targetFPS = 0;
+	private int lastFps = 0;
+
 	// Methods for Easy UI.
 	public void LinkOpacityWithTwist(bool linked)
 	{
@@ -49,7 +52,7 @@ public class TurnSignal_Director : MonoBehaviour
 
 	void Start () 
 	{
-		Application.targetFrameRate = targetFPS;
+		Application.targetFrameRate = idleFPS;
 
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
 		handler = OVR_Handler.instance;
@@ -59,6 +62,12 @@ public class TurnSignal_Director : MonoBehaviour
 
 	void Update() 
 	{
+		if(lastFps != targetFPS)
+		{
+			lastFps = targetFPS;
+			Application.targetFrameRate = targetFPS;
+		}
+
 		DirectorUpdate();
 		SetWindowSize();
 	}
@@ -95,6 +104,13 @@ public class TurnSignal_Director : MonoBehaviour
 
 		prefs.StartWithSteamVR = GetManifestAutoLaunch();
 		menuRig.SetUIValues();
+
+		targetFPS = runningFPS;
+	}
+
+	public void OnSteamVRDisconnect()
+	{
+		targetFPS = idleFPS;
 	}
 
 	public bool CreateVRManifest()
