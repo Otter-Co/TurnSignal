@@ -155,6 +155,8 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
 
             bool result = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
+
+            Debug.Log("Writing Prefs to SteamCloud!");
         }
 
         string fullP = _filePath + _fileName;
@@ -176,6 +178,8 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
                 if(fileC > 0)
                     text = System.Text.Encoding.ASCII.GetString(bytes);
+
+                Debug.Log("Reading Prefs from SteamCloud!");
             }
         }
         else if(File.Exists(_filePath))
