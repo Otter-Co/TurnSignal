@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.Events;
-using Valve.VR;
 
+using Valve.VR;
 public class TurnSignal_Director : MonoBehaviour 
 {
 	public string appKey = "";
@@ -51,8 +52,13 @@ public class TurnSignal_Director : MonoBehaviour
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
 		handler = OVR_Handler.instance;
 
-		string prefsPath = Application.dataPath + "\\..\\prefs.json";
-		prefs.SetFilePath(prefsPath);
+		// Some SteamCloud Stuff
+
+		string prefsPath = Application.dataPath + "\\..\\";
+		string prefsFileName = "prefs.json";
+
+		prefs.SetFilePath(prefsPath, prefsFileName);
+
 		prefs.Load();
 	}
 

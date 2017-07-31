@@ -4,13 +4,18 @@ using System.IO;
 
 using UnityEngine;
 
+using Steamworks;
+
 public class TurnSignal_Prefs_Handler : MonoBehaviour 
 {   
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";
-    public void SetFilePath(string path)
+    private string _fileName = "";
+
+    public void SetFilePath(string path, string fileName)
     {
         _filePath = path;
+        _fileName = fileName;
     }
 
 	public float Scale 
@@ -143,23 +148,52 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     public bool Save()
     {
         string text = JsonUtility.ToJson(prefs);
-        File.WriteAllText(_filePath, text);
-        return File.Exists(_filePath);
+
+        if(SteamManager.Initialized && SteamRemoteStorage.IsCloudEnabledForAccount())
+        {
+            var bytes = System.Text.Encoding.ASCII.GetBytes(text);
+            var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
+
+            bool result = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
+        }
+
+        string fullP = _filePath + _fileName;
+
+        File.WriteAllText(fullP, text);
+        return File.Exists(fullP);
     }
     public bool Load()
     {
-        if(!File.Exists(_filePath))
-            return false;
+        string text = "";
+        if(SteamManager.Initialized && SteamRemoteStorage.IsCloudEnabledForAccount())
+        {
+            if(SteamRemoteStorage.FileExists(_fileName))
+            {
+                var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
+                var bytes = new byte[byteCount];
 
-        string text = File.ReadAllText(_filePath);
+                var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
+
+                if(fileC > 0)
+                    text = System.Text.Encoding.ASCII.GetString(bytes);
+            }
+        }
+        else if(File.Exists(_filePath))
+        {
+            text = File.ReadAllText(_filePath);
+        }
+    
         var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
         if(o != null)
         {
             prefs = o;
             return true;
         }
-        else 
+        else
+        {
+            prefs = new TurnSignalPrefs();
             return false;
+        }
     }
     public void Reset()
     {
