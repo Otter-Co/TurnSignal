@@ -1,4 +1,4 @@
-TurnSignal (New 2.1.2!)
+TurnSignal (New 2.1.5!)
 =
 
 ![TurnSignal Icon](/Assets/_Res/turnsignal-v2.png)
@@ -8,7 +8,7 @@ A minimalistic, intuitive, visual, IN-GAME utility for keeping track of Cord Wra
 ---
 
 ### Please Note (!):
- TurnSignal 2.1.2 (and up) is a much needed optimization upgrade, it uses proper SteamVR auto-startup, less CPU cycles, and is all around better! Please Upgrade if you have not!
+ TurnSignal 2.1.5 (and up) is a much needed optimization upgrade, it uses proper SteamVR auto-startup, less CPU cycles, and is all around better! Please Upgrade if you have not!
 
 ---
 ## ScreenShots - Updated for 2.0!
