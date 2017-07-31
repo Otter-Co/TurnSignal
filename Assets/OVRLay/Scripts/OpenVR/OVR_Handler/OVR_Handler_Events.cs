@@ -30,7 +30,7 @@ public partial class OVR_Handler
         switch(type)
         {
             case EVREventType.VREvent_Quit:
-                
+                Debug.Log("VR - QUIT - EVENT");
                 onOpenVRChange(false);
             break;
             

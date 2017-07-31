@@ -8,9 +8,6 @@ public class TurnSignal_Director : MonoBehaviour
 {
 	public string appKey = "";
 
-	public TextAsset appManifest;
-
-
 	[Space(10)]
 
 	public Unity_Overlay floorOverlay;
@@ -36,8 +33,6 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private OVR_Handler handler;
 
-	private string manifestPath;
-
 	private bool twistTied = false;
 
 
@@ -49,7 +44,6 @@ public class TurnSignal_Director : MonoBehaviour
 	{
 		twistTied = linked;
 	}
-
 	void Start () 
 	{
 		Application.targetFrameRate = idleFPS;
@@ -57,7 +51,9 @@ public class TurnSignal_Director : MonoBehaviour
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
 		handler = OVR_Handler.instance;
 
-		manifestPath = Application.dataPath + "\\appmanifest.vrmanifest";
+		string prefsPath = Application.dataPath + "\\..\\prefs.json";
+		prefs.SetFilePath(prefsPath);
+		prefs.Load();
 	}
 
 	void Update() 
@@ -94,14 +90,6 @@ public class TurnSignal_Director : MonoBehaviour
 
 	public void OnSteamVRConnect()
 	{
-		if(CreateVRManifest() && AddVRManifest())
-			Debug.Log("Successfully Installed App to SteamVR");
-		else
-		{
-			Debug.Log("Error Installing App to SteamVR!");
-			return;
-		}
-
 		prefs.StartWithSteamVR = GetManifestAutoLaunch();
 		menuRig.SetUIValues();
 
@@ -110,28 +98,14 @@ public class TurnSignal_Director : MonoBehaviour
 
 	public void OnSteamVRDisconnect()
 	{
+		if(prefs.StartWithSteamVR)
+		{
+			Debug.Log("SD:LKFJSD:LKFJSL:KDFJS:KLDFJ:l");
+			Debug.Log("Quitting!");
+			Application.Quit();
+		}
+
 		targetFPS = idleFPS;
-	}
-
-	public bool CreateVRManifest()
-	{
-		string manifestText = appManifest.text;
-		System.IO.File.WriteAllText(manifestPath, manifestText);
-
-		return System.IO.File.Exists(manifestPath);
-	}
-
-	public bool AddVRManifest()
-	{
-		if(handler == null || handler.Applications == null)
-			return false;
-
-		EVRApplicationError error = EVRApplicationError.None;
-		error = handler.Applications.AddApplicationManifest(manifestPath, false);
-		if(ErrorCheck(error))
-			return false;
-
-		return handler.Applications.IsApplicationInstalled(appKey);
 	}
 
 	public void SetManifestAutoLaunch(bool autoLaunch)
@@ -143,16 +117,6 @@ public class TurnSignal_Director : MonoBehaviour
 	public bool GetManifestAutoLaunch()
 	{
 		return (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false; 
-	}
-
-	public bool RemoveVRManifest()
-	{
-		if(handler == null || handler.Applications == null)
-			return false;
-
-		handler.Applications.RemoveApplicationManifest(manifestPath);
-
-		return !handler.Applications.IsApplicationInstalled(appKey);
 	}
 
 	bool ErrorCheck(EVRApplicationError err)
