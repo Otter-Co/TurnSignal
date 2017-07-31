@@ -1,5 +1,5 @@
 {
-    "source": "steam",
+    "source": "builtin",
     "applications": [
         {
             "app_key": "steam.app.689580",
