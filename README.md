@@ -35,13 +35,8 @@ Now in the Process of getting on Steam! Of course, still Free, Always Free!
 [Some Fun Stuff ;3](https://gfycat.com/ThoroughThunderousAmurminnow)
 
 ---
-## Download:
 
-[Click here to go to releases!](https://github.com/benotter/TurnSignal/releases)
-
----
-
-## Installation:
+## Download / Installation:
 Until Steam Store Page gets reviewed, Please Contact me for 2.2 Beta Keys!
 
 Once (If) 2.2 is live on Steam, you can grab it from [The TurnSignal Steam Store Page!](http://store.steampowered.com/app/689580/TurnSignal/) (Its 100% Free!)
