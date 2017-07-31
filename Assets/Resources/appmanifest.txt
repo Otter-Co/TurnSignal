@@ -1,8 +1,8 @@
 {
-    "source": "builtin",
+    "source": "steam",
     "applications": [
         {
-            "app_key": "otterco.TurnSignal",
+            "app_key": "steam.app.689580",
             "launch_type": "binary",
             "binary_path_windows": "../TurnSignal.exe",
             "is_dashboard_overlay": true,
