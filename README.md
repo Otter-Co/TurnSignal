@@ -7,8 +7,9 @@ A minimalistic, intuitive, visual, IN-GAME utility for keeping track of Cord Wra
 
 ---
 
-Now in the Process of getting on Steam! Of course, still Free, Always Free!
+Get it Now, [On Steam](http://store.steampowered.com/app/689580/TurnSignal/)!
 ===
+Still Free, Always Free!
 
 ---
 ## ScreenShots - Updated for 2.0!
@@ -37,9 +38,7 @@ Now in the Process of getting on Steam! Of course, still Free, Always Free!
 ---
 
 ## Download / Installation:
-Until Steam Store Page gets reviewed, Please Contact me for 2.2 Beta Keys!
-
-Once (If) 2.2 is live on Steam, you can grab it from [The TurnSignal Steam Store Page!](http://store.steampowered.com/app/689580/TurnSignal/) (Its 100% Free!)
+You can download it on Steam, here's [The TurnSignal Steam Store Page!](http://store.steampowered.com/app/689580/TurnSignal/) (Still 100% Free!)
 
 ---
 ## Usage:
@@ -95,13 +94,13 @@ After fidling with Unity and the SteamVR plugin, I realized that somewhere in Un
 
 The result is I basically resupun my own OpenVR handler that works outside of Unity's built-in support, and is now completely free of the SteamVR Plugin! (Although I totes Copied out majority chunk of SteamVR_Utils to get them sweet transform operations!)
 
-Its called OVRLay, and the entirety of its should be contained in the OVRLay folder under 'Assets', or in the unity package/archive in the root of the git.
+Its called OVRLay, and it can be found [Here](), but the versions may be slightly different as turnsignal gets more customized (outdated).
 
 Let me know if you find it useful or interesting!
 
 ---
 
-I think thats that, Credit/CopyRight to Valve for OpenVR/SteamVR stuff. 
+I think thats that, Credit/Copyright to Valve for OpenVR/SteamVR stuff. 
 
 Thanks and credit to my friend Mason Halstead (141art) for The Icon, and Steam Store Art assets!
 
