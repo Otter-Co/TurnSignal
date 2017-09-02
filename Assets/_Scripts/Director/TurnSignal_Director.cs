@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 using Valve.VR;
-public class TurnSignal_Director : MonoBehaviour 
+public partial class TurnSignal_Director : MonoBehaviour 
 {
 	public string appKey = "";
 
@@ -22,7 +22,7 @@ public class TurnSignal_Director : MonoBehaviour
 	[Space(10)]
 
 	public float floorOverlayHandScale = 0.2f;
-
+	public bool flipSides = false;
 	public Unity_Overlay.OverlayTrackedDevice floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
 
 	[Space(10)]
@@ -52,28 +52,6 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private int lastFps = 0;
 	private float lastFloorHeight = 0f;
-	private Unity_Overlay.OverlayTrackedDevice lastFloorDevice = Unity_Overlay.OverlayTrackedDevice.None;
-
-	// Methods for Easy UI.
-	public void LinkOpacityWithTwist(bool linked)
-	{
-		twistTied = linked;
-	}
-
-	public void SetOverlayHeight(float height) 
-	{
-		floorOverlayHeight = height;
-	}
-
-	public void SetOverlayTrackedObj(int ind)
-	{
-		if(ind == 1)
-			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.RightHand;
-		else if(ind == 2)
-			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.LeftHand;
-		else
-			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
-	}
 
 	void Start () 
 	{
@@ -115,23 +93,14 @@ public class TurnSignal_Director : MonoBehaviour
 		else if(floorOverlay.opacity != prefs.Opacity)
 			floorOverlay.opacity = prefs.Opacity;
 
-			
-		if(lastFloorHeight != floorOverlayHeight) 
-		{
-			var foT = floorOverlay.transform;
-
-			foT.position = new Vector3(foT.position.x, floorOverlayHeight, foT.position.z);
-			lastFloorHeight = floorOverlayHeight;
-		}
-
-		if(hmdO.transform.position.y < floorOverlayHeight)
+		if(hmdO.transform.position.y < floorOverlayHeight || flipSides)
 		{
 			var foT = floorOverlay.transform;
 
 			if(foT.eulerAngles.x != 270f)
 				foT.eulerAngles = new Vector3(270f, foT.eulerAngles.y, foT.eulerAngles.z);
 
-			if(!floorRig.reversed)
+			if(!flipSides && !floorRig.reversed)
 				floorRig.reversed = true;
 		} 
 		else
@@ -143,33 +112,6 @@ public class TurnSignal_Director : MonoBehaviour
 
 			if(floorRig.reversed)
 				floorRig.reversed = false;
-		}
-
-		if(floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-		{
-			var foT = floorOverlay.transform;
-
-			if(foT.position.y != floorOverlayHeight * floorOverlayHandScale)
-				foT.position = new Vector3(foT.position.x, floorOverlayHeight * floorOverlayHandScale, foT.position.z);
-
-			if(floorOverlay.widthInMeters != prefs.Scale * floorOverlayHandScale)
-				floorOverlay.widthInMeters = prefs.Scale * floorOverlayHandScale;
-
-			if(floorOverlay.deviceToTrack != floorOverlayDevice)
-				floorOverlay.deviceToTrack = floorOverlayDevice;
-		} 
-		else
-		{
-			var foT = floorOverlay.transform;
-
-			if(foT.position.y != floorOverlayHeight)
-				foT.position = new Vector3(foT.position.x, floorOverlayHeight, foT.position.z);
-
-			if(floorOverlay.widthInMeters != prefs.Scale)
-				floorOverlay.widthInMeters = prefs.Scale;
-
-			if(floorOverlay.deviceToTrack != floorOverlayDevice)
-				floorOverlay.deviceToTrack = floorOverlayDevice;
 		}
 	}
 

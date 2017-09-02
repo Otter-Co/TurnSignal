@@ -158,6 +158,33 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public int LinkDevice 
+    {
+        get 
+        {
+            return prefs.LinkDevice;
+        }
+        set 
+        {
+            prefs.LinkDevice = value;
+            Save();
+        }
+    }
+
+    public bool FlipSides 
+    {
+        get 
+        {
+            return prefs.FlipSides;
+        }
+        set 
+        {
+            prefs.FlipSides = value;
+            Save();
+        }
+    }
+
+
     public bool Save()
     {
         string text = JsonUtility.ToJson(prefs);
@@ -229,8 +256,12 @@ public class TurnSignalPrefs
     public float Height = 0f;
     public int TwistRate = 10;
     public int PetalCount = 6;
+
     public bool StartWithSteamVR = true;
     public bool UseChaperoneColor = false;
     public bool LinkOpacityWithTwist = false;
     public bool OnlyShowInDashboard = false;
+
+    public int LinkDevice = 0;
+    public bool FlipSides = false;
 }

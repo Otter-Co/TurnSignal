@@ -22,8 +22,15 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	public Toggle useChapColorToggle;
 	public Toggle tieTwistToggle;
 	public Toggle onlyShowInDashToggle;
-	
-	void Start () 
+
+	[Space(10)]
+
+	public Toggle disableLinkToggle;
+	public Toggle rightLinkToggle;
+	public Toggle leftLinkToggle;
+	public Toggle flipSidesToggle;
+
+	public void SteamStart()
 	{
 		SetUIValues();
 	}
@@ -40,6 +47,15 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;
 		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
 		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;
+
+		if(prefs.LinkDevice == 1)
+			rightLinkToggle.isOn = true;
+		else if(prefs.LinkDevice == 2)
+			leftLinkToggle.isOn = true;
+		else
+			disableLinkToggle.isOn = true;
+
+		flipSidesToggle.isOn = prefs.FlipSides;
 	}
 
 	public void ResetSettings()
