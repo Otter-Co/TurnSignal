@@ -609,7 +609,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1583421715586074
 GameObject:
   m_ObjectHideFlags: 1
@@ -790,7 +790,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1730529672389590
 GameObject:
   m_ObjectHideFlags: 1
@@ -801,7 +801,7 @@ GameObject:
   - component: {fileID: 224774643271538128}
   - component: {fileID: 114976853704348156}
   m_Layer: 9
-  m_Name: Pedal Slider
+  m_Name: Petal Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -818,12 +818,12 @@ GameObject:
   - component: {fileID: 222579109716449050}
   - component: {fileID: 114021187528849668}
   m_Layer: 9
-  m_Name: Base Title
+  m_Name: Version
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1740307230218698
 GameObject:
   m_ObjectHideFlags: 1
@@ -940,6 +940,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1842319117421550
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 224311526425181438}
+  - component: {fileID: 222157181244364188}
+  - component: {fileID: 114699046728901068}
+  m_Layer: 9
+  m_Name: Base Title
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
 --- !u!1 &1843218734391420
 GameObject:
   m_ObjectHideFlags: 1
@@ -1126,7 +1143,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1719333544990630}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2.35}
+  m_LocalPosition: {x: 0, y: 0, z: 2.359}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4728209360879418}
@@ -1228,7 +1245,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Base
+  m_Text: V2.2
 --- !u!114 &114050724059639080
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1335,7 +1352,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Pedals
+  m_Text: Petals
 --- !u!114 &114139270320235472
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2008,7 +2025,7 @@ MonoBehaviour:
   scaleSlider: {fileID: 114448277379096130}
   opacitySlider: {fileID: 114653760415614174}
   twistRateSlider: {fileID: 114847524043955176}
-  pedalSlider: {fileID: 114976853704348156}
+  petalSlider: {fileID: 114976853704348156}
   startWithVRToggle: {fileID: 114599003332117182}
   useChapColorToggle: {fileID: 114978638596012174}
   tieTwistToggle: {fileID: 114475651448291578}
@@ -2183,7 +2200,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.7843138, g: 0.7843138, b: 0.7843138, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.466, g: 0.466, b: 0.466, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.42647058, g: 0.42647058, b: 0.42647058, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -2358,7 +2375,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_MethodName: StartWithSteamVR
+        m_MethodName: SetManifestAutoLaunch
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2588,6 +2605,39 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 1
+--- !u!114 &114699046728901068
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1842319117421550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 12
+    m_FontStyle: 0
+    m_BestFit: 1
+    m_MinSize: 0
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 1
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Base
 --- !u!114 &114709886886298088
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2999,7 +3049,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_MethodName: ResetRotationTracking
+        m_MethodName: ToggleEnable
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3206,7 +3256,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_MethodName: SetPedals
+        m_MethodName: SetPetals
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3217,7 +3267,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 0}
-        m_MethodName: set_PedalsF
+        m_MethodName: set_PetalsF
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3320,6 +3370,12 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1546361031326832}
+--- !u!222 &222157181244364188
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1842319117421550}
 --- !u!222 &222175326415383900
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -3713,8 +3769,8 @@ RectTransform:
   m_Father: {fileID: 224772907343745552}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.35714287, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3777,8 +3833,8 @@ RectTransform:
   m_Father: {fileID: 224866275020639276}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.22222222, y: 0}
+  m_AnchorMax: {x: 0.22222222, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3850,8 +3906,8 @@ RectTransform:
   m_Father: {fileID: 224283109783068834}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.03, y: 0}
+  m_AnchorMax: {x: 0.03, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3887,8 +3943,8 @@ RectTransform:
   m_Father: {fileID: 224184522017675420}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.49874687, y: 0}
+  m_AnchorMax: {x: 0.49874687, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3949,6 +4005,24 @@ RectTransform:
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 60, y: -10}
   m_SizeDelta: {x: 160, y: 20}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!224 &224311526425181438
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1842319117421550}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.27794358, y: 0.2779439, z: 0}
+  m_Children: []
+  m_Father: {fileID: 224760138214944786}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.019009352, y: 62.999992}
+  m_SizeDelta: {x: 160.03813, y: 29.929165}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224345296195355342
 RectTransform:
@@ -4045,7 +4119,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.22222222, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4170,16 +4244,16 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1736713965428656}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.27794358, y: 0.2779439, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 0.27772892, y: 0.27772936, z: 0}
   m_Children: []
   m_Father: {fileID: 224760138214944786}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.019009352, y: 62.999992}
-  m_SizeDelta: {x: 160.03813, y: 29.929165}
+  m_AnchoredPosition: {x: 0, y: 31.5}
+  m_SizeDelta: {x: 87.89, y: 29.929165}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224586201624230722
 RectTransform:
@@ -4399,7 +4473,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.49874687, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4433,6 +4507,7 @@ RectTransform:
   m_Children:
   - {fileID: 224004036969680936}
   - {fileID: 224557304295242402}
+  - {fileID: 224311526425181438}
   m_Father: {fileID: 224155719872382864}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4684,7 +4759,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.03, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4723,8 +4798,8 @@ RectTransform:
   m_Father: {fileID: 224690794375371548}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.35714287, y: 0}
+  m_AnchorMax: {x: 0.35714287, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

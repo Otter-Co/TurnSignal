@@ -105,13 +105,16 @@ static public class OVR_Utils
 	public static Quaternion GetRotation(this Matrix4x4 matrix)
 	{
 		Quaternion q = new Quaternion();
+		
 		q.w = Mathf.Sqrt(Mathf.Max(0, 1 + matrix.m00 + matrix.m11 + matrix.m22)) / 2;
 		q.x = Mathf.Sqrt(Mathf.Max(0, 1 + matrix.m00 - matrix.m11 - matrix.m22)) / 2;
 		q.y = Mathf.Sqrt(Mathf.Max(0, 1 - matrix.m00 + matrix.m11 - matrix.m22)) / 2;
 		q.z = Mathf.Sqrt(Mathf.Max(0, 1 - matrix.m00 - matrix.m11 + matrix.m22)) / 2;
+
 		q.x = _copysign(q.x, matrix.m21 - matrix.m12);
 		q.y = _copysign(q.y, matrix.m02 - matrix.m20);
 		q.z = _copysign(q.z, matrix.m10 - matrix.m01);
+
 		return q;
 	}
 

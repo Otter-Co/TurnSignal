@@ -45,6 +45,15 @@ public class OVR_Pose_Handler
         Compositor.GetLastPoses(poses, gamePoses);
     }
 
+    public Quaternion GetPosRotation(uint ind) 
+    {
+        var pose = new OVR_Utils.RigidTransform(poses[ind].mDeviceToAbsoluteTracking);
+        var mat = Matrix4x4.TRS(pose.pos, pose.rot, Vector3.one);
+        var rot = OVR_Utils.GetRotation(mat);
+        
+        return rot;
+    }
+
     public void SetTransformToTrackedDevice(Transform t, uint ind)
     {
         var pose = new OVR_Utils.RigidTransform(poses[ind].mDeviceToAbsoluteTracking);

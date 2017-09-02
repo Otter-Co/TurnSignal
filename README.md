@@ -1,4 +1,4 @@
-TurnSignal (New 2.2!)
+TurnSignal (New 2.2.1!)
 =
 
 ![TurnSignal Icon](/Assets/_Res/turnsignal-v2.png)
@@ -94,7 +94,7 @@ After fidling with Unity and the SteamVR plugin, I realized that somewhere in Un
 
 The result is I basically resupun my own OpenVR handler that works outside of Unity's built-in support, and is now completely free of the SteamVR Plugin! (Although I totes Copied out majority chunk of SteamVR_Utils to get them sweet transform operations!)
 
-Its called OVRLay, and it can be found [Here](), but the versions may be slightly different as turnsignal gets more customized (outdated).
+Its called OVRLay, and it can be found [Here](https://github.com/benotter/OVRLay), but the versions may be slightly different as turnsignal gets more customized (outdated).
 
 Let me know if you find it useful or interesting!
 

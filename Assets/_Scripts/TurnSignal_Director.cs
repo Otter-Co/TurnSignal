@@ -28,6 +28,11 @@ public class TurnSignal_Director : MonoBehaviour
 
 	public int runningFPS = 90;
 	public int idleFPS = 5;
+
+	[Space(10)]
+
+	public GameObject hmdO;
+	public float floorOverlayHeight = 0f;
 	
 
 	private TurnSignal_Prefs_Handler prefs;
@@ -39,6 +44,8 @@ public class TurnSignal_Director : MonoBehaviour
 
 	private int targetFPS = 0;
 	private int lastFps = 0;
+
+	private float lastFloorHeight = 0f;
 
 	// Methods for Easy UI.
 	public void LinkOpacityWithTwist(bool linked)
@@ -69,6 +76,36 @@ public class TurnSignal_Director : MonoBehaviour
 			lastFps = targetFPS;
 			Application.targetFrameRate = targetFPS;
 		}
+
+		if(lastFloorHeight != floorOverlayHeight) 
+		{
+			var foT = floorOverlay.transform;
+
+			foT.position = new Vector3(foT.position.x, floorOverlayHeight, foT.position.z);
+			lastFloorHeight = floorOverlayHeight;
+		}
+
+		if(hmdO.transform.position.y < floorOverlayHeight)
+		{
+			var foT = floorOverlay.transform;
+
+			if(foT.eulerAngles.x != 270f)
+				foT.eulerAngles = new Vector3(270f, foT.eulerAngles.y, foT.eulerAngles.z);
+
+			if(!floorRig.reversed)
+				floorRig.reversed = true;
+		} 
+		else
+		{
+			var foT = floorOverlay.transform;
+
+			if(foT.eulerAngles.x != 90f)
+				foT.eulerAngles = new Vector3(90f, foT.eulerAngles.y, foT.eulerAngles.z);
+
+			if(floorRig.reversed)
+				floorRig.reversed = false;
+		}
+			
 
 		DirectorUpdate();
 		SetWindowSize();

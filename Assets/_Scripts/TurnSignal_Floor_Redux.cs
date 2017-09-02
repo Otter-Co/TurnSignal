@@ -10,8 +10,11 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	[Space(10)]
 
 	public bool autoUpdate = true;
+	public bool reversed = false;
 
 	[Space(10)]
+
+	public Unity_SteamVR_Handler vrHandler;
 	public GameObject hmd;
 
 	[Space(10)]
@@ -37,6 +40,10 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	public float curRotation = 0f;
 
 	public float turnProgress = 0f;
+
+	[Space(10)]
+
+	public float debugYRot = 0f;
 
 
 	// Methods to make UI easier;
@@ -81,19 +88,25 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		if(!hmd)
 			return;
 
+		if(!vrHandler.connectedToSteam)
+			return;
+
+		var rot = vrHandler.poseHandler.GetPosRotation(vrHandler.poseHandler.hmdIndex);
+		debugYRot = rot.y;
+
 		if(initialRotation == 0)
 		{
-			curRotation = initialRotation = hmd.transform.rotation.eulerAngles.y;
+			curRotation = initialRotation = rot.y * 360f;
 			return;
 		}
 
 		lastRotation = curRotation;
-		curRotation = hmd.transform.rotation.eulerAngles.y;
+		curRotation = rot.y * 360f;
 
 		float diff = curRotation - lastRotation;
 
 		if(diff > 350f || diff < -350f)
-			return;
+			diff = (-1f * curRotation) - lastRotation;
 
 		rawTurns += diff;
 
@@ -105,6 +118,11 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 	void UpdateTurnObj()
 	{
-		turnObj.twist = rawTurns / (maxTurns * 360f);
+		float raw = rawTurns / (maxTurns * 360f);
+
+		if(reversed)
+			raw *= -1f;
+
+		turnObj.twist = raw;
 	}
 }
