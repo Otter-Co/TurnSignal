@@ -436,33 +436,32 @@ public class Unity_Overlay : MonoBehaviour
 
 		if( opts.deviceToTrack != deviceToTrack ) 
 		{
-			if(deviceToTrack == OverlayTrackedDevice.None)
-				overlay.overlayTransformType = VROverlayTransformType.VROverlayTransform_Absolute;
-			else
+			uint index = 0;
+			switch(deviceToTrack)
 			{
-				uint index = 0;
-				switch(deviceToTrack)
-				{
-					case OverlayTrackedDevice.HMD:
-						index = ovrHandler.poseHandler.hmdIndex;
-					break;
+				case OverlayTrackedDevice.HMD:
+					index = ovrHandler.poseHandler.hmdIndex;
+				break;
 
-					case OverlayTrackedDevice.RightHand:
-						index = ovrHandler.poseHandler.rightIndex;
-					break;
+				case OverlayTrackedDevice.RightHand:
+					index = ovrHandler.poseHandler.rightIndex;
+				break;
 
-					case OverlayTrackedDevice.LeftHand:
-						index = ovrHandler.poseHandler.leftIndex;
-					break;
+				case OverlayTrackedDevice.LeftHand:
+					index = ovrHandler.poseHandler.leftIndex;
+				break;
 
-					case OverlayTrackedDevice.CustomIndex:
-						index = customDeviceIndex;
-					break;
-				}
-
-				overlay.overlayTransformType = VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
-				overlay.overlayTransformTrackedDeviceRelativeIndex = index;
+				case OverlayTrackedDevice.CustomIndex:
+					index = customDeviceIndex;
+				break;
 			}
+
+			VROverlayTransformType tType = deviceToTrack == OverlayTrackedDevice.None ?  
+				VROverlayTransformType.VROverlayTransform_Absolute :
+				VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
+
+			overlay.overlayTransformType = tType;
+			overlay.overlayTransformTrackedDeviceRelativeIndex = index;
 
 			opts.deviceToTrack = deviceToTrack;
 		}

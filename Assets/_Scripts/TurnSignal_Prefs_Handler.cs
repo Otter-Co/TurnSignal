@@ -44,6 +44,19 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public float Height 
+    {
+        get 
+        {
+            return prefs.Height;
+        }
+        set 
+        {
+            prefs.Height = value;
+            Save();
+        }
+    }
+
     public int TwistRate 
     {
         get
@@ -164,6 +177,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         File.WriteAllText(fullP, text);
         return File.Exists(fullP);
     }
+
     public bool Load()
     {
         string text = "";
@@ -177,7 +191,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
                 var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
 
                 if(fileC > 0)
-                    text = System.Text.Encoding.ASCII.GetString(bytes);
+               text = System.Text.Encoding.ASCII.GetString(bytes);
 
                 Debug.Log("Reading Prefs from SteamCloud!");
             }
@@ -212,6 +226,7 @@ public class TurnSignalPrefs
 {
     public float Scale = 2f;
     public float Opacity = 0.03f;
+    public float Height = 0f;
     public int TwistRate = 10;
     public int PetalCount = 6;
     public bool StartWithSteamVR = true;

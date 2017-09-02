@@ -110,15 +110,15 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 		rawTurns += diff;
 
-		turns = (int) ( ( Mathf.Abs(rawTurns) + turnTolerance ) / 360f );
-		turnProgress = Mathf.Abs(rawTurns) / (float) (maxTurns * 360f);
+		turns = (int) ( ( Mathf.Abs(rawTurns) + turnTolerance ) / 720f );
+		turnProgress = Mathf.Abs(rawTurns) / (float) (maxTurns * 720f);
 
 		lastDiff = diff;
 	}
 
 	void UpdateTurnObj()
 	{
-		float raw = rawTurns / (maxTurns * 360f);
+		float raw = rawTurns / (maxTurns * 720f);
 
 		if(reversed)
 			raw *= -1f;

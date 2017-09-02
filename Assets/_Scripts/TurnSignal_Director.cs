@@ -21,6 +21,12 @@ public class TurnSignal_Director : MonoBehaviour
 
 	[Space(10)]
 
+	public float floorOverlayHandScale = 0.2f;
+
+	public Unity_Overlay.OverlayTrackedDevice floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
+
+	[Space(10)]
+
 	public int windowWidth = 800;
     public int windowHeight = 600;
 
@@ -43,15 +49,32 @@ public class TurnSignal_Director : MonoBehaviour
 
 
 	private int targetFPS = 0;
-	private int lastFps = 0;
 
+	private int lastFps = 0;
 	private float lastFloorHeight = 0f;
+	private Unity_Overlay.OverlayTrackedDevice lastFloorDevice = Unity_Overlay.OverlayTrackedDevice.None;
 
 	// Methods for Easy UI.
 	public void LinkOpacityWithTwist(bool linked)
 	{
 		twistTied = linked;
 	}
+
+	public void SetOverlayHeight(float height) 
+	{
+		floorOverlayHeight = height;
+	}
+
+	public void SetOverlayTrackedObj(int ind)
+	{
+		if(ind == 1)
+			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.RightHand;
+		else if(ind == 2)
+			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.LeftHand;
+		else
+			floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
+	}
+
 	void Start () 
 	{
 		Application.targetFrameRate = idleFPS;
@@ -77,6 +100,22 @@ public class TurnSignal_Director : MonoBehaviour
 			Application.targetFrameRate = targetFPS;
 		}
 
+		DirectorUpdate();
+
+		SetWindowSize();
+	}
+
+	void DirectorUpdate()
+	{
+		if(twistTied)
+		{
+			var oldOpat = prefs.Opacity;
+			floorOverlay.opacity = oldOpat * floorRig.turnProgress;
+		}
+		else if(floorOverlay.opacity != prefs.Opacity)
+			floorOverlay.opacity = prefs.Opacity;
+
+			
 		if(lastFloorHeight != floorOverlayHeight) 
 		{
 			var foT = floorOverlay.transform;
@@ -105,22 +144,37 @@ public class TurnSignal_Director : MonoBehaviour
 			if(floorRig.reversed)
 				floorRig.reversed = false;
 		}
-			
 
-		DirectorUpdate();
-		SetWindowSize();
-	}
-
-	void DirectorUpdate()
-	{
-		if(twistTied)
+		if(floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
 		{
-			var oldOpat = prefs.Opacity;
-			floorOverlay.opacity = oldOpat * floorRig.turnProgress;
+			var foT = floorOverlay.transform;
+
+			if(foT.position.y != floorOverlayHeight * floorOverlayHandScale)
+				foT.position = new Vector3(foT.position.x, floorOverlayHeight * floorOverlayHandScale, foT.position.z);
+
+			if(floorOverlay.widthInMeters != prefs.Scale * floorOverlayHandScale)
+				floorOverlay.widthInMeters = prefs.Scale * floorOverlayHandScale;
+
+			if(floorOverlay.deviceToTrack != floorOverlayDevice)
+				floorOverlay.deviceToTrack = floorOverlayDevice;
+		} 
+		else
+		{
+			var foT = floorOverlay.transform;
+
+			if(foT.position.y != floorOverlayHeight)
+				foT.position = new Vector3(foT.position.x, floorOverlayHeight, foT.position.z);
+
+			if(floorOverlay.widthInMeters != prefs.Scale)
+				floorOverlay.widthInMeters = prefs.Scale;
+
+			if(floorOverlay.deviceToTrack != floorOverlayDevice)
+				floorOverlay.deviceToTrack = floorOverlayDevice;
 		}
-		else if(floorOverlay.opacity != prefs.Opacity)
-			floorOverlay.opacity = prefs.Opacity;
 	}
+
+	
+	// Recursion DOOMSDAY
 	public void SetWindowSize(int lvl = 0, int maxLvl = 5)
     {
 		if(Screen.width != windowWidth || Screen.height != windowHeight)

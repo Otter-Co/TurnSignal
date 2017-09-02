@@ -12,6 +12,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 	public Slider scaleSlider;
 	public Slider opacitySlider;
+	public Slider heightSlider;
 	public Slider twistRateSlider;
 	public Slider petalSlider;
 
@@ -31,6 +32,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	{	
 		scaleSlider.value = prefs.Scale;
 		opacitySlider.value = prefs.Opacity;
+		heightSlider.value = prefs.Height;
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
 
