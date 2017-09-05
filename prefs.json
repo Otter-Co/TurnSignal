@@ -1,1 +1,15 @@
-{"Scale":2.0,"Opacity":0.3502403795719147,"Height":0.0,"TwistRate":10,"PetalCount":6,"StartWithSteamVR":true,"UseChaperoneColor":false,"LinkOpacityWithTwist":false,"OnlyShowInDashboard":false,"LinkDevice":0,"FlipSides":false}
+{
+    "lastEditTime": 1504590778,
+    "Scale": 2.0,
+    "Opacity": 0.029999999329447748,
+    "Height": 0.0,
+    "TwistRate": 10,
+    "PetalCount": 6,
+    "StartWithSteamVR": true,
+    "HideMainWindow": false,
+    "UseChaperoneColor": false,
+    "LinkOpacityWithTwist": false,
+    "OnlyShowInDashboard": false,
+    "LinkDevice": 0,
+    "FlipSides": false
+}

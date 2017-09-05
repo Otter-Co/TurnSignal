@@ -31,6 +31,7 @@ public class Unity_Overlay : MonoBehaviour
 
 	public Texture overlayTexture;
 	public Camera cameraForTexture;
+	public bool dontForceRenderTexCam = false;
 	public Texture thumbNailTexture;
 
 	[Space(10)]
@@ -96,6 +97,8 @@ public class Unity_Overlay : MonoBehaviour
 
 	public bool lastVisible = false;
 
+	private bool lastCamEn;
+
 
 	private bool isDashboardOpen = true;
 
@@ -146,7 +149,13 @@ public class Unity_Overlay : MonoBehaviour
 			int width = renderTexWidthOverride != 0 ? renderTexWidthOverride : (int) (cameraForTexture.pixelWidth);
 			int height = renderTexHeightOverride != 0 ? renderTexHeightOverride : (int) (cameraForTexture.pixelHeight);
 
-			cameraForTexture.enabled = false;
+			if(dontForceRenderTexCam)
+				lastCamEn = cameraForTexture.enabled;
+
+
+			if(!dontForceRenderTexCam)
+				cameraForTexture.enabled = false;
+
 			cameraTexture = new RenderTexture(width, height, 24);
 
 			if(highQualityRenderTex)
@@ -155,7 +164,9 @@ public class Unity_Overlay : MonoBehaviour
 				cameraTexture.filterMode = FilterMode.Trilinear;
 			}
 
-			cameraForTexture.targetTexture = cameraTexture;
+			if(!dontForceRenderTexCam)
+				cameraForTexture.targetTexture = cameraTexture;
+
 			overlayTexture = cameraTexture;
 		}
 
@@ -263,7 +274,7 @@ public class Unity_Overlay : MonoBehaviour
 			UpdateMouse();
 
 		if(enableSimulatedMouse && simulateUnityMouseInput)
-				UpdateUnityMouseSim();
+			UpdateUnityMouseSim();
 	}
 
 	void UpdateMouse()
@@ -314,7 +325,18 @@ public class Unity_Overlay : MonoBehaviour
 			pd.dragging = true;
 		}
 
-		var nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
+		HashSet<Selectable> nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
+		
+		bool oldEn = cameraForTexture.enabled;
+		RenderTexture oldTex = cameraForTexture.targetTexture;
+
+		if(dontForceRenderTexCam) 
+		{
+			cameraForTexture.enabled = false;
+			cameraForTexture.targetTexture = cameraTexture;
+
+			nTargs = uiHandler.GetUITargets(canvasGraphicsCaster, pd);
+		}	
 
 		uiHandler.EnterTargets(nTargs);
 
@@ -351,6 +373,12 @@ public class Unity_Overlay : MonoBehaviour
 
 			downTargets.Clear();
 		}
+
+		if(dontForceRenderTexCam)
+		{
+			cameraForTexture.targetTexture = oldTex;
+			cameraForTexture.enabled = oldEn;
+		}
 	}
 
 	void UpdateTexture()
@@ -359,7 +387,31 @@ public class Unity_Overlay : MonoBehaviour
 			return;
 
 		if(cameraForTexture)
-			cameraForTexture.Render();
+		{
+			if(dontForceRenderTexCam)
+			{	
+				cameraForTexture.targetTexture = cameraTexture;
+				cameraForTexture.Render();
+				cameraForTexture.targetTexture = null;
+
+				if(!cameraForTexture.enabled)
+					cameraForTexture.enabled = true;
+			}
+			else
+			{
+				if(cameraForTexture.targetTexture != cameraTexture)
+					cameraForTexture.targetTexture = cameraTexture;
+
+				if(cameraForTexture.enabled)
+				{
+					lastCamEn = true;
+					cameraForTexture.enabled = false;
+				}
+				
+				cameraForTexture.Render();
+			}
+		}
+			
 
 		if(!overlayTexture)
 			return;
@@ -374,7 +426,6 @@ public class Unity_Overlay : MonoBehaviour
 		mouseScale.y = mouseScale_t.v1 = reverseAspect;
 
 		overlay.overlayTexture = overlayTexture;
-
 	}
 
 	void DrawOverlayThumbnail()

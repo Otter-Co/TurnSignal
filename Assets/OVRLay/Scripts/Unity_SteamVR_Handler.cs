@@ -6,7 +6,6 @@ using UnityEngine.Events;
 public class Unity_SteamVR_Handler : MonoBehaviour 
 {
 	public float steamVRPollTime = 0.05f;
-
 	public bool connectedToSteam = false;
 
 	[Space(10)]
@@ -19,6 +18,8 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 
 	public bool autoUpdate = true;
 
+	public bool debugLog = true;
+
 	public UnityEvent onSteamVRConnect = new UnityEvent();
 	public UnityEvent onSteamVRDisconnect = new UnityEvent();
 
@@ -29,6 +30,7 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 	public OVR_Pose_Handler poseHandler { get { return ovrHandler.poseHandler; } }
 
 	private float lastSteamVRPollTime = 0f;
+	public bool lastDebugLog = false;
 
 	void Start()
 	{
@@ -60,6 +62,12 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 			return;
 
 		ovrHandler.UpdateAll();
+
+		if(lastDebugLog != debugLog)
+		{
+			ovrHandler.logDebug = debugLog;
+			lastDebugLog = debugLog;
+		}
 
 		if(hmdObject)
 			poseHandler.SetTransformToTrackedDevice(hmdObject.transform, poseHandler.hmdIndex);

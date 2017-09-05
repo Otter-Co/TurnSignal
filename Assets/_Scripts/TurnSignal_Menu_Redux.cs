@@ -6,6 +6,10 @@ using UnityEngine.Events;
 
 public class TurnSignal_Menu_Redux : MonoBehaviour 
 {
+	public Camera menuRigCamera;
+
+	[Space(10)]
+	
 	public TurnSignal_Prefs_Handler prefs;
 
 	[Space(10)]
@@ -17,8 +21,9 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	public Slider petalSlider;
 
 	[Space(5)]
-
+	
 	public Toggle startWithVRToggle;
+	public Toggle hideMainWindowToggle;
 	public Toggle useChapColorToggle;
 	public Toggle tieTwistToggle;
 	public Toggle onlyShowInDashToggle;
@@ -32,6 +37,10 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 	public void SteamStart()
 	{
+
+		if(!prefs.Load())			
+			Debug.Log("Bad Settings Load!");
+
 		SetUIValues();
 	}
 
@@ -42,6 +51,10 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		heightSlider.value = prefs.Height;
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
+
+		Debug.Log("ShowMain Window: " + prefs.HideMainWindow);
+
+		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;

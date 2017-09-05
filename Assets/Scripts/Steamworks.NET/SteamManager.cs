@@ -16,7 +16,7 @@ using Steamworks;
 [DisallowMultipleComponent]
 public class SteamManager : MonoBehaviour {
 	private static SteamManager s_instance;
-	private static SteamManager Instance {
+	public static SteamManager Instance {
 		get {
 			if (s_instance == null) {
 				return new GameObject("SteamManager").AddComponent<SteamManager>();
@@ -75,7 +75,10 @@ public class SteamManager : MonoBehaviour {
 			// Once you get a Steam AppID assigned by Valve, you need to replace AppId_t.Invalid with it and
 			// remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
 			// See the Valve documentation for more information: https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
-			if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid)) {
+			
+			// if (SteamAPI.RestartAppIfNecessary( ((AppId_t) 689580) ))
+			if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid)) 
+			{
 				Application.Quit();
 				return;
 			}

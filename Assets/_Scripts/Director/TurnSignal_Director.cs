@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Events;
 
 using Valve.VR;
+using Steamworks;
+
 public partial class TurnSignal_Director : MonoBehaviour 
 {
 	public string appKey = "";
@@ -42,6 +44,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 	
 
 	private TurnSignal_Prefs_Handler prefs;
+	private WindowController winC;
 
 	private OVR_Handler handler;
 
@@ -55,19 +58,31 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	void Start () 
 	{
-		Application.targetFrameRate = idleFPS;
+		if(SteamManager.Initialized)
+			Debug.Log("Starting up SteamWorks!");
+		else
+			Debug.Log("SteamWorks Init Failed!");
+
+		DontDestroyOnLoad(gameObject);
+		
+		targetFPS = idleFPS;
 
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
 		handler = OVR_Handler.instance;
 
+		winC = GetComponent<WindowController>();
+
 		// Some SteamCloud Stuff
 
-		string prefsPath = Application.dataPath + "\\..\\";
+		string prefsPath = Application.dataPath + "/../";
 		string prefsFileName = "prefs.json";
 
 		prefs.SetFilePath(prefsPath, prefsFileName);
+	}
 
-		prefs.Load();
+	public void OnApplicationQuit()	 
+	{
+		 prefs.Save();
 	}
 
 	void Update() 
@@ -78,13 +93,6 @@ public partial class TurnSignal_Director : MonoBehaviour
 			Application.targetFrameRate = targetFPS;
 		}
 
-		DirectorUpdate();
-
-		SetWindowSize();
-	}
-
-	void DirectorUpdate()
-	{
 		if(twistTied)
 		{
 			var oldOpat = prefs.Opacity;
@@ -93,7 +101,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 		else if(floorOverlay.opacity != prefs.Opacity)
 			floorOverlay.opacity = prefs.Opacity;
 
-		if(hmdO.transform.position.y < floorOverlayHeight || flipSides)
+		if(hmdO.transform.position.y < floorOverlayHeight || (flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None))
 		{
 			var foT = floorOverlay.transform;
 
@@ -113,8 +121,10 @@ public partial class TurnSignal_Director : MonoBehaviour
 			if(floorRig.reversed)
 				floorRig.reversed = false;
 		}
-	}
 
+		
+		SetWindowSize();
+	}
 	
 	// Recursion DOOMSDAY
 	public void SetWindowSize(int lvl = 0, int maxLvl = 5)
@@ -123,15 +133,14 @@ public partial class TurnSignal_Director : MonoBehaviour
         	Screen.SetResolution(windowWidth, windowHeight, false);
 
         if(Screen.width != windowWidth || Screen.height != windowHeight)
-            if(lvl < maxLvl)
+		{
+			if(lvl < maxLvl)
                 SetWindowSize(lvl + 1, maxLvl);
+		}    
     }
 
 	public void OnSteamVRConnect()
 	{
-		prefs.StartWithSteamVR = GetManifestAutoLaunch();
-		menuRig.SetUIValues();
-
 		targetFPS = runningFPS;
 	}
 
@@ -145,17 +154,6 @@ public partial class TurnSignal_Director : MonoBehaviour
 		}
 
 		targetFPS = idleFPS;
-	}
-
-	public void SetManifestAutoLaunch(bool autoLaunch)
-	{
-		if(handler != null && handler.Applications != null)
-			handler.Applications.SetApplicationAutoLaunch(appKey, autoLaunch);
-	}
-
-	public bool GetManifestAutoLaunch()
-	{
-		return (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false; 
 	}
 
 	bool ErrorCheck(EVRApplicationError err)

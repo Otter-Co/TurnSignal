@@ -5,12 +5,20 @@ using UnityEngine.UI;
 
 public class TurnSignal_Floor_Redux : MonoBehaviour 
 {
+	public Camera floorRigCamera;
+	
+	[Space(10)]
+	
 	public Twister_Redux turnObj;
 
 	[Space(10)]
 
 	public bool autoUpdate = true;
 	public bool reversed = false;
+
+	[Space(10)]
+
+	public Unity_Overlay overlay;
 
 	[Space(10)]
 
@@ -81,6 +89,9 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	{
 		UpdateHMDRotation();
 		UpdateTurnObj();
+
+		if(overlay)
+			overlay.UpdateOverlay();
 	}
 
 	void UpdateHMDRotation()

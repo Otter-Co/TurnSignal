@@ -9,6 +9,25 @@ using Valve.VR;
 public partial class TurnSignal_Director
 {
     // Methods for Easy UI.
+	public void SetHideMainWindow(bool hideWin) 
+	{
+		if(hideWin)
+		{
+			menuOverlay.dontForceRenderTexCam = false;
+			menuRig.menuRigCamera.enabled = false;
+
+			winC.HideUnityWindow();
+			
+		}
+		else
+		{
+			menuOverlay.dontForceRenderTexCam = true;
+			menuRig.menuRigCamera.enabled = true;
+
+			winC.ShowUnityWindow();
+		}
+	}
+
 	public void LinkOpacityWithTwist(bool linked)
 	{
 		twistTied = linked;
@@ -62,7 +81,7 @@ public partial class TurnSignal_Director
 			if(foT.position.y != floorOverlayHeight * floorOverlayHandScale)
 				height *= floorOverlayHandScale;
 
-		if(flipSides)
+		if(flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
 			height *= -1f;
 
 		if(floorOverlayHeight != height)
@@ -72,5 +91,16 @@ public partial class TurnSignal_Director
 		
 		if(foT.position != heightV)
 			foT.position = heightV;
+	}
+
+	public void SetManifestAutoLaunch(bool autoLaunch)
+	{
+		if(handler != null && handler.Applications != null)
+			handler.Applications.SetApplicationAutoLaunch(appKey, autoLaunch);
+	}
+
+	public bool GetManifestAutoLaunch()
+	{
+		return (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false; 
 	}
 }
