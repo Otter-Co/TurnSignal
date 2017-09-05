@@ -9,16 +9,6 @@ using UnityEngine;
 
 public class WindowController : MonoBehaviour
 {
-    public bool hideOnStart = false;
-
-    [Space(10)]
-
-    public bool minimizeOnStart = false;
-    public bool hideFromTaskbarOnStart = false;
-
-
-    [Space(10)]
-
     public bool hasTrayIcon = false;
     public Texture2D trayIconTex;
 
@@ -35,7 +25,6 @@ public class WindowController : MonoBehaviour
     private int oldWinStyle = 0;
 
     private TurnSignalTrayForm trayForm;
-    private Icon trayIcon;
 
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
@@ -207,12 +196,6 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
 
     private System.Windows.Forms.ContextMenuStrip trayMenu;
     private NotifyIcon trayIcon;
-    
-    [STAThread]
-    public static void Main()
-    {
-        System.Windows.Forms.Application.Run(new TurnSignalTrayForm());
-    }
 
     public TurnSignalTrayForm(Texture2D tex = null)
     {

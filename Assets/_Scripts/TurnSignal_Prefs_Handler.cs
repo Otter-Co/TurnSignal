@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System;
+using System.Collections;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -83,7 +83,6 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    private int _Petals = 6;
     public int Petals 
     {
         get 
@@ -249,22 +248,9 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         bool skipSteam = false;
         TurnSignalPrefs p = new TurnSignalPrefs();
 
-        if(fileP == null && steamP != null)
-        {
-            p = steamP;
-            skipSteam = true;
-            res = true;
-        }
-
-        if(fileP != null && steamP == null)
-        {
-            p = fileP;
-            res = true;
-        }
-    
         if(fileP != null && steamP != null) 
         {
-            if(fileP.lastEditTime > steamP.lastEditTime)
+            if(fileP.lastEditTime >= steamP.lastEditTime)
                 p = fileP;
             else 
             {
@@ -272,6 +258,17 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
                 skipSteam = true;
             }
 
+            res = true;
+        }
+        else if(fileP == null && steamP != null)
+        {
+            p = steamP;
+            skipSteam = true;
+            res = true;
+        }
+        else if(fileP != null && steamP == null)
+        {
+            p = fileP;
             res = true;
         }
         
@@ -310,6 +307,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     public TurnSignalPrefs FileLoad()
     {
         string fullP = _filePath + _fileName;
+        
         if(!File.Exists(fullP))
             return null;
 

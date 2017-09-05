@@ -30,7 +30,7 @@ public class Unity_SteamVR_Handler : MonoBehaviour
 	public OVR_Pose_Handler poseHandler { get { return ovrHandler.poseHandler; } }
 
 	private float lastSteamVRPollTime = 0f;
-	public bool lastDebugLog = false;
+	private bool lastDebugLog = false;
 
 	void Start()
 	{

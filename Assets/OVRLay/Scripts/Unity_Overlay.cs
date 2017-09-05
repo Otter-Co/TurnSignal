@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+
 using Valve.VR;
 
 public class Unity_Overlay : MonoBehaviour 
@@ -22,10 +24,6 @@ public class Unity_Overlay : MonoBehaviour
 
 	public bool isDashboardOverlay = false;
 	public bool onlyShowInDashboard = false;
-
-	[Space(10)]
-
-	public bool simulateInEditor = false;
 
 	[Space(10)]
 
@@ -73,7 +71,6 @@ public class Unity_Overlay : MonoBehaviour
 
 	protected RenderTexture cameraTexture;
 
-	protected Texture _mainTex;
 
 	protected VRTextureBounds_t textureBounds = new VRTextureBounds_t();
 	protected HmdVector2_t mouseScale_t = new HmdVector2_t();
@@ -96,9 +93,6 @@ public class Unity_Overlay : MonoBehaviour
 	private Color lastColor = Color.black;
 
 	public bool lastVisible = false;
-
-	private bool lastCamEn;
-
 
 	private bool isDashboardOpen = true;
 
@@ -148,10 +142,6 @@ public class Unity_Overlay : MonoBehaviour
 		{
 			int width = renderTexWidthOverride != 0 ? renderTexWidthOverride : (int) (cameraForTexture.pixelWidth);
 			int height = renderTexHeightOverride != 0 ? renderTexHeightOverride : (int) (cameraForTexture.pixelHeight);
-
-			if(dontForceRenderTexCam)
-				lastCamEn = cameraForTexture.enabled;
-
 
 			if(!dontForceRenderTexCam)
 				cameraForTexture.enabled = false;
@@ -403,10 +393,7 @@ public class Unity_Overlay : MonoBehaviour
 					cameraForTexture.targetTexture = cameraTexture;
 
 				if(cameraForTexture.enabled)
-				{
-					lastCamEn = true;
 					cameraForTexture.enabled = false;
-				}
 				
 				cameraForTexture.Render();
 			}

@@ -45,11 +45,9 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	private TurnSignal_Prefs_Handler prefs;
 	private WindowController winC;
-
 	private OVR_Handler handler;
-
+	
 	private bool twistTied = false;
-
 
 	private int targetFPS = 0;
 
@@ -120,6 +118,11 @@ public partial class TurnSignal_Director : MonoBehaviour
 				floorRig.reversed = false;
 		}
 
+		if(lastFloorHeight != floorOverlayHeight)
+		{
+			SetFloorOverlayHeight(floorOverlayHeight);
+			lastFloorHeight = floorOverlayHeight;
+		}
 		
 		SetWindowSize();
 	}
@@ -146,12 +149,12 @@ public partial class TurnSignal_Director : MonoBehaviour
 	{
 		if(prefs.StartWithSteamVR)
 		{
-			Debug.Log("SD:LKFJSD:LKFJSL:KDFJS:KLDFJ:l");
 			Debug.Log("Quitting!");
+
 			Application.Quit();
 		}
-
-		targetFPS = idleFPS;
+		else
+			targetFPS = idleFPS;
 	}
 
 	bool ErrorCheck(EVRApplicationError err)

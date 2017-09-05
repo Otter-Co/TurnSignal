@@ -52,8 +52,6 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
 
-		Debug.Log("ShowMain Window: " + prefs.HideMainWindow);
-
 		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
