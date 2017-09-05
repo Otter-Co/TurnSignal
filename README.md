@@ -1,4 +1,4 @@
-TurnSignal (New 2.2.1!)
+TurnSignal (New 2.3!)
 =
 
 ![TurnSignal Icon](/Assets/_Res/turnsignal-v2.png)
@@ -49,15 +49,19 @@ The settings menu to control Aspects of TurnSignal should be included in your St
 
 The Newest Settings menu includes:
 
+- (**New!**) Added Menu to Main Window to not waste space!
 - A Button Toggle to enable/disable the tools in-game display
 - A Button to Reset the utilities Rotation Tracking
 - An Opacity Setting 
 - A Scale Setting 
 - A Twist Rate Setting for manipulating the twist-i-ness levels 
+- (**New!**) A Height Setting
 - A Toggle to auto-starting and closing the utility with SteamVR
+- (**New!**) Finally, A Toggle to Hide the Main Window(!)
 - A Toggle to use Chaperone Color instead of white (real time too!) 
 - A Toggle To Link Opacity and Twist'ed-ness together, so it shows clearer the more wrapped up your cord is.
 - A Toggle to only display the Flower / Floor Overlay when the Dashboard is Open.
+- (**New!**) A link to Controller Settings Menu, for placing flower on hand instead of the floor
 
 All settings are saved between app sessions, and shouldn't need to be set every time its launched, plus (in Steam Version 2.2) Settings are also stored in SteamCloud!
 

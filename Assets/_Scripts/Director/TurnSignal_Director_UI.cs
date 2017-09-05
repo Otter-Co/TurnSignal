@@ -17,7 +17,7 @@ public partial class TurnSignal_Director
 			menuRig.menuRigCamera.enabled = false;
 
 			winC.HideUnityWindow();
-			
+			winC.ShowTrayIcon();
 		}
 		else
 		{
@@ -25,7 +25,13 @@ public partial class TurnSignal_Director
 			menuRig.menuRigCamera.enabled = true;
 
 			winC.ShowUnityWindow();
+			winC.HideTrayIcon();
 		}
+	}
+
+	public void OnShowWindow()
+	{
+		menuRig.hideMainWindowToggle.isOn = false;
 	}
 
 	public void LinkOpacityWithTwist(bool linked)

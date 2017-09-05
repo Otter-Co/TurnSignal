@@ -62,8 +62,6 @@ public partial class TurnSignal_Director : MonoBehaviour
 			Debug.Log("Starting up SteamWorks!");
 		else
 			Debug.Log("SteamWorks Init Failed!");
-
-		DontDestroyOnLoad(gameObject);
 		
 		targetFPS = idleFPS;
 
