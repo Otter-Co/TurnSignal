@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
+
+using Valve.VR;
 
 public class TurnSignal_Floor_Redux : MonoBehaviour 
 {
@@ -96,23 +99,27 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 	void UpdateHMDRotation()
 	{
-		if(!hmd)
+		if(!hmd || !vrHandler || !vrHandler.connectedToSteam)
 			return;
 
-		if(!vrHandler.connectedToSteam)
-			return;
+		HmdMatrix34_t pos = vrHandler.poseHandler.GetRawTrackedMatrix(vrHandler.poseHandler.hmdIndex);
 
-		var rot = vrHandler.poseHandler.GetPosRotation(vrHandler.poseHandler.hmdIndex);
-		debugYRot = rot.y;
+		// Assuming pos[0][2] and pos[2][2] are [((0 * 4) + 2)](2) and [((2 * 4) + 2)](10)
+		// This gibberish is referencing HmdMatrix34_t being a float[3][4] in C++, but not Here!
+		float y = Mathf.Atan2(pos.m2, pos.m10);
+
+		debugYRot = y;
 
 		if(initialRotation == 0)
 		{
-			curRotation = initialRotation = rot.y * 360f;
+			curRotation = initialRotation = PI2Eul(y);
+
+			// Skip the initial frame, saves a bunch of error checking stuff.
 			return;
 		}
 
 		lastRotation = curRotation;
-		curRotation = rot.y * 360f;
+		curRotation = PI2Eul(y);
 
 		float diff = curRotation - lastRotation;
 
@@ -125,6 +132,11 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		turnProgress = Mathf.Abs(rawTurns) / (float) (maxTurns * 720f);
 
 		lastDiff = diff;
+	}
+
+	float PI2Eul(float pi)
+	{
+		return -1f * ((pi / Mathf.PI) * 360f);
 	}
 
 	void UpdateTurnObj()
