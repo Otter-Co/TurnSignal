@@ -59,12 +59,10 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
 		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;
 
-		if(prefs.LinkDevice == 1)
-			rightLinkToggle.isOn = true;
-		else if(prefs.LinkDevice == 2)
-			leftLinkToggle.isOn = true;
-		else
-			disableLinkToggle.isOn = true;
+		disableLinkToggle.isOn = prefs.LinkDevice != 1 && prefs.LinkDevice != 2;
+
+		rightLinkToggle.isOn = prefs.LinkDevice == 1;
+		leftLinkToggle.isOn = prefs.LinkDevice == 2;	
 
 		flipSidesToggle.isOn = prefs.FlipSides;
 	}

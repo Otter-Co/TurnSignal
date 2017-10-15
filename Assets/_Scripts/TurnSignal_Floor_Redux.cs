@@ -41,28 +41,15 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	public int turns = 0;
 	public float rawTurns = 0f;
 
-
 	[Space(10)]
-	public float lastRotation = 360f;
-	public float lastDiff = 0f;
-
-
-	public float initialRotation = 0f;
-	public float curRotation = 0f;
 
 	public float turnProgress = 0f;
-
-	[Space(10)]
-
-	public float debugYRot = 0f;
 
 
 	// Methods to make UI easier;
 	public void ResetRotationTracking()
 	{
 		rawTurns = 0f;
-		lastDiff = 0f;
-		initialRotation = 0f;
 	}
 
 	public void AddMaxTurn()
@@ -102,36 +89,13 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		if(!hmd || !vrHandler || !vrHandler.connectedToSteam)
 			return;
 
-		HmdMatrix34_t pos = vrHandler.poseHandler.GetRawTrackedMatrix(vrHandler.poseHandler.hmdIndex);
+		var tp = vrHandler.poseHandler.GetRawTrackedMatrix(vrHandler.poseHandler.hmdIndex);
+		Vector3 angVel = new Vector3(tp.vAngularVelocity.v0, tp.vAngularVelocity.v1, tp.vAngularVelocity.v2);
 
-		// Assuming pos[0][2] and pos[2][2] are [((0 * 4) + 2)](2) and [((2 * 4) + 2)](10)
-		// This gibberish is referencing HmdMatrix34_t being a float[3][4] in C++, but not Here!
-		float y = Mathf.Atan2(pos.m2, pos.m10);
+		rawTurns += -(angVel.y * Time.deltaTime);
+		turns = (int) (rawTurns / (Mathf.PI * 2f));
 
-		debugYRot = y;
-
-		if(initialRotation == 0)
-		{
-			curRotation = initialRotation = PI2Eul(y);
-
-			// Skip the initial frame, saves a bunch of error checking stuff.
-			return;
-		}
-
-		lastRotation = curRotation;
-		curRotation = PI2Eul(y);
-
-		float diff = curRotation - lastRotation;
-
-		if(diff > 350f || diff < -350f)
-			diff = (-1f * curRotation) - lastRotation;
-
-		rawTurns += diff;
-
-		turns = (int) ( ( Mathf.Abs(rawTurns) + turnTolerance ) / 720f );
-		turnProgress = Mathf.Abs(rawTurns) / (float) (maxTurns * 720f);
-
-		lastDiff = diff;
+		turnProgress = Mathf.Abs(rawTurns / ((Mathf.PI * 2f) * maxTurns));
 	}
 
 	float PI2Eul(float pi)
@@ -141,7 +105,7 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 	void UpdateTurnObj()
 	{
-		float raw = rawTurns / (maxTurns * 720f);
+		float raw = rawTurns / ((Mathf.PI * 2f) * maxTurns);
 
 		if(reversed)
 			raw *= -1f;

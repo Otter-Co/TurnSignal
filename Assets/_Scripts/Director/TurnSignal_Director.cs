@@ -104,7 +104,9 @@ public partial class TurnSignal_Director : MonoBehaviour
 			if(foT.eulerAngles.x != 270f)
 				foT.eulerAngles = new Vector3(270f, foT.eulerAngles.y, foT.eulerAngles.z);
 
-			if(!flipSides && !floorRig.reversed)
+			if(flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+				floorRig.reversed = false;
+			else 
 				floorRig.reversed = true;
 		} 
 		else

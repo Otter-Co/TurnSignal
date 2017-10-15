@@ -62,8 +62,8 @@ public class OVR_Pose_Handler
         t.rotation = pose.rot;
     }
 
-    public HmdMatrix34_t GetRawTrackedMatrix(uint ind)
+    public TrackedDevicePose_t GetRawTrackedMatrix(uint ind)
     {
-        return poses[ind].mDeviceToAbsoluteTracking;
+        return poses[ind];
     }
 }

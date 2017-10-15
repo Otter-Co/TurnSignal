@@ -77,6 +77,7 @@ public class WindowController : MonoBehaviour
 
     public void CreateTray()
     {
+#if !UNITY_EDITOR
         if(trayForm == null)
         {
             trayForm = new TurnSignalTrayForm(trayIconTex); //CreateIcon(trayIconTex));
@@ -84,6 +85,7 @@ public class WindowController : MonoBehaviour
             trayForm.onExitCallback += OnExit;
             trayForm.onShowWindow += OnShowWindow;
         }
+#endif
     }
 
     public void DestroyTray()

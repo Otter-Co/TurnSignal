@@ -84,19 +84,17 @@ public partial class TurnSignal_Director
 		var foT = floorOverlay.transform;
 
 		if(floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-			if(foT.position.y != floorOverlayHeight * floorOverlayHandScale)
-				height *= floorOverlayHandScale;
-
-		if(flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-			height *= -1f;
-
-		if(floorOverlayHeight != height)
-			floorOverlayHeight = height;
+		{
+			height *= floorOverlayHandScale;				
+			
+			if(flipSides)
+				height *= -1f;
+		}
 
 		var heightV = new Vector3(foT.position.x, height, foT.position.z);
-		
-		if(foT.position != heightV)
-			foT.position = heightV;
+		foT.position = heightV;
+
+		floorOverlayHeight = height;
 	}
 
 	public void SetManifestAutoLaunch(bool autoLaunch)
