@@ -74,7 +74,7 @@ public partial class OVR_Overlay
     {
         bool err = (error != EVROverlayError.None);
 
-        if(err)
+        if(err && Overlay != null)
             Debug.Log("Error: " + Overlay.GetOverlayErrorNameFromEnum(error));
 
         return err;

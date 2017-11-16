@@ -50,9 +50,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 	private bool twistTied = false;
 
 	private int targetFPS = 0;
-
 	private int lastFps = 0;
-	private float lastFloorHeight = 0f;
 
 	void Start () 
 	{
@@ -104,9 +102,11 @@ public partial class TurnSignal_Director : MonoBehaviour
 			if(foT.eulerAngles.x != 270f)
 				foT.eulerAngles = new Vector3(270f, foT.eulerAngles.y, foT.eulerAngles.z);
 
-			if(flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+			if(floorOverlayDevice == Unity_Overlay.OverlayTrackedDevice.None)
+				floorRig.reversed = true;
+			else if(flipSides)
 				floorRig.reversed = false;
-			else 
+			else
 				floorRig.reversed = true;
 		} 
 		else
@@ -118,12 +118,6 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 			if(floorRig.reversed)
 				floorRig.reversed = false;
-		}
-
-		if(lastFloorHeight != floorOverlayHeight)
-		{
-			SetFloorOverlayHeight(floorOverlayHeight);
-			lastFloorHeight = floorOverlayHeight;
 		}
 		
 		SetWindowSize();

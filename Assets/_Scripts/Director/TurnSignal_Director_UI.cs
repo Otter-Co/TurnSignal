@@ -66,7 +66,7 @@ public partial class TurnSignal_Director
 	public void SetFloorOverlayControllerSide(bool flip)
 	{
 		flipSides = flip;
-		SetFloorOverlayHeight(prefs.Height);
+		// SetFloorOverlayHeight(prefs.Height);
 	}
 
 	public void SetFloorOverlayScale(float scale) 
@@ -84,12 +84,10 @@ public partial class TurnSignal_Director
 		var foT = floorOverlay.transform;
 
 		if(floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-		{
-			height *= floorOverlayHandScale;				
-			
-			if(flipSides)
-				height *= -1f;
-		}
+			height *= floorOverlayHandScale;
+
+		if(floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides)
+			height *= -1f;
 
 		var heightV = new Vector3(foT.position.x, height, foT.position.z);
 		foT.position = heightV;
