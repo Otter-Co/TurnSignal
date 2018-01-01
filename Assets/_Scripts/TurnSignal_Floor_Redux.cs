@@ -30,10 +30,8 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	
 	[Space(10)]
 
-	public float trackerDist = 0.2f;
-
-	public float maxXBeforeSwitch = 70f;
-	public float precision = 0.9f;
+	public float minDownXBeforeSwitch = 55f;
+	public float maxUpXBeforeSwitch = 295f;
 
 	[Space(10)]
 
@@ -65,12 +63,17 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 	[Space(10)]
 
 	public float lastDot = 0f;
+	[Space()]
+
+	public bool usingAngularVel = false;
+	public float debugX = 0f;
 
 
 	private float lastAngPos = 0f;
 
 	private Vector3 lastForward;
 	private Quaternion lastRot;
+	private bool lastRotSet = false;
 
 
 	// Methods to make UI easier;
@@ -126,8 +129,11 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		Quaternion hmdQ = hmd.transform.rotation;
 		Vector3 hmdR = hmd.transform.eulerAngles;
 
-		if(lastRot == null)
+		if(!lastRotSet)
+		{
 			lastRot = hmdQ;
+			lastRotSet = true;
+		}
 
 		hmdQ *= Quaternion.Euler(0, hmdR.y, 0);
 
@@ -135,7 +141,6 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		lastRot = hmdQ;
 
 		float angPosY = (-Mathf.Atan2(tp.mDeviceToAbsoluteTracking.m2, tp.mDeviceToAbsoluteTracking.m10) / (Mathf.PI) ) * 180f;
-
 
 		if(lastAngPos == 0)
 			lastAngPos = angPosY;
@@ -152,14 +157,29 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		rawAngPosTurns += (angPosDiff);
 		rawAngVelTurns += (angVel);
 
+		// Where the Magic Starts
 		angPosTurns = (int) (rawAngPosTurns / 360f);
 		angVelTurns = (int) (rawAngVelTurns / 360f);
 
-		if(hmdR.y > maxXBeforeSwitch || hmdR.y < -maxXBeforeSwitch)
-			rawCombinedTurns += angVel;
-		else
+		debugX = hmdR.x;
+
+		if( hmdR.x < minDownXBeforeSwitch || hmdR.x > maxUpXBeforeSwitch )
+		{
 			rawCombinedTurns += angPos;
 
+			if(usingAngularVel)
+				usingAngularVel = false;
+		}
+		else
+		{
+			rawCombinedTurns += angVel;
+
+			if(!usingAngularVel)
+				usingAngularVel = true;
+		}
+			
+		// Then it Ends.
+		
 		rawTurnProgress = (rawCombinedTurns / (360f)) / maxTurns;
 
 		turnProgress = Mathf.Abs(rawTurnProgress);
