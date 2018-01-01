@@ -1,11 +1,12 @@
 {
-    "lastEditTime": 1510810717,
+    "lastEditTime": 1514780939,
     "Scale": 2.0,
     "Opacity": 0.029999999329447748,
     "Height": 0.0,
     "TwistRate": 10,
     "PetalCount": 6,
     "StartWithSteamVR": true,
+    "EnableSteamWorks": true,
     "HideMainWindow": false,
     "UseChaperoneColor": false,
     "LinkOpacityWithTwist": false,

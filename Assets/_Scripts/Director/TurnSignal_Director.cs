@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 
 using Valve.VR;
-using Steamworks;
 
 public partial class TurnSignal_Director : MonoBehaviour 
 {
@@ -54,11 +53,6 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	void Start () 
 	{
-		if(SteamManager.Initialized)
-			Debug.Log("Starting up SteamWorks!");
-		else
-			Debug.Log("SteamWorks Init Failed!");
-		
 		targetFPS = idleFPS;
 
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();

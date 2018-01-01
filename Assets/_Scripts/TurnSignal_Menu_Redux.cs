@@ -23,6 +23,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	[Space(5)]
 	
 	public Toggle startWithVRToggle;
+	public Toggle enableSteamWorksToggle;
 	public Toggle hideMainWindowToggle;
 	public Toggle useChapColorToggle;
 	public Toggle tieTwistToggle;
@@ -37,9 +38,10 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 	public void SteamStart()
 	{
+		prefs.Load();
 
-		if(!prefs.Load())			
-			Debug.Log("Bad Settings Load!");
+		if(prefs.EnableSteamWorks)
+			prefs.SteamLoad();
 
 		SetUIValues();
 	}
@@ -55,6 +57,8 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
+		enableSteamWorksToggle.isOn = prefs.EnableSteamWorks;
+		
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;
 		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
 		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;

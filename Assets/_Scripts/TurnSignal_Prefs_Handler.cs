@@ -8,7 +8,9 @@ using UnityEngine;
 using Steamworks;
 
 public class TurnSignal_Prefs_Handler : MonoBehaviour 
-{       
+{
+    public TurnSignal_Steam_Handler steamHandler;
+
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";
     private string _fileName = "";
@@ -108,6 +110,32 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public bool StartWithSteamVR
+    {
+        get 
+        {
+            return prefs.StartWithSteamVR;
+        }
+        set
+        {
+            prefs.StartWithSteamVR = value;
+            Save();
+        }
+    }
+
+    public bool EnableSteamWorks
+    {
+        get 
+        {
+            return prefs.EnableSteamWorks;
+        }
+        set 
+        {
+            prefs.EnableSteamWorks = value;
+            Save();
+        }
+    }
+
     public bool HideMainWindow 
     {
         get 
@@ -121,18 +149,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public bool StartWithSteamVR
-    {
-        get 
-        {
-            return prefs.StartWithSteamVR;
-        }
-        set
-        {
-            prefs.StartWithSteamVR = value;
-            Save();
-        }
-    }
+
     public bool UseChaperoneColor 
     {
         get 
@@ -214,9 +231,10 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         string fullP = _filePath + _fileName;
 
         Debug.Log("Writing Local Prefs!");
+
         File.WriteAllText(fullP, text);
 
-        if(!skipSteam)
+        if(!skipSteam && prefs.EnableSteamWorks)
             SteamSave();
 
         return File.Exists(fullP);
@@ -224,7 +242,9 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public bool SteamSave() 
     {
-        if(SteamManager.Initialized && SteamRemoteStorage.IsCloudEnabledForAccount())
+        bool ret = false;
+
+        if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
         {
             string text = JsonUtility.ToJson(prefs, true);
             
@@ -232,76 +252,42 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
 
             Debug.Log("Writing Prefs to SteamCloud!");
-            return SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
+
+            ret = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
+
+            steamHandler.ShutDown();
         }
-        else
-            return false;
+        
+        return ret;
     }
 
-    public bool Load()
+    public void Load()
     {
-        TurnSignalPrefs fileP = FileLoad();
-        TurnSignalPrefs steamP = SteamLoad();
-
-        bool res = false;
-        
-        bool skipSteam = false;
         TurnSignalPrefs p = new TurnSignalPrefs();
 
-        if(fileP != null && steamP != null) 
-        {
-            if(fileP.lastEditTime >= steamP.lastEditTime)
-                p = fileP;
-            else 
-            {
-                p = steamP;
-                skipSteam = true;
-            }
+        TurnSignalPrefs fileP = FileLoad();
 
-            res = true;
-        }
-        else if(fileP == null && steamP != null)
-        {
-            p = steamP;
-            skipSteam = true;
-            res = true;
-        }
-        else if(fileP != null && steamP == null)
+        if(fileP != null)
         {
             p = fileP;
-            res = true;
+
+            if(fileP.EnableSteamWorks)
+            {
+                var steamP = SteamLoad();
+
+                if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
+                    p = steamP;
+            }        
+        }
+        else 
+        {
+            var steamP = SteamLoad();
+            if(steamP != null)
+                p = steamP;    
         }
         
         prefs = p;
-        Save(skipSteam);
-        
-        return res;
-    }
-
-    public TurnSignalPrefs SteamLoad() 
-    {
-        if(SteamManager.Initialized && SteamRemoteStorage.IsCloudEnabledForAccount())
-        {
-            if(SteamRemoteStorage.FileExists(_fileName))
-            {
-                string text = "";
-                var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
-                var bytes = new byte[byteCount];
-                
-                Debug.Log("Reading Prefs from SteamCloud!");
-                var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
-
-                if(fileC > 0)
-                    text = System.Text.Encoding.ASCII.GetString(bytes);
-                    
-                var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
-
-                if(o != null)
-                    return o;        
-            }   
-        }
-        
-        return null;
+        Save();
     }
 
     public TurnSignalPrefs FileLoad()
@@ -312,9 +298,41 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
             return null;
 
         Debug.Log("Reading Local Prefs!");
+
         string text = File.ReadAllText(fullP);
 
         return (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
+    }
+
+    public TurnSignalPrefs SteamLoad() 
+    {
+        TurnSignalPrefs ret = null;
+        
+        if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
+        {
+            if(SteamRemoteStorage.FileExists(_fileName))
+            {
+                string text = "";
+                var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
+                var bytes = new byte[byteCount];
+                
+                Debug.Log("Reading Prefs from SteamCloud!");
+                
+                var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
+
+                if(fileC > 0)
+                    text = System.Text.Encoding.ASCII.GetString(bytes);
+                    
+                var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
+
+                if(o != null)
+                    ret = o;
+            }
+
+            steamHandler.ShutDown();
+        }
+        
+        return ret;
     }
 
     public void Reset()
@@ -338,6 +356,7 @@ public class TurnSignalPrefs
     public int PetalCount = 6;
 
     public bool StartWithSteamVR = true;
+    public bool EnableSteamWorks = true;
     public bool HideMainWindow = false;
     public bool UseChaperoneColor = false;
     public bool LinkOpacityWithTwist = false;
