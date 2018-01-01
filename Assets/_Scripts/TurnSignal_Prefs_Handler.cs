@@ -5,11 +5,9 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using Steamworks;
-
 public class TurnSignal_Prefs_Handler : MonoBehaviour 
 {
-    public TurnSignal_Steam_Handler steamHandler;
+    // public TurnSignal_Steam_Handler steamHandler;
 
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";
@@ -234,12 +232,12 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
         File.WriteAllText(fullP, text);
 
-        if(!skipSteam && prefs.EnableSteamWorks)
-            SteamSave();
+        // if(!skipSteam && prefs.EnableSteamWorks) SteamSave();
 
         return File.Exists(fullP);
     }
 
+/* 
     public bool SteamSave() 
     {
         bool ret = false;
@@ -260,7 +258,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         
         return ret;
     }
-
+*/
     public void Load()
     {
         TurnSignalPrefs p = new TurnSignalPrefs();
@@ -271,20 +269,20 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         {
             p = fileP;
 
-            if(fileP.EnableSteamWorks)
-            {
-                var steamP = SteamLoad();
+            // if(fileP.EnableSteamWorks)
+            // {
+            //     var steamP = SteamLoad();
 
-                if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
-                    p = steamP;
-            }        
+            //     if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
+            //         p = steamP;
+            // }        
         }
-        else 
-        {
-            var steamP = SteamLoad();
-            if(steamP != null)
-                p = steamP;    
-        }
+        // else 
+        // {
+        //     var steamP = SteamLoad();
+        //     if(steamP != null)
+        //         p = steamP;    
+        // }
         
         prefs = p;
         Save();
@@ -304,6 +302,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         return (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
     }
 
+/*
     public TurnSignalPrefs SteamLoad() 
     {
         TurnSignalPrefs ret = null;
@@ -334,6 +333,8 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         
         return ret;
     }
+
+ */
 
     public void Reset()
     {

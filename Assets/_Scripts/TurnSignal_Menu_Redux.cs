@@ -40,8 +40,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	{
 		prefs.Load();
 
-		if(prefs.EnableSteamWorks)
-			prefs.SteamLoad();
+		// if(prefs.EnableSteamWorks) prefs.SteamLoad();
 
 		SetUIValues();
 	}
