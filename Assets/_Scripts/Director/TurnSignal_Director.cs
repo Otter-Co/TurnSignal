@@ -41,7 +41,8 @@ public partial class TurnSignal_Director : MonoBehaviour
 	public GameObject hmdO;
 	public float floorOverlayHeight = 0f;
 	
-
+	
+	private TurnSignal_Steam_Handler steamHandler;
 	private TurnSignal_Prefs_Handler prefs;
 	private WindowController winC;
 	private OVR_Handler handler;
@@ -55,7 +56,9 @@ public partial class TurnSignal_Director : MonoBehaviour
 	{
 		targetFPS = idleFPS;
 
+		steamHandler = GetComponent<TurnSignal_Steam_Handler>();
 		prefs = GetComponent<TurnSignal_Prefs_Handler>();
+
 		handler = OVR_Handler.instance;
 
 		winC = GetComponent<WindowController>();
@@ -66,6 +69,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 		string prefsFileName = "prefs.json";
 
 		prefs.SetFilePath(prefsPath, prefsFileName);
+		prefs.Load();
 	}
 
 	public void OnApplicationQuit()	 

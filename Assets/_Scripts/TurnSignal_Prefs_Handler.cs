@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class TurnSignal_Prefs_Handler : MonoBehaviour 
 {
-    // public TurnSignal_Steam_Handler steamHandler;
+    public TurnSignal_Steam_Handler steamHandler;
 
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";
@@ -232,33 +232,47 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
         File.WriteAllText(fullP, text);
 
-        // if(!skipSteam && prefs.EnableSteamWorks) SteamSave();
+        if(!skipSteam && prefs.EnableSteamWorks) 
+            if(SteamSave())
+                Debug.Log("Successfully Saved SteamCloud Prefs!");
+            else
+                Debug.Log("Failed to save SteamCloud Prefs!");
 
         return File.Exists(fullP);
     }
 
-/* 
+
     public bool SteamSave() 
     {
         bool ret = false;
 
-        if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
+        if(steamHandler.StartUp())
         {
-            string text = JsonUtility.ToJson(prefs, true);
-            
-            var bytes = System.Text.Encoding.ASCII.GetBytes(text);
-            var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
+            var c = steamHandler.steamClient;
 
-            Debug.Log("Writing Prefs to SteamCloud!");
+            Debug.Log("Writing SteamCloud Prefs!");
 
-            ret = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
-
-            steamHandler.ShutDown();
+            if(c.RemoteStorage.IsCloudEnabledForAccount)
+                ret = c.RemoteStorage.WriteString(_fileName, JsonUtility.ToJson(prefs, true));
         }
+
+        // if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
+        // {
+        //     string text = JsonUtility.ToJson(prefs, true);
+            
+        //     var bytes = System.Text.Encoding.ASCII.GetBytes(text);
+        //     var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
+
+        //     Debug.Log("Writing Prefs to SteamCloud!");
+
+        //     ret = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
+
+        //     steamHandler.ShutDown();
+        // }
         
         return ret;
     }
-*/
+
     public void Load()
     {
         TurnSignalPrefs p = new TurnSignalPrefs();
@@ -269,20 +283,20 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         {
             p = fileP;
 
-            // if(fileP.EnableSteamWorks)
-            // {
-            //     var steamP = SteamLoad();
+            if(fileP.EnableSteamWorks)
+            {
+                var steamP = SteamLoad();
 
-            //     if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
-            //         p = steamP;
-            // }        
+                if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
+                    p = steamP;
+            }        
         }
-        // else 
-        // {
-        //     var steamP = SteamLoad();
-        //     if(steamP != null)
-        //         p = steamP;    
-        // }
+        else 
+        {
+            var steamP = SteamLoad();
+            if(steamP != null)
+                p = steamP;    
+        }
         
         prefs = p;
         Save();
@@ -291,50 +305,58 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     public TurnSignalPrefs FileLoad()
     {
         string fullP = _filePath + _fileName;
+
+        Debug.Log("Reading Local Prefs!");
         
         if(!File.Exists(fullP))
             return null;
-
-        Debug.Log("Reading Local Prefs!");
 
         string text = File.ReadAllText(fullP);
 
         return (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
     }
 
-/*
     public TurnSignalPrefs SteamLoad() 
     {
         TurnSignalPrefs ret = null;
-        
-        if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
+
+        if(steamHandler.StartUp())
         {
-            if(SteamRemoteStorage.FileExists(_fileName))
-            {
-                string text = "";
-                var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
-                var bytes = new byte[byteCount];
-                
-                Debug.Log("Reading Prefs from SteamCloud!");
-                
-                var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
+            var c = steamHandler.steamClient;
 
-                if(fileC > 0)
-                    text = System.Text.Encoding.ASCII.GetString(bytes);
-                    
-                var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
+            Debug.Log("Reading SteamCloud Prefs!");
 
-                if(o != null)
-                    ret = o;
-            }
-
-            steamHandler.ShutDown();
+            if(c.RemoteStorage.IsCloudEnabledForAccount && c.RemoteStorage.FileExists(_fileName))
+                ret = (TurnSignalPrefs) JsonUtility.FromJson(c.RemoteStorage.ReadString(_fileName), typeof(TurnSignalPrefs));
         }
+        
+        // if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
+        // {
+        //     if(SteamRemoteStorage.FileExists(_fileName))
+        //     {
+        //         string text = "";
+        //         var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
+        //         var bytes = new byte[byteCount];
+                
+        //         Debug.Log("Reading Prefs from SteamCloud!");
+                
+        //         var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
+
+        //         if(fileC > 0)
+        //             text = System.Text.Encoding.ASCII.GetString(bytes);
+                    
+        //         var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
+
+        //         if(o != null)
+        //             ret = o;
+        //     }
+
+        //     steamHandler.ShutDown();
+        // }
         
         return ret;
     }
 
- */
 
     public void Reset()
     {

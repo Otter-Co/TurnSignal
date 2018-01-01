@@ -105,4 +105,18 @@ public partial class TurnSignal_Director
 	{
 		return (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false; 
 	}
+
+	public void EnableSteamWorks(bool enable)
+	{
+		if(enable)
+		{
+			if(!steamHandler.connectedToSteam)
+				steamHandler.StartUp();
+		}
+		else
+		{
+			if(steamHandler.connectedToSteam)
+				steamHandler.ShutDown();
+		}
+	}
 }
