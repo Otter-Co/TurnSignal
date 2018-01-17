@@ -24,6 +24,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	
 	public Toggle startWithVRToggle;
 	public Toggle hideMainWindowToggle;
+	public Toggle followPlayerToggle;
 	public Toggle useChapColorToggle;
 	public Toggle tieTwistToggle;
 	public Toggle onlyShowInDashToggle;
@@ -52,17 +53,19 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
 
+		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
-		startWithVRToggle.isOn = prefs.StartWithSteamVR;
+		followPlayerToggle.isOn = prefs.FollowPlayerHeadset;
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;
 		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
+
 		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;
 
-		disableLinkToggle.isOn = prefs.LinkDevice != 1 && prefs.LinkDevice != 2;
+		disableLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.None;
 
-		rightLinkToggle.isOn = prefs.LinkDevice == 1;
-		leftLinkToggle.isOn = prefs.LinkDevice == 2;	
+		rightLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Right;
+		leftLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Left;
 
 		flipSidesToggle.isOn = prefs.FlipSides;
 	}

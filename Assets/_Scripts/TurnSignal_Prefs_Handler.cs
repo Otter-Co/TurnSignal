@@ -108,6 +108,19 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public bool StartWithSteamVR
+    {
+        get 
+        {
+            return prefs.StartWithSteamVR;
+        }
+        set
+        {
+            prefs.StartWithSteamVR = value;
+            Save();
+        }
+    }
+
     public bool HideMainWindow 
     {
         get 
@@ -121,18 +134,19 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public bool StartWithSteamVR
+    public bool FollowPlayerHeadset
     {
         get 
         {
-            return prefs.StartWithSteamVR;
+            return prefs.FollowPlayerHeadset;
         }
         set
         {
-            prefs.StartWithSteamVR = value;
+            prefs.FollowPlayerHeadset = value;
             Save();
         }
     }
+    
     public bool UseChaperoneColor 
     {
         get 
@@ -172,7 +186,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public int LinkDevice 
+    public TurnSignalPrefsLinkDevice LinkDevice 
     {
         get 
         {
@@ -325,8 +339,15 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     }
 }
 
-[System.Serializable]
-public class TurnSignalPrefs 
+// #enterpriseNames
+public enum TurnSignalPrefsLinkDevice 
+{
+    None,
+    Right,
+    Left
+}
+
+[System.Serializable] public class TurnSignalPrefs 
 {
     public Int32 lastEditTime = 0;
 
@@ -339,10 +360,13 @@ public class TurnSignalPrefs
 
     public bool StartWithSteamVR = true;
     public bool HideMainWindow = false;
+
+    public bool FollowPlayerHeadset = false;
     public bool UseChaperoneColor = false;
     public bool LinkOpacityWithTwist = false;
+
     public bool OnlyShowInDashboard = false;
 
-    public int LinkDevice = 0;
+    public TurnSignalPrefsLinkDevice LinkDevice = TurnSignalPrefsLinkDevice.None;
     public bool FlipSides = false;
 }

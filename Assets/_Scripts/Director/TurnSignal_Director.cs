@@ -42,6 +42,10 @@ public partial class TurnSignal_Director : MonoBehaviour
 	public GameObject hmdO;
 	public float floorOverlayHeight = 0f;
 	
+	public float floorOverlayFollowSpeed = 1.5f;
+	public float floorOverlayFollowSpeedRatio = 1.0f;
+
+	
 
 	private TurnSignal_Prefs_Handler prefs;
 	private WindowController winC;
@@ -81,12 +85,27 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	void Update() 
 	{
+		UpdateFPS();
+		UpdateTwistTie();
+
+		UpdateFloorOverlayRot();
+		UpdateFloorOverlayPos();
+		
+		SetWindowSize();
+	}
+
+	public void UpdateFPS()
+	{
 		if(lastFps != targetFPS)
 		{
 			lastFps = targetFPS;
 			Application.targetFrameRate = targetFPS;
 		}
+	}
 
+	// Ties Opacity to Twist Progress
+	public void UpdateTwistTie()
+	{
 		if(twistTied)
 		{
 			var oldOpat = prefs.Opacity;
@@ -95,7 +114,11 @@ public partial class TurnSignal_Director : MonoBehaviour
 		else if(floorOverlay.opacity != prefs.Opacity)
 			floorOverlay.opacity = prefs.Opacity;
 
-		if(hmdO.transform.position.y < floorOverlayHeight || (flipSides && floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None))
+	}
+
+	public void UpdateFloorOverlayRot()
+	{
+		if(hmdO.transform.position.y < floorOverlayHeight || (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides))
 		{
 			var foT = floorOverlay.transform;
 
@@ -119,8 +142,27 @@ public partial class TurnSignal_Director : MonoBehaviour
 			if(floorRig.reversed)
 				floorRig.reversed = false;
 		}
-		
-		SetWindowSize();
+	}
+
+	public void UpdateFloorOverlayPos()
+	{
+		var fot = floorOverlay.transform;
+
+		if(!prefs.FollowPlayerHeadset || floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+		{
+			if(fot.position.x != 0 || fot.position.y != 0 || fot.position.z != 0)
+				fot.position = Vector3.zero;
+		}
+		else if(prefs.FollowPlayerHeadset)
+		{
+			var newPos = new Vector3(
+				hmdO.transform.position.x, 
+				floorOverlayHeight, 
+				hmdO.transform.position.z
+			);
+
+			fot.position = newPos;
+		}
 	}
 	
 	// Recursion DOOMSDAY
