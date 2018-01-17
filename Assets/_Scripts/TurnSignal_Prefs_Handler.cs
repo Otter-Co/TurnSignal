@@ -58,6 +58,22 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public float FollowSpeed 
+    {
+        get 
+        {
+            return prefs.FollowSpeed;
+        }
+        set 
+        {
+            value = value > 1f ? 1f : value;
+            value = value < 0.1f ? 0.1f : value;
+
+            prefs.FollowSpeed = value;
+            Save();
+        }
+    }
+
     public int TwistRate 
     {
         get
@@ -354,6 +370,7 @@ public enum TurnSignalPrefsLinkDevice
     public float Scale = 2f;
     public float Opacity = 0.03f;
     public float Height = 0f;
+    public float FollowSpeed = 1f;
 
     public int TwistRate = 10;
     public int PetalCount = 6;

@@ -95,6 +95,11 @@ public partial class TurnSignal_Director
 		floorOverlayHeight = height;
 	}
 
+	public void SetFloorOverlayFollowSpeed(float speed)
+	{
+		floorOverlayFollowSpeedRatio = speed;
+	}
+
 	public void SetManifestAutoLaunch(bool autoLaunch)
 	{
 		if(handler != null && handler.Applications != null)

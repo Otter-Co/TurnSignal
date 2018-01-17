@@ -16,9 +16,10 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 	public Slider scaleSlider;
 	public Slider opacitySlider;
-	public Slider heightSlider;
 	public Slider twistRateSlider;
 	public Slider petalSlider;
+	public Slider heightSlider;
+	public Slider followSpeedSlider;
 
 	[Space(5)]
 	
@@ -29,7 +30,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	public Toggle tieTwistToggle;
 	public Toggle onlyShowInDashToggle;
 
-	[Space(10)]
+	[Space(5)]
 
 	public Toggle disableLinkToggle;
 	public Toggle rightLinkToggle;
@@ -49,9 +50,11 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	{	
 		scaleSlider.value = prefs.Scale;
 		opacitySlider.value = prefs.Opacity;
-		heightSlider.value = prefs.Height;
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
+		heightSlider.value = prefs.Height;
+		followSpeedSlider.value = prefs.FollowSpeed;
+
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		hideMainWindowToggle.isOn = prefs.HideMainWindow;

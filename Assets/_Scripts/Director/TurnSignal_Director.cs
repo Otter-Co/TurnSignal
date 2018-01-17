@@ -41,7 +41,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	public GameObject hmdO;
 	public float floorOverlayHeight = 0f;
-	
+
 	public float floorOverlayFollowSpeed = 1.5f;
 	public float floorOverlayFollowSpeedRatio = 1.0f;
 
@@ -146,12 +146,14 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	public void UpdateFloorOverlayPos()
 	{
-		var fot = floorOverlay.transform;
 
-		if(!prefs.FollowPlayerHeadset || floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+		var foP = floorOverlay.transform.position;
+
+		if( !prefs.FollowPlayerHeadset || 
+			floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None )
 		{
-			if(fot.position.x != 0 || fot.position.y != 0 || fot.position.z != 0)
-				fot.position = Vector3.zero;
+			if(foP.x != 0 || foP.z != 0)
+				floorOverlay.transform.position = new Vector3(0, floorOverlayHeight, 0);
 		}
 		else if(prefs.FollowPlayerHeadset)
 		{
@@ -161,7 +163,9 @@ public partial class TurnSignal_Director : MonoBehaviour
 				hmdO.transform.position.z
 			);
 
-			fot.position = newPos;
+			var speed = Time.deltaTime * floorOverlayFollowSpeed;
+
+			floorOverlay.transform.position = foP + ((newPos - foP) * (speed * floorOverlayFollowSpeedRatio));
 		}
 	}
 	

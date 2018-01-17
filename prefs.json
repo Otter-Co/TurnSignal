@@ -1,8 +1,9 @@
 {
-    "lastEditTime": 1516153670,
+    "lastEditTime": 1516156394,
     "Scale": 2.0,
     "Opacity": 0.029999999329447748,
-    "Height": 1.6892008781433106,
+    "Height": 0.0,
+    "FollowSpeed": 1.0,
     "TwistRate": 10,
     "PetalCount": 6,
     "StartWithSteamVR": true,
