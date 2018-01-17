@@ -58,6 +58,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 
 	void Start () 
 	{
+		// Init SteamWorks.net
 		if(SteamManager.Initialized)
 			Debug.Log("Starting up SteamWorks!");
 		else
@@ -71,7 +72,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 		winC = GetComponent<WindowController>();
 
 		// Some SteamCloud Stuff
-
+		// Why the hell is this not a settable public property?
 		string prefsPath = Application.dataPath + "/../";
 		string prefsFileName = "prefs.json";
 
@@ -83,6 +84,8 @@ public partial class TurnSignal_Director : MonoBehaviour
 		 prefs.Save();
 	}
 
+	// @TODO - Fix the hell outta this mess
+	// Refactor the whole speghetto-mixed app state
 	void Update() 
 	{
 		UpdateFPS();
@@ -191,6 +194,7 @@ public partial class TurnSignal_Director : MonoBehaviour
 	{
 		if(prefs.StartWithSteamVR)
 		{
+			// Logging Quit. On Quit.
 			Debug.Log("Quitting!");
 
 			Application.Quit();
