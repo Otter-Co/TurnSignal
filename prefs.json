@@ -1,5 +1,5 @@
 {
-    "lastEditTime": 1516156394,
+    "lastEditTime": 1516156749,
     "Scale": 2.0,
     "Opacity": 0.029999999329447748,
     "Height": 0.0,
@@ -8,7 +8,7 @@
     "PetalCount": 6,
     "StartWithSteamVR": true,
     "HideMainWindow": false,
-    "FollowPlayerHeadset": true,
+    "FollowPlayerHeadset": false,
     "UseChaperoneColor": false,
     "LinkOpacityWithTwist": false,
     "OnlyShowInDashboard": false,
