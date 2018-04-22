@@ -58,15 +58,16 @@ public partial class TurnSignal_Director : MonoBehaviour
 
     void Start()
     {
+        targetFPS = idleFPS;
+
+        steamHandler = GetComponent<TurnSignal_Steam_Handler>();
+
         // Init SteamWorks.net
         if (steamHandler.connectedToSteam)
             Debug.Log("Starting up SteamWorks!");
         else
             Debug.Log("SteamWorks Init Failed!");
 
-        targetFPS = idleFPS;
-
-        steamHandler = GetComponent<TurnSignal_Steam_Handler>();
         prefs = GetComponent<TurnSignal_Prefs_Handler>();
 
         handler = OVR_Handler.instance;
