@@ -151,7 +151,7 @@ MonoBehaviour:
   heightSlider: {fileID: 170382012}
   followSpeedSlider: {fileID: 313972864}
   startWithVRToggle: {fileID: 839086830}
-  enableSteamWorksToggle: {fileID: 0}
+  enableSteamWorksToggle: {fileID: 1865802561}
   hideMainWindowToggle: {fileID: 4062581}
   followPlayerToggle: {fileID: 832663606}
   useChapColorToggle: {fileID: 707216130}
