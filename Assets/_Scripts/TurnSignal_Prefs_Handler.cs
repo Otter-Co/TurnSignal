@@ -58,6 +58,22 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public float FollowSpeed
+    {
+        get
+        {
+            return prefs.FollowSpeed;
+        }
+        set
+        {
+            value = value > 1f ? 1f : value;
+            value = value < 0.1f ? 0.1f : value;
+
+            prefs.FollowSpeed = value;
+            Save();
+        }
+    }
+
     public int TwistRate
     {
         get
@@ -134,6 +150,20 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
+    public bool FollowPlayerHeadset
+    {
+        get
+        {
+
+            return prefs.FollowPlayerHeadset;
+        }
+        set
+        {
+            prefs.FollowPlayerHeadset = value;
+            Save();
+        }
+    }
+
     public bool HideMainWindow
     {
         get
@@ -187,7 +217,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public int LinkDevice
+    public TurnSignalPrefsLinkDevice LinkDevice 
     {
         get
         {
@@ -322,14 +352,22 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     }
 }
 
-[System.Serializable]
-public class TurnSignalPrefs
+// #enterpriseNames
+public enum TurnSignalPrefsLinkDevice 
+{
+    None,
+    Right,
+    Left
+}
+
+[System.Serializable] public class TurnSignalPrefs 
 {
     public Int32 lastEditTime = 0;
 
     public float Scale = 2f;
     public float Opacity = 0.03f;
     public float Height = 0f;
+    public float FollowSpeed = 1f;
 
     public int TwistRate = 10;
     public int PetalCount = 6;
@@ -337,10 +375,13 @@ public class TurnSignalPrefs
     public bool StartWithSteamVR = true;
     public bool EnableSteamWorks = true;
     public bool HideMainWindow = false;
+
+    public bool FollowPlayerHeadset = false;
     public bool UseChaperoneColor = false;
     public bool LinkOpacityWithTwist = false;
+
     public bool OnlyShowInDashboard = false;
 
-    public int LinkDevice = 0;
+    public TurnSignalPrefsLinkDevice LinkDevice = TurnSignalPrefsLinkDevice.None;
     public bool FlipSides = false;
 }

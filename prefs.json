@@ -8,6 +8,7 @@
     "StartWithSteamVR": true,
     "EnableSteamWorks": true,
     "HideMainWindow": false,
+    "FollowPlayerHeadset": false,
     "UseChaperoneColor": false,
     "LinkOpacityWithTwist": false,
     "OnlyShowInDashboard": false,

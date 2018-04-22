@@ -1,4 +1,4 @@
-TurnSignal (New 2.3!)
+TurnSignal (New 2.4!)
 =
 
 ![TurnSignal Icon](/Assets/_Res/turnsignal-v2.png)
@@ -47,27 +47,29 @@ After launching the program, the window should be minimized automatically, if no
 
 The settings menu to control Aspects of TurnSignal should be included in your SteamVR Dashboard as an Overlay, and the utility itself should be projected onto the floor of your environment.
 
-The Newest Settings menu includes:
+The Newest Settings Menu (2.4.0) includes:
 
-- (**New!**) Added Menu to Main Window to not waste space!
+- Added Menu to Main Window to not waste space!
 - A Button Toggle to enable/disable the tools in-game display
 - A Button to Reset the utilities Rotation Tracking
 - An Opacity Setting 
 - A Scale Setting 
 - A Twist Rate Setting for manipulating the twist-i-ness levels 
-- (**New!**) A Height Setting
+- A Height Setting
 - A Toggle to auto-starting and closing the utility with SteamVR
-- (**New!**) Finally, A Toggle to Hide the Main Window(!)
+- Finally, A Toggle to Hide the Main Window(!)
 - A Toggle to use Chaperone Color instead of white (real time too!) 
 - A Toggle To Link Opacity and Twist'ed-ness together, so it shows clearer the more wrapped up your cord is.
 - A Toggle to only display the Flower / Floor Overlay when the Dashboard is Open.
-- (**New!**) A link to Controller Settings Menu, for placing flower on hand instead of the floor
+- A "Link to Controller" Settings Menu, for placing flower on hand instead of the floor
+- (**New**) A Toggle to allow the Flower / Floor Overlay to follow the player, and a speed setting slider.
+- (**New**) Fixed / Improved TurnTracking algorithm that should (hopefully) limit drift and other tracking-inaccuracy.
 
 All settings are saved between app sessions, and shouldn't need to be set every time its launched, plus (in Steam Version 2.2) Settings are also stored in SteamCloud!
 
 The utility will still track rotations even when its toggled off from the dashboard menu, so if/when its toggled back on, it will still show turns as if was left on, with the turns intact.
 
--- Note -- The way Twist Rate affects the ammount of rotation the floor reacts to is actually measured from 0 - 10 (now user set Max) turns in either direction, and given as a 0.0 - 1.0 floating point, with 10 (or user number) turns used as 'max', but it can exceed this without problem, resulting in 'fun' floor shapes that have higher then 1.0 twist values. Just an FYI.
+-- Note -- The way Twist Rate affects the amount of rotation the floor reacts to is actually measured from 0 - 10 (now user set Max) turns in either direction, and given as a 0.0 - 1.0 floating point, with 10 (or user number) turns used as 'max', but it can exceed this without problem, resulting in 'fun' floor shapes that have higher then 1.0 twist values. Just an FYI.
 
 ---
 ## About:

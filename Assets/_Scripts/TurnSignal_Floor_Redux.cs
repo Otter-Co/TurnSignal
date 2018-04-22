@@ -124,7 +124,8 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		if(!tp.bPoseIsValid)
 			return;
 
-		Vector3 angVelVec = new Vector3(tp.vAngularVelocity.v0, tp.vAngularVelocity.v1, tp.vAngularVelocity.v2);
+		// Start Y-Euler Tracking (Old Algorithm) 
+		// Don't not touch, but tread carfully.
 
 		Quaternion hmdQ = hmd.transform.rotation;
 		Vector3 hmdR = hmd.transform.eulerAngles;
@@ -140,7 +141,12 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		lastDot = Quaternion.Dot(hmdQ, lastRot);
 		lastRot = hmdQ;
 
-		float angPosY = (-Mathf.Atan2(tp.mDeviceToAbsoluteTracking.m2, tp.mDeviceToAbsoluteTracking.m10) / (Mathf.PI) ) * 180f;
+		float angPosY = 180f * (
+			-Mathf.Atan2(
+				tp.mDeviceToAbsoluteTracking.m2, 
+				tp.mDeviceToAbsoluteTracking.m10
+			) / (Mathf.PI) 
+		);
 
 		if(lastAngPos == 0)
 			lastAngPos = angPosY;
@@ -151,18 +157,27 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 		if(Mathf.Abs(angPosDiff) >= 340f)
 			angPosDiff += angPosDiff > 0f ? -360f : 360f;
 
+
+		// Start Angular Velocity Tracking
+
+		Vector3 angVelVec = new Vector3(tp.vAngularVelocity.v0, tp.vAngularVelocity.v1, tp.vAngularVelocity.v2);
+
+		// Prepping Magic
 		float angPos = angPosDiff;
 		float angVel = ((angVelVec.y * Time.deltaTime) / (Mathf.PI * 2f)) * -360f;
 
+		// Writing Some History
 		rawAngPosTurns += (angPosDiff);
 		rawAngVelTurns += (angVel);
 
-		// Where the Magic Starts
+		// -- > Where the Magic Starts
 		angPosTurns = (int) (rawAngPosTurns / 360f);
 		angVelTurns = (int) (rawAngVelTurns / 360f);
 
+		// Get Dem Bugs
 		debugX = hmdR.x;
 
+		// If at breaking X angle, use new algo, if not, use old.
 		if( hmdR.x < minDownXBeforeSwitch || hmdR.x > maxUpXBeforeSwitch )
 		{
 			rawCombinedTurns += angPos;
@@ -178,7 +193,7 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 				usingAngularVel = true;
 		}
 			
-		// Then it Ends.
+		// < -- Then it Ends.
 		
 		rawTurnProgress = (rawCombinedTurns / (360f)) / maxTurns;
 
@@ -186,13 +201,9 @@ public class TurnSignal_Floor_Redux : MonoBehaviour
 
 		turns = (int) ( ( rawCombinedTurns ) / (360f) );
 
+		// Get ALL Dem Bugs.
 		debugAngPos = angPosDiff;
 		debugAngVel = (angVelVec.y);
-	}
-
-	float PI2Eul(float pi)
-	{
-		return ((pi / (Mathf.PI)) * 180f);
 	}
 
 	void UpdateTurnObj()

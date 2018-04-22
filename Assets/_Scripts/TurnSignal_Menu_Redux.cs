@@ -16,20 +16,22 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 	public Slider scaleSlider;
 	public Slider opacitySlider;
-	public Slider heightSlider;
 	public Slider twistRateSlider;
 	public Slider petalSlider;
+	public Slider heightSlider;
+	public Slider followSpeedSlider;
 
 	[Space(5)]
 	
 	public Toggle startWithVRToggle;
 	public Toggle enableSteamWorksToggle;
 	public Toggle hideMainWindowToggle;
+	public Toggle followPlayerToggle;
 	public Toggle useChapColorToggle;
 	public Toggle tieTwistToggle;
 	public Toggle onlyShowInDashToggle;
 
-	[Space(10)]
+	[Space(5)]
 
 	public Toggle disableLinkToggle;
 	public Toggle rightLinkToggle;
@@ -45,23 +47,27 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	{	
 		scaleSlider.value = prefs.Scale;
 		opacitySlider.value = prefs.Opacity;
-		heightSlider.value = prefs.Height;
 		twistRateSlider.value = prefs.TwistRate;
 		petalSlider.value = prefs.Petals;
+		heightSlider.value = prefs.Height;
+		followSpeedSlider.value = prefs.FollowSpeed;
 
-		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		enableSteamWorksToggle.isOn = prefs.EnableSteamWorks;
 		
+		hideMainWindowToggle.isOn = prefs.HideMainWindow;
+
+		followPlayerToggle.isOn = prefs.FollowPlayerHeadset;
 		useChapColorToggle.isOn = prefs.UseChaperoneColor;
 		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
+
 		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;
 
-		disableLinkToggle.isOn = prefs.LinkDevice != 1 && prefs.LinkDevice != 2;
+		disableLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.None;
 
-		rightLinkToggle.isOn = prefs.LinkDevice == 1;
-		leftLinkToggle.isOn = prefs.LinkDevice == 2;	
+		rightLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Right;
+		leftLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Left;
 
 		flipSidesToggle.isOn = prefs.FlipSides;
 	}
