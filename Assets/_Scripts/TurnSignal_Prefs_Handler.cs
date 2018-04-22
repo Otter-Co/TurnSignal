@@ -217,7 +217,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public TurnSignalPrefsLinkDevice LinkDevice 
+    public TurnSignalPrefsLinkDevice LinkDevice
     {
         get
         {
@@ -343,6 +343,38 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         return null;
     }
 
+    public bool checkNeedToMove(string oldPath)
+    {
+        string fullP = oldPath + _fileName;
+
+        return File.Exists(fullP);
+    }
+
+    public bool movePrefsToNewDir(string oldPath)
+    {
+        TurnSignalPrefs p = prefs;
+
+        string oldFullP = oldPath + _fileName;
+        string newFullP = _filePath + _fileName;
+
+        string text = File.ReadAllText(oldFullP);
+
+        Debug.Log("Moving Local Prefs!");
+
+        File.WriteAllText(newFullP, text);
+        bool writeGood = File.Exists(newFullP);
+
+        if (!writeGood)
+            return false;
+
+        File.Delete(oldFullP);
+        bool deleteGood = !File.Exists(oldFullP);
+
+        if (!deleteGood)
+            return false;
+
+        return true;
+    }
 
     public void Reset()
     {
@@ -353,14 +385,15 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 }
 
 // #enterpriseNames
-public enum TurnSignalPrefsLinkDevice 
+public enum TurnSignalPrefsLinkDevice
 {
     None,
     Right,
     Left
 }
 
-[System.Serializable] public class TurnSignalPrefs 
+[System.Serializable]
+public class TurnSignalPrefs
 {
     public Int32 lastEditTime = 0;
 

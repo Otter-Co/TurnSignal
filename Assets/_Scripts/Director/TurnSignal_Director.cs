@@ -74,12 +74,16 @@ public partial class TurnSignal_Director : MonoBehaviour
 
         winC = GetComponent<WindowController>();
 
-        // Some SteamCloud Stuff
-        // Why the hell is this not a settable public property?
-        string prefsPath = Application.dataPath + "/../";
+        string old_prefsPath = Application.dataPath + "/../";
+
+        string prefsPath = Application.persistentDataPath + "/";
         string prefsFileName = "prefs.json";
 
         prefs.SetFilePath(prefsPath, prefsFileName);
+
+        if (prefs.checkNeedToMove(old_prefsPath))
+            prefs.movePrefsToNewDir(old_prefsPath);
+
         prefs.Load();
     }
 
@@ -216,4 +220,5 @@ public partial class TurnSignal_Director : MonoBehaviour
 
         return e;
     }
+
 }
