@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public class TurnSignal_Prefs_Handler : MonoBehaviour 
+public class TurnSignal_Prefs_Handler : MonoBehaviour
 {
     public TurnSignal_Steam_Handler steamHandler;
 
@@ -19,22 +19,22 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         _fileName = fileName;
     }
 
-	public float Scale 
+    public float Scale
     {
-        get 
+        get
         {
             return prefs.Scale;
         }
-        set 
+        set
         {
             prefs.Scale = value;
             Save();
         }
     }
 
-    public float Opacity 
+    public float Opacity
     {
-        get 
+        get
         {
             return prefs.Opacity;
         }
@@ -45,20 +45,20 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         }
     }
 
-    public float Height 
+    public float Height
     {
-        get 
+        get
         {
             return prefs.Height;
         }
-        set 
+        set
         {
             prefs.Height = value;
             Save();
         }
     }
 
-    public int TwistRate 
+    public int TwistRate
     {
         get
         {
@@ -73,23 +73,23 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public float TwistRateF
     {
-        get 
+        get
         {
-            return (float) TwistRate;
+            return (float)TwistRate;
         }
-        set 
+        set
         {
-            TwistRate = (int) value;
+            TwistRate = (int)value;
         }
     }
 
-    public int Petals 
+    public int Petals
     {
-        get 
+        get
         {
             return prefs.PetalCount;
         }
-        set 
+        set
         {
             prefs.PetalCount = value;
             Save();
@@ -98,19 +98,19 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public float PetalsF
     {
-        get 
+        get
         {
-            return (float) Petals;
+            return (float)Petals;
         }
-        set 
+        set
         {
-            Petals = (int) value;
+            Petals = (int)value;
         }
     }
 
     public bool StartWithSteamVR
     {
-        get 
+        get
         {
             return prefs.StartWithSteamVR;
         }
@@ -123,24 +123,24 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public bool EnableSteamWorks
     {
-        get 
+        get
         {
             return prefs.EnableSteamWorks;
         }
-        set 
+        set
         {
             prefs.EnableSteamWorks = value;
             Save();
         }
     }
 
-    public bool HideMainWindow 
+    public bool HideMainWindow
     {
-        get 
+        get
         {
             return prefs.HideMainWindow;
         }
-        set 
+        set
         {
             prefs.HideMainWindow = value;
             Save();
@@ -148,13 +148,13 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     }
 
 
-    public bool UseChaperoneColor 
+    public bool UseChaperoneColor
     {
-        get 
+        get
         {
             return prefs.UseChaperoneColor;
         }
-        set 
+        set
         {
             prefs.UseChaperoneColor = value;
             Save();
@@ -163,50 +163,50 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public bool LinkOpacityWithTwist
     {
-        get 
+        get
         {
             return prefs.LinkOpacityWithTwist;
         }
-        set 
+        set
         {
             prefs.LinkOpacityWithTwist = value;
             Save();
         }
     }
 
-    public bool OnlyShowInDashboard 
+    public bool OnlyShowInDashboard
     {
-        get 
+        get
         {
             return prefs.OnlyShowInDashboard;
         }
-        set 
+        set
         {
             prefs.OnlyShowInDashboard = value;
             Save();
         }
     }
 
-    public int LinkDevice 
+    public int LinkDevice
     {
-        get 
+        get
         {
             return prefs.LinkDevice;
         }
-        set 
+        set
         {
             prefs.LinkDevice = value;
             Save();
         }
     }
 
-    public bool FlipSides 
+    public bool FlipSides
     {
-        get 
+        get
         {
             return prefs.FlipSides;
         }
-        set 
+        set
         {
             prefs.FlipSides = value;
             Save();
@@ -218,7 +218,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     {
         TurnSignalPrefs p;
 
-        if(overrideP != null)
+        if (overrideP != null)
             p = overrideP;
         else
             p = prefs;
@@ -232,8 +232,8 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
         File.WriteAllText(fullP, text);
 
-        if(!skipSteam && prefs.EnableSteamWorks) 
-            if(SteamSave())
+        if (!skipSteam && prefs.EnableSteamWorks)
+            if (SteamSave())
                 Debug.Log("Successfully Saved SteamCloud Prefs!");
             else
                 Debug.Log("Failed to save SteamCloud Prefs!");
@@ -242,62 +242,44 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
     }
 
 
-    public bool SteamSave() 
+    public bool SteamSave()
     {
-        bool ret = false;
-
-        if(steamHandler.StartUp())
+        if (steamHandler.StartUp())
         {
-            var c = steamHandler.steamClient;
-
             Debug.Log("Writing SteamCloud Prefs!");
 
-            if(c.RemoteStorage.IsCloudEnabledForAccount)
-                ret = c.RemoteStorage.WriteString(_fileName, JsonUtility.ToJson(prefs, true));
+            var c = steamHandler.steamClient;
+            if (c.RemoteStorage.IsCloudEnabledForAccount)
+                return c.RemoteStorage.WriteString(_fileName, JsonUtility.ToJson(prefs, true));
         }
 
-        // if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
-        // {
-        //     string text = JsonUtility.ToJson(prefs, true);
-            
-        //     var bytes = System.Text.Encoding.ASCII.GetBytes(text);
-        //     var byteCount = System.Text.Encoding.ASCII.GetByteCount(text);
-
-        //     Debug.Log("Writing Prefs to SteamCloud!");
-
-        //     ret = SteamRemoteStorage.FileWrite(_fileName, bytes, byteCount);
-
-        //     steamHandler.ShutDown();
-        // }
-        
-        return ret;
+        return false;
     }
 
     public void Load()
     {
         TurnSignalPrefs p = new TurnSignalPrefs();
-
         TurnSignalPrefs fileP = FileLoad();
 
-        if(fileP != null)
+        if (fileP != null)
         {
             p = fileP;
 
-            if(fileP.EnableSteamWorks)
+            if (fileP.EnableSteamWorks)
             {
                 var steamP = SteamLoad();
 
-                if(steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
+                if (steamP != null && steamP.lastEditTime >= fileP.lastEditTime)
                     p = steamP;
-            }        
+            }
         }
-        else 
+        else
         {
             var steamP = SteamLoad();
-            if(steamP != null)
-                p = steamP;    
+            if (steamP != null)
+                p = steamP;
         }
-        
+
         prefs = p;
         Save();
     }
@@ -307,54 +289,28 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
         string fullP = _filePath + _fileName;
 
         Debug.Log("Reading Local Prefs!");
-        
-        if(!File.Exists(fullP))
+
+        if (!File.Exists(fullP))
             return null;
 
         string text = File.ReadAllText(fullP);
 
-        return (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
+        return (TurnSignalPrefs)JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
     }
 
-    public TurnSignalPrefs SteamLoad() 
+    public TurnSignalPrefs SteamLoad()
     {
-        TurnSignalPrefs ret = null;
-
-        if(steamHandler.StartUp())
+        if (steamHandler.StartUp())
         {
             var c = steamHandler.steamClient;
 
             Debug.Log("Reading SteamCloud Prefs!");
 
-            if(c.RemoteStorage.IsCloudEnabledForAccount && c.RemoteStorage.FileExists(_fileName))
-                ret = (TurnSignalPrefs) JsonUtility.FromJson(c.RemoteStorage.ReadString(_fileName), typeof(TurnSignalPrefs));
+            if (c.RemoteStorage.IsCloudEnabledForAccount && c.RemoteStorage.FileExists(_fileName))
+                return (TurnSignalPrefs)JsonUtility.FromJson(c.RemoteStorage.ReadString(_fileName), typeof(TurnSignalPrefs));
         }
-        
-        // if(steamHandler.StartUp() && SteamRemoteStorage.IsCloudEnabledForAccount())
-        // {
-        //     if(SteamRemoteStorage.FileExists(_fileName))
-        //     {
-        //         string text = "";
-        //         var byteCount = SteamRemoteStorage.GetFileSize(_fileName);
-        //         var bytes = new byte[byteCount];
-                
-        //         Debug.Log("Reading Prefs from SteamCloud!");
-                
-        //         var fileC = SteamRemoteStorage.FileRead(_fileName, bytes, byteCount);
 
-        //         if(fileC > 0)
-        //             text = System.Text.Encoding.ASCII.GetString(bytes);
-                    
-        //         var o = (TurnSignalPrefs) JsonUtility.FromJson(text, typeof(TurnSignalPrefs));
-
-        //         if(o != null)
-        //             ret = o;
-        //     }
-
-        //     steamHandler.ShutDown();
-        // }
-        
-        return ret;
+        return null;
     }
 
 
@@ -367,7 +323,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 }
 
 [System.Serializable]
-public class TurnSignalPrefs 
+public class TurnSignalPrefs
 {
     public Int32 lastEditTime = 0;
 
