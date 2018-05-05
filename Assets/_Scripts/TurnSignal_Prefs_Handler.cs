@@ -352,7 +352,7 @@ public class TurnSignal_Prefs_Handler : MonoBehaviour
 
     public bool movePrefsToNewDir(string oldPath)
     {
-        TurnSignalPrefs p = prefs;
+        // TurnSignalPrefs p = prefs;
 
         string oldFullP = oldPath + _fileName;
         string newFullP = _filePath + _fileName;
