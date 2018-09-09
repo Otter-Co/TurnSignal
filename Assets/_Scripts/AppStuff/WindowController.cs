@@ -50,17 +50,17 @@ public class WindowController : MonoBehaviour
 
         winHandle = FindWindowByCaption(IntPtr.Zero, UnityEngine.Application.productName);
 
-        if(hasTrayIcon)
+        if (hasTrayIcon)
             CreateTray();
     }
 
     void OnEnable()
     {
-        if(hasTrayIcon)
+        if (hasTrayIcon)
             CreateTray();
     }
 
-    void OnDestroy() 
+    void OnDestroy()
     {
         DestroyTray();
     }
@@ -90,14 +90,14 @@ public class WindowController : MonoBehaviour
 
     public void DestroyTray()
     {
-        if(trayForm != null)
+        if (trayForm != null)
         {
             trayForm.Dispose();
             trayForm = null;
         }
     }
 
-    public void OnExit() 
+    public void OnExit()
     {
         UnityEngine.Application.Quit();
     }
@@ -109,17 +109,17 @@ public class WindowController : MonoBehaviour
 
     public void ShowTrayIcon()
     {
-        if(trayForm != null)
+        if (trayForm != null)
             trayForm.ShowTray();
     }
 
     public void HideTrayIcon()
     {
-        if(trayForm != null)
+        if (trayForm != null)
             trayForm.HideTray();
     }
 
-    public bool HideTaskbarIcon() 
+    public bool HideTaskbarIcon()
     {
         bool res = false;
 
@@ -134,22 +134,22 @@ public class WindowController : MonoBehaviour
     {
         bool res = false;
 
-        res = ShowWindow(winHandle, (uint) 0);
+        res = ShowWindow(winHandle, (uint)0);
         SetWindowLong(winHandle, GWL_EXSTYLE, oldWinStyle);
-        res = ShowWindow(winHandle, (uint) 5);
+        res = ShowWindow(winHandle, (uint)5);
 
         return res;
     }
 
     public bool MinimizeUnityWindow()
     {
-        bool res = ShowWindow(winHandle, (uint) 6);
+        bool res = ShowWindow(winHandle, (uint)6);
         return res;
     }
 
-    public bool RestoreUnityWindow() 
+    public bool RestoreUnityWindow()
     {
-        bool res = ShowWindow(winHandle, (uint) 1);
+        bool res = ShowWindow(winHandle, (uint)1);
         return res;
     }
 
@@ -157,11 +157,11 @@ public class WindowController : MonoBehaviour
     {
         Debug.Log("Attempting to Hide Window!");
 
-        if(!windowVisible)
+        if (!windowVisible)
             return true;
 
         bool res = false;
-        
+
         res = MinimizeUnityWindow();
         res = HideTaskbarIcon();
 
@@ -174,21 +174,21 @@ public class WindowController : MonoBehaviour
     {
         Debug.Log("Attempting to Show Window!");
 
-        if(windowVisible)
+        if (windowVisible)
             return true;
-            
+
         bool res = false;
 
         res = RestoreUnityWindow();
         res = ShowTaskbarIcon();
-        
+
         windowVisible = true;
 
         return res;
-    }    
+    }
 }
 
-public class TurnSignalTrayForm : System.Windows.Forms.Form 
+public class TurnSignalTrayForm : System.Windows.Forms.Form
 {
     public delegate void OnExitDel();
     public delegate void OnShowWindowDel();
@@ -202,8 +202,8 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
     public TurnSignalTrayForm(Texture2D tex = null)
     {
         trayMenu = new System.Windows.Forms.ContextMenuStrip();
-        
-        if(tex)
+
+        if (tex)
             trayMenu.Items.Add("Show TurnSignal", CreateBitmap(tex), OnShowWindow);
         else
             trayMenu.Items.Add("Show TurnSignal", CreateBitmap(Texture2D.whiteTexture), OnShowWindow);
@@ -215,7 +215,7 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
 
         trayIcon.ContextMenuStrip = trayMenu;
 
-        if(tex == null)
+        if (tex == null)
             trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
         else
             trayIcon.Icon = Icon.FromHandle(CreateBitmap(tex).GetHicon());
@@ -227,7 +227,7 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
         memS.Seek(0, System.IO.SeekOrigin.Begin);
 
         Bitmap bitmap = new Bitmap(memS);
-        
+
         return bitmap;
     }
 
@@ -266,7 +266,7 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
 
     protected override void Dispose(bool disposing)
     {
-        if(disposing)
+        if (disposing)
             trayIcon.Dispose();
 
         base.Dispose(disposing);
