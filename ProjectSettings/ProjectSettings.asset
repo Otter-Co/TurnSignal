@@ -727,7 +727,7 @@ PlayerSettings:
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 3
   cloudProjectId: fb82fe25-0d8f-4df9-b852-ce725e8ddd89
-  projectName: 
+  projectName: TurnSignal
   organizationId: otter-co
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
