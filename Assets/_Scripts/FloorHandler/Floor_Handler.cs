@@ -63,10 +63,7 @@ public class Floor_Handler : MonoBehaviour
 
             lastRadius = centerRadius;
         }
-        var selected = fhp.FindAll(f => f.selected);
         var activeP = fhp.FindAll(f => f.activated);
-
-        activePoints = activeP.Count;
         averageDiff = GetAverage(activeP.ConvertAll(f => f.diffTest));
     }
 
@@ -78,28 +75,6 @@ public class Floor_Handler : MonoBehaviour
             combo += diff;
 
         return combo / (float)l.Count;
-    }
-
-    void PositionPointsOnSphere(float radius, List<GameObject> points)
-    {
-        float offset = 2f / points.Count;
-
-        int i = 0;
-        foreach (GameObject obj in points)
-        {
-            float x = 0,
-                y = 0,
-                z = 0,
-                r = Mathf.Sqrt(1 - Mathf.Pow(((i * offset) - 1) + (offset / 2), 2)),
-                p = i * INC;
-
-            x = radius * (Mathf.Cos(p) * r);
-            y = radius * ((i * offset) - 1) + (offset / 2);
-            z = radius * (Mathf.Sin(p) * r);
-
-            obj.transform.localPosition = new Vector3(x, y, z);
-            i++;
-        }
     }
 
     GameObject CreatePoints(int count)
@@ -129,11 +104,32 @@ public class Floor_Handler : MonoBehaviour
 
         return ret;
     }
-}
 
-public enum TurnDirection
-{
-    Unset,
-    Right,
-    Left
+    void PositionPointsOnSphere(float maxRadius, List<GameObject> points)
+    {
+        float offset = 2f / points.Count;
+
+        int i = 0;
+        foreach (GameObject obj in points)
+        {
+            var fhp = obj.GetComponent<Floor_Handler_Point>();
+
+            float x = 0,
+                y = 0,
+                z = 0,
+                r = Mathf.Sqrt(1 - Mathf.Pow(((i * offset) - 1) + (offset / 2), 2)),
+                p = i * INC;
+
+            var curRad = r * maxRadius;
+
+            x = Mathf.Cos(p) * curRad;
+            y = maxRadius * ((i * offset) - 1) + (offset / 2);
+            z = Mathf.Sin(p) * curRad;
+
+            fhp.interiorRadius = curRad;
+            fhp.initialPoint = obj.transform.localPosition = new Vector3(x, y, z);
+
+            i++;
+        }
+    }
 }

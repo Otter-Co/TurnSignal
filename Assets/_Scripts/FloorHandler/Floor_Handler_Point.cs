@@ -11,18 +11,16 @@ public class Floor_Handler_Point : MonoBehaviour
     public Material activeMat;
     [Space(10)]
     public bool activated = false;
-    public bool selected = false;
     [Space(10)]
-    public float diffTest = 0;
-    public TurnDirection currentDir = TurnDirection.Unset;
+    public float diffTest = 0f;
+    public float currentProgress = 0f;
 
-    [HideInInspector]
-    public int pointIndex = 0;
+    [HideInInspector] public Vector3 initialPoint = Vector3.zero;
+    [HideInInspector] public int pointIndex = 0;
+    [HideInInspector] public float interiorRadius = 0f;
 
     private Vector3 lastPos;
     private Renderer rend;
-
-
 
     void Start()
     {
@@ -37,19 +35,17 @@ public class Floor_Handler_Point : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (lastPos == Vector3.zero)
-            lastPos = transform.position;
-
         var curLocPos = transform.position - transform.parent.position;
-        activated = Mathf.Abs(curLocPos.y) <= floorHandler.activatorDistance;
+        if (lastPos == Vector3.zero)
+            lastPos = curLocPos;
 
-        var cleanCur = transform.position;
-        var cleanLast = lastPos;
+        activated = Mathf.Abs((transform.parent.position - initialPoint).y) <= floorHandler.activatorDistance;
+        diffTest = GetProgressChange(curLocPos, lastPos, floorHandler.centerRadius);
+        currentProgress = GetProgressFromPoint(curLocPos, interiorRadius);
 
-        diffTest = GetCurrentChange();
-        currentDir = GetDirection(cleanCur, cleanLast);
+        lastPos = curLocPos;
 
-        lastPos = transform.position;
+        UpdatePosition();
 
         if (floorHandler.visualDebug)
             UpdateVisual();
@@ -68,39 +64,31 @@ public class Floor_Handler_Point : MonoBehaviour
             rend.sharedMaterial = inactiveMat;
     }
 
-    public float GetCurrentChange()
+    void UpdatePosition()
     {
-        var cleanCur = transform.position;
-        var cleanLast = lastPos;
-
-        switch (GetDirection(cleanCur, cleanLast))
+        if (activated)
         {
-            case TurnDirection.Right:
-                return Vector3.Distance(cleanCur, cleanLast);
-            case TurnDirection.Left:
-                return -Vector3.Distance(cleanCur, cleanLast);
-            default:
-                return 0;
+            var originPos = transform.parent.position + initialPoint;
+            var newPos = originPos;
+            newPos.y = transform.parent.position.y;
+
+            transform.position = newPos;
         }
+        else if (transform.localPosition != initialPoint)
+            transform.localPosition = initialPoint;
+
     }
 
-    TurnDirection GetDirection(Vector3 cur, Vector3 old)
+    static float GetProgressChange(Vector3 p1, Vector3 p2, float radius)
     {
-        var diff = old - cur;
+        return (GetProgressFromPoint(p2, radius) - GetProgressFromPoint(p1, radius));
+    }
 
-        TurnDirection q = TurnDirection.Unset;
+    static float GetProgressFromPoint(Vector3 p1, float radius)
+    {
+        var cos = Mathf.Acos(p1.x / radius);
+        var sin = Mathf.Asin(p1.z / radius);
 
-        float lX = diff.x, lZ = diff.z;
-
-        if (lX > 0 && lZ > 0)
-            q = TurnDirection.Left;
-        else if (lX > 0 && lZ < 0)
-            q = TurnDirection.Right;
-        else if (lX < 0 && lZ > 0)
-            q = TurnDirection.Right;
-        else if (lX < 0 && lZ < 0)
-            q = TurnDirection.Left;
-
-        return q;
+        return (cos + sin) / 2f;
     }
 }
