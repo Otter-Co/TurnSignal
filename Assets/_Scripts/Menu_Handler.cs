@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-public class TurnSignal_Menu_Redux : MonoBehaviour 
+public class Menu_Handler : MonoBehaviour
 {
 	public Camera menuRigCamera;
 
 	[Space(10)]
-	
-	public TurnSignal_Prefs_Handler prefs;
+
+	public Prefs_Handler prefs;
 
 	[Space(10)]
 
@@ -22,7 +22,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	public Slider followSpeedSlider;
 
 	[Space(5)]
-	
+
 	public Toggle startWithVRToggle;
 	public Toggle enableSteamWorksToggle;
 	public Toggle hideMainWindowToggle;
@@ -44,7 +44,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 	}
 
 	public void SetUIValues()
-	{	
+	{
 		scaleSlider.value = prefs.Scale;
 		opacitySlider.value = prefs.Opacity;
 		twistRateSlider.value = prefs.TwistRate;
@@ -55,7 +55,7 @@ public class TurnSignal_Menu_Redux : MonoBehaviour
 
 		startWithVRToggle.isOn = prefs.StartWithSteamVR;
 		enableSteamWorksToggle.isOn = prefs.EnableSteamWorks;
-		
+
 		hideMainWindowToggle.isOn = prefs.HideMainWindow;
 
 		followPlayerToggle.isOn = prefs.FollowPlayerHeadset;

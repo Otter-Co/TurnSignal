@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode()]
-public class Twister_Redux : MonoBehaviour
+public class Twister : MonoBehaviour
 {
 	public bool autoUpdate = true;
 
@@ -11,7 +11,7 @@ public class Twister_Redux : MonoBehaviour
 	public int armCount = 6;
 	public int armPointCount = 15;
 	public int armResolution = 25;
-	
+
 
 	[Space(10)]
 	public float outerDiameter = 1f;
@@ -47,7 +47,7 @@ public class Twister_Redux : MonoBehaviour
 		int petals = (int) p;
 		armCount = petals;
 	}
-	void Update() 
+	void Update()
 	{
 		if(autoUpdate)
 			UpdateTwister();
@@ -60,7 +60,7 @@ public class Twister_Redux : MonoBehaviour
 
 		if(!lineHolder)
 		{
-			Transform t = transform.Find("LineHolder"); 
+			Transform t = transform.Find("LineHolder");
 			if(!t)
 			{
 				lineHolder = new GameObject("LineHolder");
@@ -72,7 +72,7 @@ public class Twister_Redux : MonoBehaviour
 			else
 				lineHolder = t.gameObject;
 		}
-			
+
 		if(lastArmCount != armCount || lastArmPoints != armPointCount || lastArmRes != armResolution)
 		{
 			UpdateArmCount();
@@ -89,11 +89,11 @@ public class Twister_Redux : MonoBehaviour
 
 	bool Changed()
 	{
-		return 
-			(lastArmCount != armCount) || 
-			(lastArmPoints != armPointCount) || 
-			(lastArmRes != armResolution) || 
-			(lastOD != outerDiameter) || 
+		return
+			(lastArmCount != armCount) ||
+			(lastArmPoints != armPointCount) ||
+			(lastArmRes != armResolution) ||
+			(lastOD != outerDiameter) ||
 			(lastID != innerDiameter) ||
 			(lastCoilS != coilStrength) ||
 			(lastTwist != twist);
@@ -104,7 +104,7 @@ public class Twister_Redux : MonoBehaviour
 		lastArmCount = armCount;
 		lastArmPoints = armPointCount;
 		lastArmRes = armResolution;
-		
+
 		lastOD = outerDiameter;
 		lastID = innerDiameter;
 		lastCoilS = coilStrength;
@@ -127,7 +127,7 @@ public class Twister_Redux : MonoBehaviour
 			Vector3[] linePoint = linePoints[i];
 
 			float prog = (float) i / (float) armLines.Length;
-			
+
 			armO.transform.localPosition = GetPosOnCircle(Vector3.zero, outerDiameter, prog);
 			armPoints[armPoints.Length - 1] = -armO.transform.localPosition;
 
@@ -145,7 +145,7 @@ public class Twister_Redux : MonoBehaviour
 		for(int x = 1; x < armPoints.Length - 1; x++)
 		{
 			float armProg = (float) x / (float) armPoints.Length;
-			
+
 			float cirRadius;
 					cirRadius = ((outerDiameter - innerDiameter) * (1f - armProg)) + innerDiameter;
 					cirRadius += ( cirRadius * (coilStrength * twist) ) * twist;
@@ -155,7 +155,7 @@ public class Twister_Redux : MonoBehaviour
 			GetPosOnCircle(origin, cirRadius, cirProg, ref armPoints[x]);
 		}
 	}
-	
+
 	void UpdateLinePoints(Vector3 [] linePoint, Vector3 [] armPoints)
 	{
 		for(int i = 0; i < linePoint.Length; i++)
@@ -197,7 +197,7 @@ public class Twister_Redux : MonoBehaviour
 		}
 
 		baseLine.SetActive(false);
-	
+
 		armLines = newLineA;
 		armObjs = newLineOA;
 	}
@@ -226,7 +226,7 @@ public class Twister_Redux : MonoBehaviour
 
 		float cx = origin.x,
 			  cy = origin.z;
-		
+
 		float x = cx + Mathf.Sin(prog) * radius,
 			  y = cy + Mathf.Cos(prog) * radius;
 
@@ -239,7 +239,7 @@ public class Twister_Redux : MonoBehaviour
 
 		float cx = origin.x,
 			  cy = origin.z;
-		
+
 		float x = cx + Mathf.Sin(prog) * radius,
 			  y = cy + Mathf.Cos(prog) * radius;
 
@@ -256,7 +256,7 @@ public class Twister_Redux : MonoBehaviour
 
 		for(int i = 0; i < pN.Length - 1; i++)
 			nextP[i] = Vector3.Lerp(pN[i], pN[i + 1], prog);
-		
+
 		return BezierN(nextP, prog);
 	}
 
@@ -266,7 +266,7 @@ public class Twister_Redux : MonoBehaviour
 		{
 			indOff = pN.Length;
 			wrkCpy = new Vector3[pN.Length];
-			pN.CopyTo(wrkCpy, 0);	
+			pN.CopyTo(wrkCpy, 0);
 		}
 
 		if(indOff == 1)
@@ -274,7 +274,7 @@ public class Twister_Redux : MonoBehaviour
 
 		for(int i = 0; i < indOff - 1; i++)
 			wrkCpy[i] = Vector3.Lerp(wrkCpy[i], wrkCpy[i + 1], prog);
-		
+
 		return BezierNOpt(null, prog, wrkCpy, indOff - 1);
 	}
 }

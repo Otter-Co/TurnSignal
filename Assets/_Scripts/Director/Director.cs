@@ -6,48 +6,35 @@ using UnityEngine.Events;
 
 using Valve.VR;
 
-public partial class TurnSignal_Director : MonoBehaviour
+public partial class Director : MonoBehaviour
 {
     public string appKey = "";
-
     [Space(10)]
-
     public Unity_Overlay floorOverlay;
     public Unity_Overlay menuOverlay;
-
     [Space(10)]
-
-    public TurnSignal_Floor_Redux floorRig;
-    public TurnSignal_Menu_Redux menuRig;
-
+    public Floor_Handler floorRig;
+    public Menu_Handler menuRig;
     [Space(10)]
-
     public float floorOverlayHandScale = 0.2f;
     public bool flipSides = false;
     public Unity_Overlay.OverlayTrackedDevice floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
-
     [Space(10)]
-
     public int windowWidth = 800;
     public int windowHeight = 600;
-
     [Space(10)]
-
     public int runningFPS = 90;
     public int idleFPS = 5;
-
     [Space(10)]
-
     public GameObject hmdO;
     public float floorOverlayHeight = 0f;
-
     public float floorOverlayFollowSpeed = 1.5f;
     public float floorOverlayFollowSpeedRatio = 1.0f;
 
 
 
-    private TurnSignal_Steam_Handler steamHandler;
-    private TurnSignal_Prefs_Handler prefs;
+    private Steam_Handler steamHandler;
+    private Prefs_Handler prefs;
     private WindowController winC;
     private OVR_Handler handler;
 
@@ -60,7 +47,7 @@ public partial class TurnSignal_Director : MonoBehaviour
     {
         targetFPS = idleFPS;
 
-        steamHandler = GetComponent<TurnSignal_Steam_Handler>();
+        steamHandler = GetComponent<Steam_Handler>();
 
         // Init SteamWorks.net
         if (steamHandler.connectedToSteam)
@@ -68,7 +55,7 @@ public partial class TurnSignal_Director : MonoBehaviour
         else
             Debug.Log("SteamWorks Init Failed!");
 
-        prefs = GetComponent<TurnSignal_Prefs_Handler>();
+        prefs = GetComponent<Prefs_Handler>();
 
         handler = OVR_Handler.instance;
 

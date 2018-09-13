@@ -15,7 +15,7 @@ public class WindowController : MonoBehaviour
     [HideInInspector] public bool windowVisible = true;
 
 
-    private TurnSignal_Director director;
+    private Director director;
 
     private const int GWL_EXSTYLE = -0x14;
     private const int WS_EX_TOOLWINDOW = 0x0080;
@@ -46,7 +46,7 @@ public class WindowController : MonoBehaviour
 #endif
     void Start()
     {
-        director = GetComponent<TurnSignal_Director>();
+        director = GetComponent<Director>();
 
         winHandle = FindWindowByCaption(IntPtr.Zero, UnityEngine.Application.productName);
 

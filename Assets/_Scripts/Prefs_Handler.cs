@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public class TurnSignal_Prefs_Handler : MonoBehaviour
+public class Prefs_Handler : MonoBehaviour
 {
-    public TurnSignal_Steam_Handler steamHandler;
+    public Steam_Handler steamHandler;
 
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";

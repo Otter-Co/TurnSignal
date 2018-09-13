@@ -1,20 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using Facepunch.Steamworks;
 
-public class TurnSignal_Steam_Handler : MonoBehaviour
+public class Steam_Handler : MonoBehaviour
 {
     [Space(10)]
     public bool disableSteamWorks = false;
-
     [Space(10)]
     public uint appID = 0;
-
     [Space(10)]
     public bool connectedToSteam = false;
-
     [HideInInspector] public Client steamClient;
 
     public bool StartUp()
