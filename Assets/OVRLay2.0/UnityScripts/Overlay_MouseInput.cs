@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -11,7 +12,6 @@ public class Overlay_MouseInput : MonoBehaviour
     public VROverlayInputMethod inputMethod = VROverlayInputMethod.None;
     [Space(10)]
     public bool simulateUnityInteraction = false;
-    public Camera targetCamera;
     public GraphicRaycaster targetMenu;
     [Space(10)]
     public Vector2 mousePosition = Vector2.zero;
@@ -21,7 +21,10 @@ public class Overlay_MouseInput : MonoBehaviour
 
 
     private VROverlayInputMethod lastMethod = VROverlayInputMethod.None;
-    private PointerEventData pointerD = new PointerEventData(EventSystem.current);
+
+    private PointerEventData curPointerD = new PointerEventData(EventSystem.current);
+    private PointerEventData oldPointerD = new PointerEventData(EventSystem.current);
+
     private AxisEventData axisD = new AxisEventData(EventSystem.current);
 
 
@@ -69,5 +72,27 @@ public class Overlay_MouseInput : MonoBehaviour
                 mouseRightDown = state;
                 break;
         }
+    }
+
+    List<Selectable> GetSelectableTargets()
+    {
+        var cam = targetMenu.eventCamera;
+        var diffVec = (curPointerD.position - oldPointerD.position);
+
+        float xDiff = diffVec.x, yDiff = diffVec.y;
+
+        MoveDirection dir = (xDiff > yDiff)
+            ? (xDiff > 0f)
+                ? MoveDirection.Right
+                : MoveDirection.Left
+            : (yDiff > 0f)
+                ? MoveDirection.Up
+                : MoveDirection.Down;
+
+        axisD.Reset();
+        axisD.moveDir = dir;
+        axisD.moveVector = diffVec;
+
+        var ray = cam.ScreenPointToRay(curPointerD.position);
     }
 }
