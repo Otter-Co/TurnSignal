@@ -58,11 +58,32 @@ public class Overlay_Unity : MonoBehaviour
         overlay.OnDashboardChange += OnDashboardChange;
         overlay.OnFocusChange += OnFocusChange;
         overlay.OnVisibilityChange += OnVisibilityChange;
+
         overlay.OnKeyboardDone += OnKeyboardDone;
         overlay.OnKeyboardClose += OnKeyboardClose;
         overlay.OnKeyboardInput += OnKeyboardInput;
 
         overlayCreated = overlay.Created;
+    }
+
+    void OnDestroy()
+    {
+        if (overlay.Created)
+            overlay.DestroyOverlay();
+
+        overlay = null;
+    }
+
+    void OnEnable()
+    {
+        if (overlay.Created)
+            overlay.Visible = true;
+    }
+
+    void OnDisable()
+    {
+        if (overlay.Created)
+            overlay.Visible = false;
     }
 
     void Update()
