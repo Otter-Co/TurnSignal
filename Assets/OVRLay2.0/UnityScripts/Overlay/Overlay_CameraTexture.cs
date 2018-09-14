@@ -14,16 +14,13 @@ public class Overlay_CameraTexture : MonoBehaviour
     public int textureWidthOverride = 0;
     public int textureHeightOverride = 0;
 
-    private RenderTexture targetTex;
+    public RenderTexture targetTex;
 
     private Overlay_Unity u_overlay;
     private OVRLay.OVRLay overlay;
 
     void Start()
     {
-        u_overlay = GetComponent<Overlay_Unity>();
-        overlay = u_overlay.overlay;
-
         int width = (textureWidthOverride > 0) ? textureWidthOverride : targetCamera.pixelWidth;
         int height = (textureHeightOverride > 0) ? textureHeightOverride : targetCamera.pixelHeight;
 
@@ -38,16 +35,23 @@ public class Overlay_CameraTexture : MonoBehaviour
 
     void Update()
     {
+        if (overlay == null)
+        {
+            u_overlay = GetComponent<Overlay_Unity>();
+            overlay = u_overlay.overlay;
+        }
+
         if (overlay.Created)
         {
             if (overlay.TextureType != ETextureType.DirectX)
                 overlay.TextureType = ETextureType.DirectX;
 
-            if (!overlay.TextureBounds.Equals(Overlay_Unity.TextureBounds))
-                overlay.TextureBounds = Overlay_Unity.TextureBounds;
+            targetCamera.targetTexture = targetTex;
 
             targetCamera.Render();
 
+            overlay.WidthInMeters = u_overlay.settings.WidthInMeters;
+            overlay.TextureBounds = Overlay_Unity.TextureBounds;
             overlay.Texture = targetTex;
         }
     }

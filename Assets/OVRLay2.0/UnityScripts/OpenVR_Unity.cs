@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using Valve.VR;
 using OVRLay;
 
@@ -18,15 +19,9 @@ public class OpenVR_Unity : MonoBehaviour
     public bool pollForEvents = true;
     public bool autoUpdatePoses = true;
     [Space(10)]
-    public D_OpenVRConnected OpenVRConnected = () => { };
-    public D_OpenVRDisconnected OpenVRDisconnected = () => { };
-    public delegate void D_OpenVRConnected();
-    public delegate void D_OpenVRDisconnected();
-    [Space(10)]
-    public OVR.D_OnDashboardChange OnDashboardChange;
-    public OVR.D_OnStandbyChange OnStandbyChange;
-    public OVR.D_OnChaperoneSettingsChange OnChaperoneSettingsChange;
-    public OVR.D_OnVRAppQuit OnVRAppQuit;
+    public VoidEvent OpenVRConnected;
+    public VoidEvent OpenVRDisconnected;
+    [Serializable] public class VoidEvent : UnityEvent { }
 
     #endregion
 
@@ -34,13 +29,14 @@ public class OpenVR_Unity : MonoBehaviour
 
     void Start()
     {
+        if (OpenVRConnected == null)
+            OpenVRConnected = new VoidEvent();
+
+        if (OpenVRDisconnected == null)
+            OpenVRConnected = new VoidEvent();
+
         if (connectOnStart)
             ConnectToSteam();
-
-        OVR.OnDashboardChange += OnDashboardChange;
-        OVR.OnStandbyChange += OnStandbyChange;
-        OVR.OnChaperoneSettingsChange += OnChaperoneSettingsChange;
-        OVR.OnVRAppQuit += OnVRAppQuit;
     }
 
     void Update()
@@ -70,7 +66,7 @@ public class OpenVR_Unity : MonoBehaviour
         if (!OVR.StartedUp && OVR.Startup(appType))
         {
             connectedToOpenVR = true;
-            OpenVRConnected();
+            OpenVRConnected.Invoke();
         }
 
     }
@@ -81,7 +77,7 @@ public class OpenVR_Unity : MonoBehaviour
         {
             OVR.Shutdown();
             connectedToOpenVR = false;
-            OpenVRDisconnected();
+            OpenVRDisconnected.Invoke();
         }
     }
 

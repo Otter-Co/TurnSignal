@@ -1,28 +1,33 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using Valve.VR;
 
 public class Overlay_Unity : MonoBehaviour
 {
-    public static readonly VRTextureBounds_t TextureBounds = new VRTextureBounds_t()
-    {
-        uMin = 0,
-        vMin = 1,
-        uMax = 1,
-        vMax = 0
-    };
+    public static readonly VRTextureBounds_t TextureBounds =
+        new VRTextureBounds_t() { uMin = 0, vMin = 1, uMax = 1, vMax = 0 };
 
+    [System.Serializable]
+    public struct Overlay_Unity_Settings
+    {
+        public float WidthInMeters;
+        public Color Color;
+        public float Alpha;
+        public float TexelAspect;
+        public bool Visible;
+        public bool HighQuality;
+    }
+
+    [HideInInspector] public OVRLay.OVRLay overlay;
     [Header("Overlay State")]
     public bool overlayCreated = false;
-    [Space(10)]
     [Header("Overlay Setup Info")]
     public string overlayName = "Unity Overlay";
     public string overlayKey = "unity-overlay";
     public bool isDashboardOverlay = false;
-    [Space(10)]
     [Header("Overlay Creation Settings")]
     public bool createOnStart = true;
-    [Space(10)]
     [Header("Overlay General Settings")]
     public Overlay_Unity_Settings settings = new Overlay_Unity_Settings()
     {
@@ -33,18 +38,6 @@ public class Overlay_Unity : MonoBehaviour
         Visible = true,
         HighQuality = false,
     };
-    [Space(10)]
-
-    public OVRLay.OVRLay.D_OnDashboardChange OnDashboardChange = (active) => { };
-    public OVRLay.OVRLay.D_OnFocusChange OnFocusChange = (hasFocus) => { };
-    public OVRLay.OVRLay.D_OnVisibilityChange OnVisibilityChange = (visible) => { };
-    public OVRLay.OVRLay.D_OnKeyboardDone OnKeyboardDone = () => { };
-    public OVRLay.OVRLay.D_OnKeyboardClose OnKeyboardClose = () => { };
-    public OVRLay.OVRLay.D_OnKeyboardInput OnKeyboardInput = (m, f) => { };
-
-
-    [HideInInspector]
-    public OVRLay.OVRLay overlay;
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings()
     {
         TexelAspect = 0f,
@@ -55,15 +48,6 @@ public class Overlay_Unity : MonoBehaviour
     void Start()
     {
         overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createOnStart);
-
-        overlay.OnDashboardChange += OnDashboardChange;
-        overlay.OnFocusChange += OnFocusChange;
-        overlay.OnVisibilityChange += OnVisibilityChange;
-
-        overlay.OnKeyboardDone += OnKeyboardDone;
-        overlay.OnKeyboardClose += OnKeyboardClose;
-        overlay.OnKeyboardInput += OnKeyboardInput;
-
         overlayCreated = overlay.Created;
     }
 
@@ -77,13 +61,13 @@ public class Overlay_Unity : MonoBehaviour
 
     void OnEnable()
     {
-        if (overlay.Created)
+        if (overlay != null && overlay.Created && settings.Visible)
             overlay.Visible = true;
     }
 
     void OnDisable()
     {
-        if (overlay.Created)
+        if (overlay != null && overlay.Created)
             overlay.Visible = false;
     }
 
@@ -95,6 +79,9 @@ public class Overlay_Unity : MonoBehaviour
             lastSettings = settings;
             Debug.Log("Settings Changed!");
         }
+
+        if (overlay.Created)
+            PollForEvents();
     }
 
     public void CreateOverlay()
@@ -143,13 +130,3 @@ public class Overlay_Unity : MonoBehaviour
     }
 }
 
-[System.Serializable]
-public struct Overlay_Unity_Settings
-{
-    public float WidthInMeters;
-    public Color Color;
-    public float Alpha;
-    public float TexelAspect;
-    public bool Visible;
-    public bool HighQuality;
-}

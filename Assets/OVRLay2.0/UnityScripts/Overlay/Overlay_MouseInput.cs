@@ -44,11 +44,14 @@ public class Overlay_MouseInput : MonoBehaviour
 
     void Update()
     {
-        if (overlay.Created && lastMethod != inputMethod)
+        if (overlay == null)
         {
-            overlay.InputMethod = inputMethod;
-            lastMethod = inputMethod;
+            u_overlay = GetComponent<Overlay_Unity>();
+            overlay = u_overlay.overlay;
         }
+
+        if (overlay.Created)
+            overlay.InputMethod = inputMethod;
 
         UpdateMouse();
 
@@ -89,11 +92,11 @@ public class Overlay_MouseInput : MonoBehaviour
     {
         var cam = targetMenu.eventCamera;
 
-        int ttW = cam.pixelWidth;
-        int ttH = cam.pixelHeight;
+        int ttW = cam.targetTexture.width;
+        int ttH = cam.targetTexture.height;
 
         float mouseX = ttW * rawMousePosition.x;
-        float mouseY = ttH * (1f - (rawMousePosition.y / (ttH / ttW)));
+        float mouseY = ttH * (1f - (rawMousePosition.y / ((float)ttH / (float)ttW)));
 
         simulatedMousePosition.x = mouseX;
         simulatedMousePosition.y = mouseY;
@@ -104,7 +107,7 @@ public class Overlay_MouseInput : MonoBehaviour
             button = PointerEventData.InputButton.Left,
             clickTime = mouseDownTime,
             dragging = mouseHeld,
-            clickCount = 1
+            clickCount = (mouseHeld) ? 0 : 1
         };
     }
 
@@ -131,7 +134,7 @@ public class Overlay_MouseInput : MonoBehaviour
             }
             else
             {
-                var diffVec = (curPD.position - lastPD.position);
+                var diffVec = (lastPD.position - curPD.position);
                 float xDiff = diffVec.x, yDiff = diffVec.y;
 
                 MoveDirection dir = (xDiff > yDiff)

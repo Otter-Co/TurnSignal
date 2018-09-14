@@ -14,15 +14,22 @@ public class Overlay_Transform : MonoBehaviour
     public OpenVR_DeviceTracker.DeviceType relativeDevice = OpenVR_DeviceTracker.DeviceType.Hmd;
     public int customDeviceIndex;
 
+    private Overlay_Unity u_overlay;
     private OVRLay.OVRLay overlay;
 
     void Start()
     {
-        overlay = GetComponent<Overlay_Unity>().overlay;
+        u_overlay = GetComponent<Overlay_Unity>();
+        overlay = u_overlay.overlay;
     }
-
     void Update()
     {
+        if (overlay == null)
+        {
+            u_overlay = GetComponent<Overlay_Unity>();
+            overlay = u_overlay.overlay;
+        }
+
         if (overlay.Created)
         {
             if (overlay.TransformType != transformType)

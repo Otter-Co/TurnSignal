@@ -5,13 +5,14 @@ using UnityEngine;
 using UnityEngine.Events;
 
 using Valve.VR;
+using OVRLay;
 
 public partial class Director : MonoBehaviour
 {
     public string appKey = "";
     [Space(10)]
-    public Unity_Overlay floorOverlay;
-    public Unity_Overlay menuOverlay;
+    public Overlay_Unity floorOverlay;
+    public Overlay_Unity menuOverlay;
     [Space(10)]
     public Floor_Handler floorRig;
     public Menu_Handler menuRig;
@@ -36,7 +37,6 @@ public partial class Director : MonoBehaviour
     private Steam_Handler steamHandler;
     private Prefs_Handler prefs;
     private WindowController winC;
-    private OVR_Handler handler;
 
     private bool twistTied = false;
 
@@ -56,9 +56,6 @@ public partial class Director : MonoBehaviour
             Debug.Log("SteamWorks Init Failed!");
 
         prefs = GetComponent<Prefs_Handler>();
-
-        handler = OVR_Handler.instance;
-
         winC = GetComponent<WindowController>();
 
         string old_prefsPath = Application.dataPath + "/../";
@@ -107,10 +104,10 @@ public partial class Director : MonoBehaviour
         if (twistTied)
         {
             var oldOpat = prefs.Opacity;
-            floorOverlay.opacity = oldOpat * floorRig.turnProgress;
+            floorOverlay.settings.Alpha = oldOpat * floorRig.turnProgress;
         }
-        else if (floorOverlay.opacity != prefs.Opacity)
-            floorOverlay.opacity = prefs.Opacity;
+        else if (floorOverlay.settings.Alpha != prefs.Opacity)
+            floorOverlay.settings.Alpha = prefs.Opacity;
 
     }
 
@@ -203,7 +200,7 @@ public partial class Director : MonoBehaviour
         bool e = err != EVRApplicationError.None;
 
         if (e)
-            Debug.Log("App Error: " + handler.Applications.GetApplicationsErrorNameFromEnum(err));
+            Debug.Log("App Error: " + OVR.Applications.GetApplicationsErrorNameFromEnum(err));
 
         return e;
     }

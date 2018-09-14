@@ -24,6 +24,12 @@ public class Overlay_Texture : MonoBehaviour
 
     void Update()
     {
+        if (overlay == null)
+        {
+            u_overlay = GetComponent<Overlay_Unity>();
+            overlay = u_overlay.overlay;
+        }
+
         if (overlay.Created)
         {
             if (isDashboardIcon && overlay.IsDashboard)

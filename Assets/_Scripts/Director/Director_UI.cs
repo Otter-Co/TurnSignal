@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.Events;
-
 using Valve.VR;
+using OVRLay;
 
 public partial class Director
 {
@@ -18,7 +17,7 @@ public partial class Director
     {
         if (hideWin)
         {
-            menuOverlay.dontForceRenderTexCam = false;
+            // menuOverlay.dontForceRenderTexCam = false;
             menuRig.menuRigCamera.enabled = false;
 
             winC.HideUnityWindow();
@@ -26,7 +25,7 @@ public partial class Director
         }
         else
         {
-            menuOverlay.dontForceRenderTexCam = true;
+            // menuOverlay.dontForceRenderTexCam = true;
             menuRig.menuRigCamera.enabled = true;
 
             winC.ShowUnityWindow();
@@ -51,8 +50,8 @@ public partial class Director
                 break;
         }
 
-        if (floorOverlay.deviceToTrack != floorOverlayDevice)
-            floorOverlay.deviceToTrack = floorOverlayDevice;
+        // if (floorOverlay.deviceToTrack != floorOverlayDevice)
+        //     floorOverlay.deviceToTrack = floorOverlayDevice;
 
         SetFloorOverlayScale(prefs.Scale);
         SetFloorOverlayHeight(prefs.Height);
@@ -63,11 +62,11 @@ public partial class Director
     public void SetFloorOverlayScale(float scale)
     {
         if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-            if (floorOverlay.widthInMeters != prefs.Scale * floorOverlayHandScale)
+            if (floorOverlay.settings.WidthInMeters != prefs.Scale * floorOverlayHandScale)
                 scale *= floorOverlayHandScale;
 
-        if (floorOverlay.widthInMeters != scale)
-            floorOverlay.widthInMeters = scale;
+        if (floorOverlay.settings.WidthInMeters != scale)
+            floorOverlay.settings.WidthInMeters = scale;
     }
 
     public void SetFloorOverlayHeight(float height)
@@ -87,11 +86,11 @@ public partial class Director
     }
 
     public bool GetManifestAutoLaunch() =>
-        (handler != null && handler.Applications != null) ? handler.Applications.GetApplicationAutoLaunch(appKey) : false;
+        (OVR.Applications != null) ? OVR.Applications.GetApplicationAutoLaunch(appKey) : false;
 
     public void SetManifestAutoLaunch(bool autoLaunch)
     {
-        if (handler != null && handler.Applications != null)
-            handler.Applications.SetApplicationAutoLaunch(appKey, autoLaunch);
+        if (OVR.Applications != null)
+            OVR.Applications.SetApplicationAutoLaunch(appKey, autoLaunch);
     }
 }
