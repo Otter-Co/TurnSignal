@@ -27,7 +27,7 @@ public class OpenVR_DeviceTracker : MonoBehaviour
     {
         if (OVR.StartedUp && (trackPosition || trackRotation))
         {
-            uint devIndex = GetDeviceIndex();
+            uint devIndex = GetDeviceIndex(deviceType);
 
             if (trackPosition)
                 transform.position = OVRLay.Pose.GetDevicePosition(devIndex);
@@ -37,7 +37,7 @@ public class OpenVR_DeviceTracker : MonoBehaviour
         }
     }
 
-    uint GetDeviceIndex()
+    public static uint GetDeviceIndex(DeviceType deviceType, uint custom = 0)
     {
         switch (deviceType)
         {
@@ -49,7 +49,7 @@ public class OpenVR_DeviceTracker : MonoBehaviour
             case DeviceType.LeftController:
                 return OVRLay.Pose.LeftPoseIndex;
             case DeviceType.CustomIndex:
-                return (uint)customDeviceIndex;
+                return (uint)custom;
         }
     }
 }

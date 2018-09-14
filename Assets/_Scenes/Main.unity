@@ -7604,6 +7604,50 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1359043363}
   m_CullTransparentMesh: 0
+--- !u!1 &1394586165
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1394586166}
+  - component: {fileID: 1394586167}
+  m_Layer: 0
+  m_Name: OpenVR_DeviceTracker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1394586166
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1394586165}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2047159311}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1394586167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1394586165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 177a3d5c7f1f53d4fbfc506049da9502, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deviceType: 0
+  customDeviceIndex: 0
+  trackPosition: 1
+  trackRotation: 1
 --- !u!1 &1400658411
 GameObject:
   m_ObjectHideFlags: 0
@@ -10180,6 +10224,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 991803036}
+  - {fileID: 1394586166}
+  - {fileID: 2112142571}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10336,6 +10382,73 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2088332244}
   m_CullTransparentMesh: 0
+--- !u!1 &2112142570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2112142571}
+  - component: {fileID: 2112142572}
+  - component: {fileID: 2112142573}
+  m_Layer: 0
+  m_Name: Overlay_Unity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2112142571
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2112142570}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2047159311}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2112142572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2112142570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f30702d1ce0e54aa295284fec0fb89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  overlayCreated: 0
+  overlayName: Unity Overlay
+  overlayKey: unity-overlay
+  createOnStart: 1
+  settings:
+    WidthInMeters: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Alpha: 1
+    TexelAspect: 0
+    Visible: 1
+    HighQuality: 0
+--- !u!114 &2112142573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2112142570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96878ff958ac7604491e2ed9ce918ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformOrigin: 1
+  transformType: 0
+  relativeDevice: 0
+  customDeviceIndex: 0
 --- !u!1 &2125144642
 GameObject:
   m_ObjectHideFlags: 0

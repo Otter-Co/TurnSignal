@@ -4,19 +4,89 @@ using Valve.VR;
 
 public class Overlay_Unity : MonoBehaviour
 {
+    [Header("Overlay State")]
+    public bool overlayCreated = false;
+    [Space(10)]
+    [Header("Overlay Setup Info")]
     public string overlayName = "Unity Overlay";
     public string overlayKey = "unity-overlay";
     [Space(10)]
-    public bool created = false;
+    [Header("Overlay Creation Settings")]
+    public bool createOnStart = true;
     [Space(10)]
+    [Header("Overlay General Settings")]
     public Overlay_Unity_Settings settings = new Overlay_Unity_Settings()
     {
         WidthInMeters = 1,
         Color = Color.white,
         Alpha = 1f,
+        TexelAspect = 0f,
         Visible = true,
         HighQuality = false,
     };
+
+    [HideInInspector] public OVRLay.OVRLay overlay;
+    private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings()
+    {
+        TexelAspect = 0f,
+        Visible = true,
+        HighQuality = false,
+    };
+
+    void Start()
+    {
+        overlay = new OVRLay.OVRLay(overlayName, overlayKey, !createOnStart);
+        overlayCreated = overlay.Created;
+    }
+
+    void Update()
+    {
+        if (overlay.Created && !lastSettings.Equals(settings))
+        {
+            ApplySettings();
+            lastSettings = settings;
+            Debug.Log("Settings Changed!");
+        }
+    }
+
+    public void CreateOverlay()
+    {
+        if (!overlay.Created)
+        {
+            overlay.CreateOverlay();
+            overlayCreated = true;
+        }
+    }
+
+    public void DestroyOverlay()
+    {
+        if (overlay.Created)
+        {
+            overlay.DestroyOverlay();
+            overlayCreated = false;
+        }
+    }
+
+    void ApplySettings()
+    {
+        if (lastSettings.WidthInMeters != settings.WidthInMeters)
+            overlay.WidthInMeters = settings.WidthInMeters;
+
+        if (lastSettings.Color != settings.Color)
+            overlay.Color = settings.Color;
+
+        if (lastSettings.Alpha != settings.Alpha)
+            overlay.Alpha = settings.Alpha;
+
+        if (lastSettings.TexelAspect != settings.TexelAspect)
+            overlay.TexelAspect = settings.TexelAspect;
+
+        if (lastSettings.Visible != settings.Visible)
+            overlay.Visible = settings.Visible;
+
+        if (lastSettings.HighQuality != settings.HighQuality)
+            overlay.HighQuality = settings.HighQuality;
+    }
 }
 
 [System.Serializable]
@@ -25,6 +95,7 @@ public struct Overlay_Unity_Settings
     public float WidthInMeters;
     public Color Color;
     public float Alpha;
+    public float TexelAspect;
     public bool Visible;
     public bool HighQuality;
 }

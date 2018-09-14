@@ -140,6 +140,16 @@ namespace OVRLay
         private Color pubColor = Color.white;
         private Vector2 pubVec2 = Vector2.zero;
 
+        public float WidthInMeters
+        {
+            get
+            {
+                lastError = OVR.Overlay.GetOverlayWidthInMeters(Handle, ref pubFloat);
+                return pubFloat;
+            }
+            set => lastError = OVR.Overlay.SetOverlayWidthInMeters(Handle, value);
+        }
+
         public Color Color
         {
             get
@@ -228,45 +238,42 @@ namespace OVRLay
 
         public ETextureType TextureType { get; set; } = ETextureType.DirectX;
 
-        public HmdMatrix34_t Transform
+        public HmdMatrix34_t TransformAbsolute
         {
             get
             {
                 HmdMatrix34_t posMatrix = new HmdMatrix34_t();
-                switch (transformType)
-                {
-                    default:
-                    case VROverlayTransformType.VROverlayTransform_Absolute:
-                        lastError = OVR.Overlay.GetOverlayTransformAbsolute(
-                            Handle, ref transformAbsoluteTrackingOrigin, ref posMatrix
-                        );
-                        break;
-                    case VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative:
-
-                        break;
-                }
+                lastError = OVR.Overlay.GetOverlayTransformAbsolute(
+                    Handle, ref transformAbsoluteTrackingOrigin, ref posMatrix
+                );
                 return posMatrix;
             }
-            set
-            {
-                switch (transformType)
-                {
-                    default:
-                    case VROverlayTransformType.VROverlayTransform_Absolute:
-                        lastError = OVR.Overlay.SetOverlayTransformAbsolute(
-                            Handle, transformAbsoluteTrackingOrigin, ref value
-                        );
-                        break;
-                    case VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative:
-                        lastError = OVR.Overlay.SetOverlayTransformTrackedDeviceRelative(
-                            Handle, TransformTrackedDeviceRelativeIndex, ref value
-                        );
-                        break;
-                }
-            }
+            set => lastError = OVR.Overlay.SetOverlayTransformAbsolute(
+                Handle, transformAbsoluteTrackingOrigin, ref value
+            );
         }
 
-        public uint TransformTrackedDeviceRelativeIndex { get; set; }
+        public HmdMatrix34_t TransformTrackedDeviceRelative
+        {
+            get
+            {
+                HmdMatrix34_t posMatrix = new HmdMatrix34_t();
+                lastError = OVR.Overlay.GetOverlayTransformTrackedDeviceRelative(
+                    Handle, ref trackedDeviceIndex, ref posMatrix
+                );
+                return posMatrix;
+            }
+            set => lastError = OVR.Overlay.SetOverlayTransformTrackedDeviceRelative(
+                Handle, trackedDeviceIndex, ref value
+            );
+        }
+        
+        private uint trackedDeviceIndex = OpenVR.k_unTrackedDeviceIndexInvalid;
+        public uint TransformTrackedDeviceRelativeIndex
+        {
+            get => trackedDeviceIndex;
+            set => trackedDeviceIndex = value;
+        }
 
         private VROverlayTransformType transformType = VROverlayTransformType.VROverlayTransform_Absolute;
         public VROverlayTransformType TransformType
