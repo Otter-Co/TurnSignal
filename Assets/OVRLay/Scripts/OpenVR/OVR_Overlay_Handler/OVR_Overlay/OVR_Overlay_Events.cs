@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Valve.VR;
 
-public partial class OVR_Overlay 
+public partial class OVR_Overlay
 {
     public DashboardChange onDashboardChange = delegate(bool open){};
     public FocusChange onFocusChange = delegate(bool hasFocus){};
@@ -30,8 +30,8 @@ public partial class OVR_Overlay
     public delegate void KeyboardInput(string input);
     public delegate void KeyboardClosed();
     public delegate void KeyboardDone();
-    
-    
+
+
     protected virtual void DigestEvent(VREvent_t pEvent)
     {
         EVREventType eventType = (EVREventType) pEvent.eventType;
