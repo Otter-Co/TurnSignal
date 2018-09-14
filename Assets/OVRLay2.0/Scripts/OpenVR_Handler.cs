@@ -44,6 +44,15 @@ namespace OVRLay
             }
         }
 
+        public delegate void D_OnVRAppQuit();
+        public static D_OnDashboardChange OnDashboardChange = (bool open) => { };
+        public delegate void D_OnStandbyChange(bool inStandby);
+        public static D_OnStandbyChange OnStandbyChange = (bool inStandby) => { };
+        public delegate void D_OnChaperoneSettingsChange();
+        public static D_OnChaperoneSettingsChange OnChaperoneSettingsChange = () => { };
+        public delegate void D_OnDashboardChange(bool open);
+        public static D_OnVRAppQuit OnVRAppQuit = () => { };
+
         public static void UpdateEvents()
         {
             VREvent_t event_T = new VREvent_t();
@@ -52,15 +61,25 @@ namespace OVRLay
                 switch ((EVREventType)event_T.eventType)
                 {
                     case EVREventType.VREvent_DashboardActivated:
+                        OnDashboardChange(true);
+                        break;
                     case EVREventType.VREvent_DashboardDeactivated:
+                        OnDashboardChange(false);
+                        break;
 
                     case EVREventType.VREvent_EnterStandbyMode:
+                        OnStandbyChange(true);
+                        break;
                     case EVREventType.VREvent_LeaveStandbyMode:
+                        OnStandbyChange(false);
+                        break;
 
                     case EVREventType.VREvent_ChaperoneSettingsHaveChanged:
+                        OnChaperoneSettingsChange();
+                        break;
 
                     case EVREventType.VREvent_Quit:
-                    default:
+                        OnVRAppQuit();
                         break;
                 }
         }

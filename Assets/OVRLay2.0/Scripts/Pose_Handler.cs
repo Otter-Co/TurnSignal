@@ -18,8 +18,8 @@ namespace OVRLay
         public static uint RightPoseIndex { get; private set; } = OpenVR.k_unTrackedDeviceIndexInvalid;
         public static uint LeftPoseIndex { get; private set; } = OpenVR.k_unTrackedDeviceIndexInvalid;
 
-        public static Quaternion GetDeviceRotation(int i) => lastPoses[i].rot;
-        public static Vector3 GetDevicePosition(int i) => lastPoses[i].pos;
+        public static Quaternion GetDeviceRotation(uint i) => lastPoses[i].rot;
+        public static Vector3 GetDevicePosition(uint i) => lastPoses[i].pos;
 
         public static void UpdatePoses()
         {
