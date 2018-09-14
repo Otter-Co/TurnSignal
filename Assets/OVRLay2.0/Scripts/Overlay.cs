@@ -64,6 +64,25 @@ namespace OVRLay
                 return true;
         }
 
+        public delegate void D_OnFocusChange(bool hasFocus);
+        public D_OnFocusChange OnFocusChange = (hasFocus) => { };
+        public delegate void D_OnDashboardChange(bool active);
+        public D_OnDashboardChange OnDashboardChange = (active) => { };
+        public delegate void D_OnVisibilityChange(bool visible);
+        public D_OnVisibilityChange OnVisibilityChange = (visible) => { };
+        public delegate void D_OnKeyboardDone();
+        public D_OnKeyboardDone OnKeyboardDone = () => { };
+        public delegate void D_OnKeyboardClose();
+        public D_OnKeyboardClose OnKeyboardClose = () => { };
+        public delegate void D_OnKeyboardInput(string minimal, string full);
+        public D_OnKeyboardInput OnKeyboardInput = (minimal, full) => { };
+        public delegate void D_OnMouseMove(VREvent_Mouse_t data);
+        public D_OnMouseMove OnMouseMove = (data) => { };
+        public delegate void D_OnMouseDown(VREvent_Mouse_t data);
+        public D_OnMouseDown OnMouseDown = (data) => { };
+        public delegate void D_OnMouseUp(VREvent_Mouse_t data);
+        public D_OnMouseUp OnMouseUp = (data) => { };
+
         public void UpdateEvents()
         {
             VREvent_t event_T = new VREvent_t();
@@ -73,65 +92,58 @@ namespace OVRLay
                 switch (eventType)
                 {
                     case EVREventType.VREvent_FocusEnter:
+                        OnFocusChange(true);
                         break;
                     case EVREventType.VREvent_FocusLeave:
+                        OnFocusChange(false);
                         break;
                     case EVREventType.VREvent_DashboardActivated:
+                        OnDashboardChange(true);
                         break;
                     case EVREventType.VREvent_DashboardDeactivated:
+                        OnDashboardChange(false);
                         break;
                     case EVREventType.VREvent_OverlayShown:
+                        OnVisibilityChange(true);
                         break;
                     case EVREventType.VREvent_OverlayHidden:
-                        break;
-                    case EVREventType.VREvent_KeyboardDone:
-                        break;
-                    case EVREventType.VREvent_KeyboardClosed:
+                        OnVisibilityChange(false);
                         break;
 
+                    case EVREventType.VREvent_KeyboardDone:
+                        OnKeyboardDone();
+                        break;
+                    case EVREventType.VREvent_KeyboardClosed:
+                        OnKeyboardClose();
+                        break;
                     case EVREventType.VREvent_KeyboardCharInput:
                         {
-                            string txt = "";
                             var kd = event_T.data.keyboard;
-                            byte[] bytes = new byte[]
-                            {
-                            kd.cNewInput0,
-                            kd.cNewInput1,
-                            kd.cNewInput2,
-                            kd.cNewInput3,
-                            kd.cNewInput4,
-                            kd.cNewInput5,
-                            kd.cNewInput6,
-                            kd.cNewInput7,
+                            byte[] bytes = new byte[] {
+                                kd.cNewInput0, kd.cNewInput1, kd.cNewInput2, kd.cNewInput3,
+                                kd.cNewInput4, kd.cNewInput5, kd.cNewInput6, kd.cNewInput7,
                             };
                             int len = 0;
                             while (bytes[len++] != 0 && len < 7) ;
-                            string input = System.Text.Encoding.UTF8.GetString(bytes, 0, len);
+                            string minTxt = System.Text.Encoding.UTF8.GetString(bytes, 0, len);
 
                             System.Text.StringBuilder txtB = new System.Text.StringBuilder(1024);
                             OVR.Overlay.GetKeyboardText(txtB, 1024);
-                            txt = txtB.ToString();
+                            string fullTxt = txtB.ToString();
 
+                            OnKeyboardInput(minTxt, fullTxt);
                             break;
                         }
-
+                        
                     case EVREventType.VREvent_MouseMove:
-                        {
-                            var data = event_T.data.mouse;
-                            break;
-                        }
-
+                        OnMouseMove(event_T.data.mouse);
+                        break;
                     case EVREventType.VREvent_MouseButtonDown:
-                        {
-                            var data = event_T.data.mouse;
-                            break;
-                        }
-
+                        OnMouseDown(event_T.data.mouse);
+                        break;
                     case EVREventType.VREvent_MouseButtonUp:
-                        {
-                            var data = event_T.data.mouse;
-                            break;
-                        }
+                        OnMouseUp(event_T.data.mouse);
+                        break;
                 }
             }
         }
@@ -225,7 +237,7 @@ namespace OVRLay
             }
         }
 
-        public VRTextureBounds_t TexureBounds
+        public VRTextureBounds_t TextureBounds
         {
             get
             {
@@ -267,7 +279,7 @@ namespace OVRLay
                 Handle, trackedDeviceIndex, ref value
             );
         }
-        
+
         private uint trackedDeviceIndex = OpenVR.k_unTrackedDeviceIndexInvalid;
         public uint TransformTrackedDeviceRelativeIndex
         {

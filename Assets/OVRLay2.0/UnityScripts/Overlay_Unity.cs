@@ -4,6 +4,14 @@ using Valve.VR;
 
 public class Overlay_Unity : MonoBehaviour
 {
+    public static readonly VRTextureBounds_t TextureBounds = new VRTextureBounds_t()
+    {
+        uMin = 0,
+        vMin = 1,
+        uMax = 1,
+        vMax = 0
+    };
+
     [Header("Overlay State")]
     public bool overlayCreated = false;
     [Space(10)]
@@ -24,8 +32,18 @@ public class Overlay_Unity : MonoBehaviour
         Visible = true,
         HighQuality = false,
     };
+    [Space(10)]
 
-    [HideInInspector] public OVRLay.OVRLay overlay;
+    public OVRLay.OVRLay.D_OnDashboardChange OnDashboardChange = (active) => { };
+    public OVRLay.OVRLay.D_OnFocusChange OnFocusChange = (hasFocus) => { };
+    public OVRLay.OVRLay.D_OnVisibilityChange OnVisibilityChange = (visible) => { };
+    public OVRLay.OVRLay.D_OnKeyboardDone OnKeyboardDone = () => { };
+    public OVRLay.OVRLay.D_OnKeyboardClose OnKeyboardClose = () => { };
+    public OVRLay.OVRLay.D_OnKeyboardInput OnKeyboardInput = (m, f) => { };
+
+
+    [HideInInspector]
+    public OVRLay.OVRLay overlay;
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings()
     {
         TexelAspect = 0f,
@@ -36,6 +54,14 @@ public class Overlay_Unity : MonoBehaviour
     void Start()
     {
         overlay = new OVRLay.OVRLay(overlayName, overlayKey, !createOnStart);
+
+        overlay.OnDashboardChange += OnDashboardChange;
+        overlay.OnFocusChange += OnFocusChange;
+        overlay.OnVisibilityChange += OnVisibilityChange;
+        overlay.OnKeyboardDone += OnKeyboardDone;
+        overlay.OnKeyboardClose += OnKeyboardClose;
+        overlay.OnKeyboardInput += OnKeyboardInput;
+
         overlayCreated = overlay.Created;
     }
 
@@ -67,7 +93,7 @@ public class Overlay_Unity : MonoBehaviour
         }
     }
 
-    void ApplySettings()
+    public void ApplySettings()
     {
         if (lastSettings.WidthInMeters != settings.WidthInMeters)
             overlay.WidthInMeters = settings.WidthInMeters;
@@ -86,6 +112,12 @@ public class Overlay_Unity : MonoBehaviour
 
         if (lastSettings.HighQuality != settings.HighQuality)
             overlay.HighQuality = settings.HighQuality;
+    }
+
+    public void PollForEvents()
+    {
+        if (overlay.Created)
+            overlay.UpdateEvents();
     }
 }
 
