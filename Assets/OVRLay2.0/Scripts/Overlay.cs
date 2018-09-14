@@ -11,17 +11,21 @@ namespace OVRLay
 
         public string Name { get; private set; } = "OpenVR Overlay";
         public string Key { get; private set; } = "openvr-overlay";
+        public bool IsDashboard { get; private set; } = false;
         public ulong Handle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
+        public ulong IconHandle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
         public bool Created { get; private set; }
         public EVROverlayError lastError { get; private set; } = EVROverlayError.None;
 
-        public OVRLay(string name = null, string key = null, bool dontCreate = false)
+        public OVRLay(string name = null, string key = null, bool isDashboard = false, bool dontCreate = false)
         {
             if (name != null)
                 Name = name;
 
             if (key != null)
                 Key = key;
+
+            IsDashboard = isDashboard;
 
             if (!dontCreate)
                 CreateOverlay();
@@ -38,12 +42,20 @@ namespace OVRLay
                 return true;
 
             ulong newHandle = OpenVR.k_ulOverlayHandleInvalid;
-            lastError = OVR.Overlay.CreateOverlay(Key, Name, ref newHandle);
+            ulong iconHandle = OpenVR.k_ulOverlayHandleInvalid;
+
+            if (IsDashboard)
+                lastError = OVR.Overlay.CreateDashboardOverlay(Key, Name, ref newHandle, ref iconHandle);
+            else
+                lastError = OVR.Overlay.CreateOverlay(Key, Name, ref newHandle);
 
             var result = (lastError == EVROverlayError.None);
 
             if (result)
+            {
                 Handle = newHandle;
+                IconHandle = iconHandle;
+            }
 
             return (Created = result);
         }
@@ -134,7 +146,7 @@ namespace OVRLay
                             OnKeyboardInput(minTxt, fullTxt);
                             break;
                         }
-                        
+
                     case EVREventType.VREvent_MouseMove:
                         OnMouseMove(event_T.data.mouse);
                         break;
@@ -237,6 +249,23 @@ namespace OVRLay
             }
         }
 
+        private Texture lastIconTex = null;
+        public Texture IconTexture
+        {
+            get => lastIconTex;
+            set
+            {
+                Texture_t t = new Texture_t
+                {
+                    handle = value.GetNativeTexturePtr(),
+                    eColorSpace = EColorSpace.Auto,
+                    eType = IconTextureType
+                };
+
+                lastError = OVR.Overlay.SetOverlayTexture(IconHandle, ref t);
+            }
+        }
+
         public VRTextureBounds_t TextureBounds
         {
             get
@@ -248,7 +277,19 @@ namespace OVRLay
             set => lastError = OVR.Overlay.SetOverlayTextureBounds(Handle, ref value);
         }
 
+        public VRTextureBounds_t IconTextureBounds
+        {
+            get
+            {
+                VRTextureBounds_t t = new VRTextureBounds_t();
+                lastError = OVR.Overlay.GetOverlayTextureBounds(IconHandle, ref t);
+                return t;
+            }
+            set => lastError = OVR.Overlay.SetOverlayTextureBounds(IconHandle, ref value);
+        }
+
         public ETextureType TextureType { get; set; } = ETextureType.DirectX;
+        public ETextureType IconTextureType { get; set; } = ETextureType.DirectX;
 
         public HmdMatrix34_t TransformAbsolute
         {

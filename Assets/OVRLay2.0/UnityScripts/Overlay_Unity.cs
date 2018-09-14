@@ -18,6 +18,7 @@ public class Overlay_Unity : MonoBehaviour
     [Header("Overlay Setup Info")]
     public string overlayName = "Unity Overlay";
     public string overlayKey = "unity-overlay";
+    public bool isDashboardOverlay = false;
     [Space(10)]
     [Header("Overlay Creation Settings")]
     public bool createOnStart = true;
@@ -53,7 +54,7 @@ public class Overlay_Unity : MonoBehaviour
 
     void Start()
     {
-        overlay = new OVRLay.OVRLay(overlayName, overlayKey, !createOnStart);
+        overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createOnStart);
 
         overlay.OnDashboardChange += OnDashboardChange;
         overlay.OnFocusChange += OnFocusChange;

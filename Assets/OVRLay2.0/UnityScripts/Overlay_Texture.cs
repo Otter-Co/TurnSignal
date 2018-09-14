@@ -26,13 +26,26 @@ public class Overlay_Texture : MonoBehaviour
     {
         if (overlay.Created)
         {
-            if (overlay.TextureType != ETextureType.DirectX)
-                overlay.TextureType = ETextureType.DirectX;
+            if (isDashboardIcon && overlay.IsDashboard)
+            {
+                if (overlay.IconTextureType != ETextureType.DirectX)
+                    overlay.IconTextureType = ETextureType.DirectX;
 
-            if (!overlay.TextureBounds.Equals(Overlay_Unity.TextureBounds))
-                overlay.TextureBounds = Overlay_Unity.TextureBounds;
+                if (!overlay.IconTextureBounds.Equals(Overlay_Unity.TextureBounds))
+                    overlay.IconTextureBounds = Overlay_Unity.TextureBounds;
 
-            overlay.Texture = currentTexture;
+                overlay.IconTexture = currentTexture;
+            }
+            else
+            {
+                if (overlay.TextureType != ETextureType.DirectX)
+                    overlay.TextureType = ETextureType.DirectX;
+
+                if (!overlay.TextureBounds.Equals(Overlay_Unity.TextureBounds))
+                    overlay.TextureBounds = Overlay_Unity.TextureBounds;
+
+                overlay.Texture = currentTexture;
+            }
         }
     }
 }
