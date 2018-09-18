@@ -32,22 +32,18 @@ public class Overlay_MouseInput : MonoBehaviour
     private Overlay_Unity u_overlay;
     private OVRLay.OVRLay overlay;
 
-    void Start()
-    {
-        u_overlay = GetComponent<Overlay_Unity>();
-        overlay = u_overlay.overlay;
-
-        overlay.OnMouseMove += (data) => UpdateRawMousePosition(data);
-        overlay.OnMouseDown += (data) => UpdateRawMouseButton(data, true);
-        overlay.OnMouseUp += (data) => UpdateRawMouseButton(data, false);
-    }
-
     void Update()
     {
         if (overlay == null)
         {
             u_overlay = GetComponent<Overlay_Unity>();
             overlay = u_overlay.overlay;
+
+            overlay.OnMouseMove += (data) => UpdateRawMousePosition(data);
+            overlay.OnMouseDown += (data) => UpdateRawMouseButton(data, true);
+            overlay.OnMouseUp += (data) => UpdateRawMouseButton(data, false);
+
+            return;
         }
 
         if (overlay.Created)
@@ -107,7 +103,7 @@ public class Overlay_MouseInput : MonoBehaviour
             button = PointerEventData.InputButton.Left,
             clickTime = mouseDownTime,
             dragging = mouseHeld,
-            clickCount = (mouseHeld) ? 0 : 1
+            clickCount = 1
         };
     }
 
@@ -179,61 +175,71 @@ public class Overlay_MouseInput : MonoBehaviour
         static public void EnterTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerEnterHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerEnterHandler);
         }
 
         static public void ExitTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerExitHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerExitHandler);
         }
 
         static public void DownTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerDownHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerDownHandler);
         }
 
         static public void UpTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerUpHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.pointerUpHandler);
         }
 
         static public void SubmitTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.submitHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.submitHandler);
         }
 
         static public void StartDragTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.beginDragHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.beginDragHandler);
         }
 
         static public void DragTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.dragHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.dragHandler);
         }
 
         static public void MoveTargets(List<Selectable> t, AxisEventData aD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, aD, ExecuteEvents.moveHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, aD, ExecuteEvents.moveHandler);
         }
 
         static public void EndDragTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.endDragHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.endDragHandler);
         }
 
         static public void DropTargets(List<Selectable> t, PointerEventData pD)
         {
             foreach (Selectable b in t)
-                ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.dropHandler);
+                if (b != null && b.gameObject != null)
+                    ExecuteEvents.Execute(b.gameObject, pD, ExecuteEvents.dropHandler);
         }
     }
 }

@@ -205,4 +205,9 @@ public partial class Director : MonoBehaviour
         return e;
     }
 
+
+    public void OnError(string err)
+    {
+        Debug.Log(err);
+    }
 }

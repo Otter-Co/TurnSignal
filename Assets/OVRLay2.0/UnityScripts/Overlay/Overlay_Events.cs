@@ -11,6 +11,7 @@ public class Overlay_Events : MonoBehaviour
 
     [Serializable] public class BoolEvent : UnityEvent<bool> { }
     [Serializable] public class VoidEvent : UnityEvent { }
+    [Serializable] public class StringEvent : UnityEvent<string> { };
     [Serializable] public class DoubleStringEvent : UnityEvent<string, string> { }
 
     public BoolEvent OnDashboardChange;
@@ -19,8 +20,7 @@ public class Overlay_Events : MonoBehaviour
     public VoidEvent OnKeyboardDone;
     public VoidEvent OnKeyboardClose;
     public DoubleStringEvent OnKeyboardInput;
-
-
+    public StringEvent OnError;
     void Start()
     {
         u_overlay = GetComponent<Overlay_Unity>();
@@ -44,11 +44,15 @@ public class Overlay_Events : MonoBehaviour
         if (OnKeyboardInput == null)
             OnKeyboardInput = new DoubleStringEvent();
 
+        if (OnError == null)
+            OnError = new StringEvent();
+
         overlay.OnDashboardChange += (active) => OnDashboardChange.Invoke(active);
         overlay.OnFocusChange += (hasFocus) => OnFocusChange.Invoke(hasFocus);
         overlay.OnVisibilityChange += (visible) => OnVisibilityChange.Invoke(visible);
         overlay.OnKeyboardDone += () => OnKeyboardDone.Invoke();
         overlay.OnKeyboardClose += () => OnKeyboardClose.Invoke();
         overlay.OnKeyboardInput += (m, f) => OnKeyboardInput.Invoke(m, f);
+        overlay.OnError += (err) => OnError.Invoke(err);
     }
 }

@@ -4,6 +4,7 @@ using Valve.VR;
 using OVRLay;
 
 [RequireComponent(typeof(Overlay_Unity))]
+[RequireComponent(typeof(Overlay_Texture))]
 public class Overlay_CameraTexture : MonoBehaviour
 {
     [Space(10)]
@@ -14,9 +15,9 @@ public class Overlay_CameraTexture : MonoBehaviour
     public int textureWidthOverride = 0;
     public int textureHeightOverride = 0;
 
-    public RenderTexture targetTex;
-
+    private RenderTexture targetTex;
     private Overlay_Unity u_overlay;
+    private Overlay_Texture u_oTex;
     private OVRLay.OVRLay overlay;
 
     void Start()
@@ -38,21 +39,20 @@ public class Overlay_CameraTexture : MonoBehaviour
         if (overlay == null)
         {
             u_overlay = GetComponent<Overlay_Unity>();
+            u_oTex = GetComponent<Overlay_Texture>();
+            
             overlay = u_overlay.overlay;
+            u_oTex.currentTexture = targetTex;
+
+            return;
         }
 
         if (overlay.Created)
         {
-            if (overlay.TextureType != ETextureType.DirectX)
-                overlay.TextureType = ETextureType.DirectX;
-
-            targetCamera.targetTexture = targetTex;
+            if (targetCamera.targetTexture != targetTex)
+                targetCamera.targetTexture = targetTex;
 
             targetCamera.Render();
-
-            overlay.WidthInMeters = u_overlay.settings.WidthInMeters;
-            overlay.TextureBounds = Overlay_Unity.TextureBounds;
-            overlay.Texture = targetTex;
         }
     }
 }

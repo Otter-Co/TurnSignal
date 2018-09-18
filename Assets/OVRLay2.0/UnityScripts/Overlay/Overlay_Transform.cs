@@ -17,29 +17,24 @@ public class Overlay_Transform : MonoBehaviour
     private Overlay_Unity u_overlay;
     private OVRLay.OVRLay overlay;
 
-    void Start()
-    {
-        u_overlay = GetComponent<Overlay_Unity>();
-        overlay = u_overlay.overlay;
-    }
+    private Vector3 lastPos = Vector3.zero;
+    private Vector3 lastRot = Vector3.zero;
+
     void Update()
     {
         if (overlay == null)
         {
             u_overlay = GetComponent<Overlay_Unity>();
             overlay = u_overlay.overlay;
+
+            return;
         }
 
-        if (overlay.Created)
+        if (overlay.Created && (transform.eulerAngles != lastRot || transform.position != lastPos))
         {
-            if (overlay.TransformType != transformType)
-                overlay.TransformType = transformType;
-
-            if (overlay.TransformAbsoluteTrackingOrigin != transformOrigin)
-                overlay.TransformAbsoluteTrackingOrigin = transformOrigin;
-
-            if (overlay.TransformTrackedDeviceRelativeIndex != OpenVR_DeviceTracker.GetDeviceIndex(relativeDevice))
-                overlay.TransformTrackedDeviceRelativeIndex = OpenVR_DeviceTracker.GetDeviceIndex(relativeDevice);
+            overlay.TransformType = transformType;
+            overlay.TransformAbsoluteTrackingOrigin = transformOrigin;
+            overlay.TransformTrackedDeviceRelativeIndex = OpenVR_DeviceTracker.GetDeviceIndex(relativeDevice);
 
             var mat = new OVRLay.Utility.RigidTransform(transform.position, transform.rotation).ToHmdMatrix34();
 
@@ -53,6 +48,9 @@ public class Overlay_Transform : MonoBehaviour
                     overlay.TransformTrackedDeviceRelative = mat;
                     break;
             }
+
+            lastRot = transform.eulerAngles;
+            lastPos = transform.position;
         }
     }
 }

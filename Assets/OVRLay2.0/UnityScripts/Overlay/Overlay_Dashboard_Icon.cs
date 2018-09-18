@@ -1,10 +1,9 @@
-using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
-using OVRLay;
 
-[RequireComponent(typeof(Overlay_Unity))]
-public class Overlay_Texture : MonoBehaviour
+public class Overlay_Dashboard_Icon : MonoBehaviour
 {
 
     [Header("Overlay Texture")]
@@ -22,7 +21,7 @@ public class Overlay_Texture : MonoBehaviour
             return;
         }
 
-        if (overlay.Created && currentTexture != null)
+        if (overlay.Created)
         {
             if (overlay.TextureType != ETextureType.DirectX)
                 overlay.TextureType = ETextureType.DirectX;

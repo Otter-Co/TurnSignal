@@ -34,21 +34,40 @@ public class Overlay_Unity : MonoBehaviour
         WidthInMeters = 1,
         Color = Color.white,
         Alpha = 1f,
-        TexelAspect = 0f,
+        TexelAspect = 1f,
         Visible = true,
         HighQuality = false,
     };
-    private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings()
-    {
-        TexelAspect = 0f,
-        Visible = true,
-        HighQuality = false,
-    };
+    public bool reportDebug = false;
+    private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings();
 
     void Start()
     {
         overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createOnStart);
         overlayCreated = overlay.Created;
+    }
+
+    void Update()
+    {
+        if (overlay.Created && !lastSettings.Equals(settings))
+        {
+            ApplySettings();
+            lastSettings = settings;
+        }
+
+        if (overlay.Created)
+            PollForEvents();
+
+        if (reportDebug)
+        {
+            var curPos = (new OVRLay.Utility.RigidTransform(overlay.TransformAbsolute));
+
+            Debug.Log(curPos.pos);
+            Debug.Log(curPos.rot.eulerAngles);
+            Debug.Log("Is Visible: " + overlay.Visible);
+
+            reportDebug = false;
+        }
     }
 
     void OnDestroy()
@@ -69,19 +88,6 @@ public class Overlay_Unity : MonoBehaviour
     {
         if (overlay != null && overlay.Created)
             overlay.Visible = false;
-    }
-
-    void Update()
-    {
-        if (overlay.Created && !lastSettings.Equals(settings))
-        {
-            ApplySettings();
-            lastSettings = settings;
-            Debug.Log("Settings Changed!");
-        }
-
-        if (overlay.Created)
-            PollForEvents();
     }
 
     public void CreateOverlay()

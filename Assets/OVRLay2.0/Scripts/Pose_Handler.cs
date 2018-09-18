@@ -20,6 +20,8 @@ namespace OVRLay
 
         public static Quaternion GetDeviceRotation(uint i) => lastPoses[i].rot;
         public static Vector3 GetDevicePosition(uint i) => lastPoses[i].pos;
+        public static TrackedDevicePose_t GetDevicePose(uint i) => devicesPoses[i];
+        public static Utility.RigidTransform GetRigidT(uint i) => lastPoses[i];
 
         public static void UpdatePoses()
         {

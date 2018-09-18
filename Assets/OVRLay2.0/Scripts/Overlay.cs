@@ -95,6 +95,9 @@ namespace OVRLay
         public delegate void D_OnMouseUp(VREvent_Mouse_t data);
         public D_OnMouseUp OnMouseUp = (data) => { };
 
+        public delegate void D_OnError(string error);
+        public D_OnError OnError = (error) => { };
+
         public void UpdateEvents()
         {
             VREvent_t event_T = new VREvent_t();
@@ -168,7 +171,7 @@ namespace OVRLay
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayWidthInMeters(Handle, ref pubFloat);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayWidthInMeters(Handle, ref pubFloat));
                 return pubFloat;
             }
             set => lastError = OVR.Overlay.SetOverlayWidthInMeters(Handle, value);
@@ -178,30 +181,30 @@ namespace OVRLay
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayColor(Handle, ref pubColor.r, ref pubColor.g, ref pubColor.b);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayColor(Handle, ref pubColor.r, ref pubColor.g, ref pubColor.b));
                 return pubColor;
             }
-            set => lastError = OVR.Overlay.SetOverlayColor(Handle, value.r, value.g, value.b);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayColor(Handle, value.r, value.g, value.b));
         }
 
         public float Alpha
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayAlpha(Handle, ref pubFloat);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayAlpha(Handle, ref pubFloat));
                 return pubFloat;
             }
-            set => lastError = OVR.Overlay.SetOverlayAlpha(Handle, value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayAlpha(Handle, value));
         }
 
         public float TexelAspect
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayTexelAspect(Handle, ref pubFloat);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayTexelAspect(Handle, ref pubFloat));
                 return pubFloat;
             }
-            set => lastError = OVR.Overlay.SetOverlayTexelAspect(Handle, value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayTexelAspect(Handle, value));
         }
 
         public bool Visible
@@ -209,8 +212,8 @@ namespace OVRLay
             get => OVR.Overlay.IsOverlayVisible(Handle);
             set
             {
-                if (value) lastError = OVR.Overlay.ShowOverlay(Handle);
-                else lastError = OVR.Overlay.HideOverlay(Handle);
+                if (value) ErrorCheck(lastError = OVR.Overlay.ShowOverlay(Handle));
+                else ErrorCheck(lastError = OVR.Overlay.HideOverlay(Handle));
             }
         }
 
@@ -225,7 +228,7 @@ namespace OVRLay
             get
             {
                 uint w = 0, h = 0;
-                lastError = OVR.Overlay.GetOverlayImageData(Handle, System.IntPtr.Zero, 0, ref w, ref h);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayImageData(Handle, System.IntPtr.Zero, 0, ref w, ref h));
                 pubVec2.x = w;
                 pubVec2.y = h;
                 return pubVec2;
@@ -245,7 +248,7 @@ namespace OVRLay
                     eType = TextureType
                 };
 
-                lastError = OVR.Overlay.SetOverlayTexture(Handle, ref t);
+                ErrorCheck(lastError = OVR.Overlay.SetOverlayTexture(Handle, ref t));
             }
         }
 
@@ -262,7 +265,7 @@ namespace OVRLay
                     eType = IconTextureType
                 };
 
-                lastError = OVR.Overlay.SetOverlayTexture(IconHandle, ref t);
+                ErrorCheck(lastError = OVR.Overlay.SetOverlayTexture(IconHandle, ref t));
             }
         }
 
@@ -271,10 +274,10 @@ namespace OVRLay
             get
             {
                 VRTextureBounds_t t = new VRTextureBounds_t();
-                lastError = OVR.Overlay.GetOverlayTextureBounds(Handle, ref t);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayTextureBounds(Handle, ref t));
                 return t;
             }
-            set => lastError = OVR.Overlay.SetOverlayTextureBounds(Handle, ref value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayTextureBounds(Handle, ref value));
         }
 
         public VRTextureBounds_t IconTextureBounds
@@ -282,10 +285,10 @@ namespace OVRLay
             get
             {
                 VRTextureBounds_t t = new VRTextureBounds_t();
-                lastError = OVR.Overlay.GetOverlayTextureBounds(IconHandle, ref t);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayTextureBounds(IconHandle, ref t));
                 return t;
             }
-            set => lastError = OVR.Overlay.SetOverlayTextureBounds(IconHandle, ref value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayTextureBounds(IconHandle, ref value));
         }
 
         public ETextureType TextureType { get; set; } = ETextureType.DirectX;
@@ -296,14 +299,14 @@ namespace OVRLay
             get
             {
                 HmdMatrix34_t posMatrix = new HmdMatrix34_t();
-                lastError = OVR.Overlay.GetOverlayTransformAbsolute(
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayTransformAbsolute(
                     Handle, ref transformAbsoluteTrackingOrigin, ref posMatrix
-                );
+                ));
                 return posMatrix;
             }
-            set => lastError = OVR.Overlay.SetOverlayTransformAbsolute(
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayTransformAbsolute(
                 Handle, transformAbsoluteTrackingOrigin, ref value
-            );
+            ));
         }
 
         public HmdMatrix34_t TransformTrackedDeviceRelative
@@ -311,14 +314,14 @@ namespace OVRLay
             get
             {
                 HmdMatrix34_t posMatrix = new HmdMatrix34_t();
-                lastError = OVR.Overlay.GetOverlayTransformTrackedDeviceRelative(
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayTransformTrackedDeviceRelative(
                     Handle, ref trackedDeviceIndex, ref posMatrix
-                );
+                ));
                 return posMatrix;
             }
-            set => lastError = OVR.Overlay.SetOverlayTransformTrackedDeviceRelative(
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayTransformTrackedDeviceRelative(
                 Handle, trackedDeviceIndex, ref value
-            );
+            ));
         }
 
         private uint trackedDeviceIndex = OpenVR.k_unTrackedDeviceIndexInvalid;
@@ -347,10 +350,10 @@ namespace OVRLay
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayInputMethod(Handle, ref inputMethod);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayInputMethod(Handle, ref inputMethod));
                 return inputMethod;
             }
-            set => lastError = OVR.Overlay.SetOverlayInputMethod(Handle, inputMethod = value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayInputMethod(Handle, inputMethod = value));
         }
 
         private HmdVector2_t mouseScale = new HmdVector2_t();
@@ -358,15 +361,19 @@ namespace OVRLay
         {
             get
             {
-                lastError = OVR.Overlay.GetOverlayMouseScale(Handle, ref mouseScale);
+                ErrorCheck(lastError = OVR.Overlay.GetOverlayMouseScale(Handle, ref mouseScale));
                 return mouseScale;
             }
             set
             {
                 mouseScale = value;
-                lastError = OVR.Overlay.SetOverlayMouseScale(Handle, ref mouseScale);
+                ErrorCheck(lastError = OVR.Overlay.SetOverlayMouseScale(Handle, ref mouseScale));
             }
         }
-
+        public void ErrorCheck(EVROverlayError error)
+        {
+            if (error != EVROverlayError.None)
+                OnError(Name + " : " + OVR.Overlay.GetOverlayErrorNameFromEnum(error));
+        }
     }
 }
