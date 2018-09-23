@@ -35,23 +35,23 @@ public partial class Old_Director
 
     public void SetFloorOverlayDevice(int dev)
     {
-        switch (dev)
-        {
-            case 1:
-                floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.RightHand;
-                break;
+        // switch (dev)
+        // {
+        //     case 1:
+        //         floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.RightHand;
+        //         break;
 
-            case 2:
-                floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.LeftHand;
-                break;
+        //     case 2:
+        //         floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.LeftHand;
+        //         break;
 
-            default:
-                floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
-                break;
-        }
+        //     default:
+        //         floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
+        //         break;
+        // }
 
-        // if (floorOverlay.deviceToTrack != floorOverlayDevice)
-        //     floorOverlay.deviceToTrack = floorOverlayDevice;
+        // // if (floorOverlay.deviceToTrack != floorOverlayDevice)
+        // //     floorOverlay.deviceToTrack = floorOverlayDevice;
 
         SetFloorOverlayScale(prefs.Scale);
         SetFloorOverlayHeight(prefs.Height);
@@ -61,9 +61,9 @@ public partial class Old_Director
 
     public void SetFloorOverlayScale(float scale)
     {
-        if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-            if (floorOverlay.settings.WidthInMeters != prefs.Scale * floorOverlayHandScale)
-                scale *= floorOverlayHandScale;
+        // if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+        //     if (floorOverlay.settings.WidthInMeters != prefs.Scale * floorOverlayHandScale)
+        //         scale *= floorOverlayHandScale;
 
         if (floorOverlay.settings.WidthInMeters != scale)
             floorOverlay.settings.WidthInMeters = scale;
@@ -73,11 +73,11 @@ public partial class Old_Director
     {
         var foT = floorOverlay.transform;
 
-        if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
-            height *= floorOverlayHandScale;
+        // if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+        //     height *= floorOverlayHandScale;
 
-        if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides)
-            height *= -1f;
+        // if (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides)
+        //     height *= -1f;
 
         var heightV = new Vector3(foT.position.x, height, foT.position.z);
         foT.position = heightV;

@@ -342,8 +342,8 @@ namespace OVRLay
 
             public void Interpolate(RigidTransform to, float t)
             {
-                pos = OVR_Utils.Lerp(pos, to.pos, t);
-                rot = OVR_Utils.Slerp(rot, to.rot, t);
+                pos = Lerp(pos, to.pos, t);
+                rot = Slerp(rot, to.rot, t);
             }
         }
     }

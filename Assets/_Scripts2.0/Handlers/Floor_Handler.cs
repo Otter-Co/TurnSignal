@@ -14,13 +14,9 @@ public class Floor_Handler : MonoBehaviour
     public void SetMaxTurns(float t) => maxTurns = (int)t;
 
     public Transform hmd;
-    public Transform refT;
-    [Space(10)]
-    public Camera floorRigCamera;
     [Space(10)]
     public Old_Twister turnObj;
     [Space(10)]
-    public bool autoUpdate = true;
     public bool reversed = false;
     [Space(10)]
     public float maxYDist = 0.65f;

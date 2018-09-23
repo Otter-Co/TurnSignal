@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Old_Prefs_Handler : MonoBehaviour
 {
-    public Steam_Handler steamHandler;
+    public Old_Steam_Handler steamHandler;
 
     private TurnSignalPrefs prefs = new TurnSignalPrefs();
     private string _filePath = "";

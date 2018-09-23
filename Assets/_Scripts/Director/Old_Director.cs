@@ -19,7 +19,7 @@ public partial class Old_Director : MonoBehaviour
     [Space(10)]
     public float floorOverlayHandScale = 0.2f;
     public bool flipSides = false;
-    public Unity_Overlay.OverlayTrackedDevice floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
+    // public Unity_Overlay.OverlayTrackedDevice floorOverlayDevice = Unity_Overlay.OverlayTrackedDevice.None;
     [Space(10)]
     public int windowWidth = 800;
     public int windowHeight = 600;
@@ -34,7 +34,7 @@ public partial class Old_Director : MonoBehaviour
 
 
 
-    private Steam_Handler steamHandler;
+    private Old_Steam_Handler steamHandler;
     private Old_Prefs_Handler prefs;
     private WindowController winC;
 
@@ -47,7 +47,7 @@ public partial class Old_Director : MonoBehaviour
     {
         targetFPS = idleFPS;
 
-        steamHandler = GetComponent<Steam_Handler>();
+        steamHandler = GetComponent<Old_Steam_Handler>();
 
         // Init SteamWorks.net
         if (steamHandler.connectedToSteam)
@@ -113,14 +113,14 @@ public partial class Old_Director : MonoBehaviour
 
     public void UpdateFloorOverlayRot()
     {
-        if (hmdO.transform.position.y < floorOverlayHeight || (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides))
+        if (hmdO.transform.position.y < floorOverlayHeight) // || (floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None && flipSides))
         {
             var foT = floorOverlay.transform;
 
             if (foT.eulerAngles.x != 270f)
                 foT.eulerAngles = new Vector3(270f, foT.eulerAngles.y, foT.eulerAngles.z);
 
-            if (floorOverlayDevice == Unity_Overlay.OverlayTrackedDevice.None)
+            if (false) // floorOverlayDevice == Unity_Overlay.OverlayTrackedDevice.None)
                 floorRig.reversed = true;
             else if (flipSides)
                 floorRig.reversed = false;
@@ -144,8 +144,7 @@ public partial class Old_Director : MonoBehaviour
 
         var foP = floorOverlay.transform.position;
 
-        if (!prefs.FollowPlayerHeadset ||
-            floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
+        if (!prefs.FollowPlayerHeadset) // || floorOverlayDevice != Unity_Overlay.OverlayTrackedDevice.None)
         {
             if (foP.x != 0 || foP.z != 0)
                 floorOverlay.transform.position = new Vector3(0, floorOverlayHeight, 0);

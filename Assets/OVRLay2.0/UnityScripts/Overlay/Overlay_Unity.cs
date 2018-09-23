@@ -20,14 +20,14 @@ public class Overlay_Unity : MonoBehaviour
     }
 
     [HideInInspector] public OVRLay.OVRLay overlay;
-    [Header("Overlay State")]
+
+    [Header("Overlay Creation Settings")]
+    public bool createWhenReady = true;
     public bool overlayCreated = false;
     [Header("Overlay Setup Info")]
     public string overlayName = "Unity Overlay";
     public string overlayKey = "unity-overlay";
     public bool isDashboardOverlay = false;
-    [Header("Overlay Creation Settings")]
-    public bool createWhenReady = true;
     [Header("Overlay General Settings")]
     public Overlay_Unity_Settings settings = new Overlay_Unity_Settings()
     {
