@@ -41,6 +41,9 @@ namespace OVRLay
             if (Created)
                 return true;
 
+            if (OVR.Overlay == null)
+                return false;
+
             ulong newHandle = OpenVR.k_ulOverlayHandleInvalid;
             ulong iconHandle = OpenVR.k_ulOverlayHandleInvalid;
 
@@ -174,7 +177,7 @@ namespace OVRLay
                 ErrorCheck(lastError = OVR.Overlay.GetOverlayWidthInMeters(Handle, ref pubFloat));
                 return pubFloat;
             }
-            set => lastError = OVR.Overlay.SetOverlayWidthInMeters(Handle, value);
+            set => ErrorCheck(lastError = OVR.Overlay.SetOverlayWidthInMeters(Handle, value));
         }
 
         public Color Color
@@ -220,7 +223,7 @@ namespace OVRLay
         public bool HighQuality
         {
             get => OVR.Overlay.GetHighQualityOverlay() == Handle;
-            set { if (value) OVR.Overlay.SetHighQualityOverlay(Handle); }
+            set { if (value) ErrorCheck(lastError = OVR.Overlay.SetHighQualityOverlay(Handle)); }
         }
 
         public Vector2 Size

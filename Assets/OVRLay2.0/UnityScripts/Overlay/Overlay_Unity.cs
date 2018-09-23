@@ -27,7 +27,7 @@ public class Overlay_Unity : MonoBehaviour
     public string overlayKey = "unity-overlay";
     public bool isDashboardOverlay = false;
     [Header("Overlay Creation Settings")]
-    public bool createOnStart = true;
+    public bool createWhenReady = true;
     [Header("Overlay General Settings")]
     public Overlay_Unity_Settings settings = new Overlay_Unity_Settings()
     {
@@ -41,22 +41,26 @@ public class Overlay_Unity : MonoBehaviour
     public bool reportDebug = false;
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings();
 
-    void Start()
-    {
-        overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createOnStart);
-        overlayCreated = overlay.Created;
-    }
-
     void Update()
     {
-        if (overlay.Created && !lastSettings.Equals(settings))
+        if (overlay == null && createWhenReady && OVRLay.OVR.StartedUp)
         {
-            ApplySettings();
-            lastSettings = settings;
+            overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createWhenReady);
+            overlayCreated = overlay.Created;
+
+            return;
         }
 
         if (overlay.Created)
+        {
+            if (!lastSettings.Equals(settings))
+            {
+                ApplySettings();
+                lastSettings = settings;
+            }
+
             PollForEvents();
+        }
 
         if (reportDebug)
         {

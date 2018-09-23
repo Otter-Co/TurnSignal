@@ -36,7 +36,7 @@ public class OpenVR_Unity : MonoBehaviour
             OpenVRConnected = new VoidEvent();
 
         if (connectOnStart)
-            ConnectToSteam();
+            ConnectToOpenVR();
     }
 
     void Update()
@@ -47,7 +47,7 @@ public class OpenVR_Unity : MonoBehaviour
                 timeSinceLastTry += Time.deltaTime;
             else
             {
-                ConnectToSteam();
+                ConnectToOpenVR();
                 timeSinceLastTry = 0f;
             }
 
@@ -61,7 +61,7 @@ public class OpenVR_Unity : MonoBehaviour
             PollForEvents();
     }
 
-    public void ConnectToSteam()
+    public void ConnectToOpenVR()
     {
         if (!OVR.StartedUp && OVR.Startup(appType))
         {
@@ -71,7 +71,7 @@ public class OpenVR_Unity : MonoBehaviour
 
     }
 
-    public void DisconnectFromSteam()
+    public void DisconnectFromOpenVR()
     {
         if (OVR.StartedUp)
         {

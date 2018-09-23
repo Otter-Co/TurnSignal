@@ -25,7 +25,9 @@ public class Overlay_Transform : MonoBehaviour
         if (overlay == null)
         {
             u_overlay = GetComponent<Overlay_Unity>();
-            overlay = u_overlay.overlay;
+
+            if (u_overlay.overlay != null)
+                overlay = u_overlay.overlay;
 
             return;
         }

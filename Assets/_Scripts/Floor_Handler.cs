@@ -23,58 +23,119 @@ public class Floor_Handler : MonoBehaviour
     public bool autoUpdate = true;
     public bool reversed = false;
     [Space(10)]
-    public float followSpeed = 5f;
+    public float maxYDist = 0.65f;
     public int maxTurns = 10;
     [Space(10)]
     public float turnProgress = 0f;
     public float currentTurnValue = 0f;
     [Space(10)]
-    public Vector3 curProg = Vector3.zero;
-
-    private Quaternion lastRot;
-    private OVRLay.Utility.RigidTransform lastRigidT;
+    // -1: Unset, 0: Forward, 1: Right, 2: Up
+    public float lastTrustedProgress = 0f;
+    public int currentTrustedpoint = -1;
+    public float[] pointTrust = new float[3] { 0, 0, 0 };
 
     void Update()
     {
-        hmd.rotation = GetHMDRotation(hmd);
-        var ea = hmd.eulerAngles;
+        GetAllPointTrusts();
 
-        curProg.x += Mathf.Abs(ea.x) < 180 ? ea.x : -(360f - ea.x);
-        curProg.y += Mathf.Abs(ea.y) < 180 ? ea.y : -(360f - ea.y);
-        curProg.z += Mathf.Abs(ea.z) < 180 ? ea.z : -(360f - ea.z);
+        int mostTrustedPoint = GetMostTrustedPointIndex();
+        if (mostTrustedPoint != currentTrustedpoint)
+        {
+            if (mostTrustedPoint >= 0)
+                SetCurrentTrustPoint(mostTrustedPoint);
 
-        currentTurnValue = curProg.x + curProg.y + curProg.z;
+            return;
+        }
+
+        if (currentTrustedpoint < 0)
+            return;
+
+        var trustedPoint = GetPointFromPointIndex(currentTrustedpoint);
+        var trustedProgress = GetPointOnCircleProgress(trustedPoint);
+
+        var diff = GetAdjustedDiff(trustedProgress, lastTrustedProgress);
+        lastTrustedProgress = trustedProgress;
+
+        currentTurnValue += diff;
 
         float adjustedTurnValue = currentTurnValue / (360f * maxTurns);
-        turnProgress = Mathf.Abs(adjustedTurnValue);
-        turnObj.twist = (reversed) ? -adjustedTurnValue : adjustedTurnValue;
+        turnObj.twist = (reversed) ? adjustedTurnValue : -adjustedTurnValue;
     }
 
-    float GetAdjustedDiff(float newP, float oldP)
+    public void SetCurrentTrustPoint(int pointIndex)
     {
-        float baseDiff = Mathf.Abs(newP) - Mathf.Abs(oldP);
-        float absBD = Mathf.Abs(baseDiff);
-
-        if (absBD > 350)
-            absBD = Mathf.Abs(360 - absBD);
-        else if (absBD > 170)
-            absBD = Mathf.Abs(180 - absBD);
-        else if (absBD > 70)
-            absBD = Mathf.Abs(90 - absBD);
-
-        return (baseDiff > 0f) ? absBD : -(absBD);
+        currentTrustedpoint = pointIndex;
+        lastTrustedProgress = GetPointOnCircleProgress(
+            GetPointFromPointIndex(pointIndex)
+        );
     }
 
-    Quaternion GetHMDRotation(Transform t)
+    void GetAllPointTrusts()
     {
-        var newHmdRot = OVRLay.Pose.GetDeviceRotation(OVRLay.Pose.HmdPoseIndex);
-        var pose = OVRLay.Pose.GetRigidT(OVRLay.Pose.HmdPoseIndex);
+        pointTrust[0] = 1f - Mathf.Abs(hmd.forward.y / maxYDist);
+        pointTrust[1] = 1f - Mathf.Abs(hmd.right.y / maxYDist);
+        pointTrust[2] = 1f - Mathf.Abs(hmd.up.y / maxYDist);
+    }
 
-        var relDiff = pose.GetInverse() * lastRigidT;
+    int GetMostTrustedPointIndex()
+    {
+        float f = pointTrust[0], r = pointTrust[1], u = pointTrust[2];
 
-        lastRot = newHmdRot;
-        lastRigidT = pose;
+        if (f > r && f > u)
+            return 0;
+        else if (r > f && r > u)
+            return 1;
+        else if (u > f && u > r)
+            return 2;
 
-        return relDiff.rot.normalized;
+        return -1;
+    }
+
+    Vector3 GetPointFromPointIndex(int ind)
+    {
+        switch (ind)
+        {
+            case 0:
+                return hmd.forward;
+            case 1:
+                return hmd.right;
+            case 2:
+                return hmd.up;
+            default:
+                return Vector3.zero;
+        }
+    }
+
+    float GetAdjustedDiff(float newer, float older)
+    {
+        var diff = newer - older;
+
+        if (diff > 340)
+            diff = newer - (360f + older);
+        else if (diff < -340)
+            diff = newer - (360f - older);
+
+        return diff;
+    }
+
+    private static readonly float unit = 180f / Mathf.PI;
+    private float ClampSinCos(float num) => Mathf.Max(-1f, Mathf.Min(1f, num));
+    private float GetRadius(Vector3 point) => Vector3.Distance(point, new Vector3(0, point.y, 0));
+    public float GetPointOnCircleProgress(Vector3 spot)
+    {
+        float radius = Vector3.Distance(spot, new Vector3(0, spot.y, 0));
+
+        float sin = (180 / Mathf.PI) * Mathf.Asin(
+            Mathf.Max(-1f, (Mathf.Min(1f, spot.z / radius)))
+        );
+
+        float cos = (180 / Mathf.PI) * Mathf.Acos(
+            Mathf.Max(-1f, (Mathf.Min(1f, spot.x / radius)))
+        );
+
+        float outSin = (cos > 90) ? 180 - sin : (sin < 0) ? 360 + sin : sin;
+        float outCos = (sin < 0) ? 360 - cos : cos;
+
+        return (outSin + outCos) / 2f;
     }
 }

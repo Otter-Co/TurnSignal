@@ -21,10 +21,12 @@ public class Overlay_Events : MonoBehaviour
     public VoidEvent OnKeyboardClose;
     public DoubleStringEvent OnKeyboardInput;
     public StringEvent OnError;
+
+    private bool setup = false;
+
     void Start()
     {
         u_overlay = GetComponent<Overlay_Unity>();
-        overlay = u_overlay.overlay;
 
         if (OnDashboardChange == null)
             OnDashboardChange = new BoolEvent();
@@ -46,13 +48,28 @@ public class Overlay_Events : MonoBehaviour
 
         if (OnError == null)
             OnError = new StringEvent();
+    }
 
-        overlay.OnDashboardChange += (active) => OnDashboardChange.Invoke(active);
-        overlay.OnFocusChange += (hasFocus) => OnFocusChange.Invoke(hasFocus);
-        overlay.OnVisibilityChange += (visible) => OnVisibilityChange.Invoke(visible);
-        overlay.OnKeyboardDone += () => OnKeyboardDone.Invoke();
-        overlay.OnKeyboardClose += () => OnKeyboardClose.Invoke();
-        overlay.OnKeyboardInput += (m, f) => OnKeyboardInput.Invoke(m, f);
-        overlay.OnError += (err) => OnError.Invoke(err);
+    void Update()
+    {
+        if (!setup && u_overlay.overlay != null)
+        {
+            u_overlay = GetComponent<Overlay_Unity>();
+
+            if (u_overlay.overlay != null)
+                overlay = u_overlay.overlay;
+            else
+                return;
+
+            overlay.OnDashboardChange += (active) => OnDashboardChange.Invoke(active);
+            overlay.OnFocusChange += (hasFocus) => OnFocusChange.Invoke(hasFocus);
+            overlay.OnVisibilityChange += (visible) => OnVisibilityChange.Invoke(visible);
+            overlay.OnKeyboardDone += () => OnKeyboardDone.Invoke();
+            overlay.OnKeyboardClose += () => OnKeyboardClose.Invoke();
+            overlay.OnKeyboardInput += (m, f) => OnKeyboardInput.Invoke(m, f);
+            overlay.OnError += (err) => OnError.Invoke(err);
+
+            setup = true;
+        }
     }
 }

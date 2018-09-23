@@ -17,19 +17,20 @@ public class Overlay_Dashboard_Icon : MonoBehaviour
         if (overlay == null)
         {
             u_overlay = GetComponent<Overlay_Unity>();
-            overlay = u_overlay.overlay;
+
+            if (u_overlay.overlay != null)
+                overlay = u_overlay.overlay;
+
             return;
         }
 
         if (overlay.Created)
         {
-            if (overlay.TextureType != ETextureType.DirectX)
-                overlay.TextureType = ETextureType.DirectX;
+            if (overlay.IconTextureType != ETextureType.DirectX)
+                overlay.IconTextureType = ETextureType.DirectX;
 
-            if (overlay.TextureBounds.Equals(Overlay_Unity.TextureBounds))
-                overlay.TextureBounds = Overlay_Unity.TextureBounds;
-
-            overlay.Texture = currentTexture;
+            overlay.IconTextureBounds = Overlay_Unity.TextureBounds;
+            overlay.IconTexture = currentTexture;
         }
     }
 }
