@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using Valve.VR;
 using OVRLay;
 
-public partial class Director : MonoBehaviour
+public partial class Old_Director : MonoBehaviour
 {
     public string appKey = "";
     [Space(10)]
@@ -15,7 +15,7 @@ public partial class Director : MonoBehaviour
     public Overlay_Unity menuOverlay;
     [Space(10)]
     public Floor_Handler floorRig;
-    public Menu_Handler menuRig;
+    public Old_Menu_Handler menuRig;
     [Space(10)]
     public float floorOverlayHandScale = 0.2f;
     public bool flipSides = false;
@@ -35,7 +35,7 @@ public partial class Director : MonoBehaviour
 
 
     private Steam_Handler steamHandler;
-    private Prefs_Handler prefs;
+    private Old_Prefs_Handler prefs;
     private WindowController winC;
 
     private bool twistTied = false;
@@ -55,7 +55,7 @@ public partial class Director : MonoBehaviour
         else
             Debug.Log("SteamWorks Init Failed!");
 
-        prefs = GetComponent<Prefs_Handler>();
+        prefs = GetComponent<Old_Prefs_Handler>();
         winC = GetComponent<WindowController>();
 
         string old_prefsPath = Application.dataPath + "/../";

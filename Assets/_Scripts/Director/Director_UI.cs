@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using Valve.VR;
 using OVRLay;
 
-public partial class Director
+public partial class Old_Director
 {
     // Methods for Easy UI.
     public void OnShowWindow() => menuRig.hideMainWindowToggle.isOn = false;

@@ -18,7 +18,7 @@ public class Floor_Handler : MonoBehaviour
     [Space(10)]
     public Camera floorRigCamera;
     [Space(10)]
-    public Twister turnObj;
+    public Old_Twister turnObj;
     [Space(10)]
     public bool autoUpdate = true;
     public bool reversed = false;

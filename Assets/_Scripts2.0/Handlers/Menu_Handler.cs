@@ -10,7 +10,7 @@ public class Menu_Handler : MonoBehaviour
 
 	[Space(10)]
 
-	public Prefs_Handler prefs;
+	public Old_Prefs_Handler prefs;
 
 	[Space(10)]
 
@@ -37,6 +37,7 @@ public class Menu_Handler : MonoBehaviour
 	public Toggle rightLinkToggle;
 	public Toggle leftLinkToggle;
 	public Toggle flipSidesToggle;
+
 
 	public void SteamStart()
 	{

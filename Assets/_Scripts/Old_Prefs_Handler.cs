@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public class Prefs_Handler : MonoBehaviour
+public class Old_Prefs_Handler : MonoBehaviour
 {
     public Steam_Handler steamHandler;
 
