@@ -77,7 +77,6 @@ public class Director : MonoBehaviour
 
         if (options.EnableSteamworks && steamClient == null)
             steamClient = new Client(appID);
-
         if (options.EnableSteamworks && steamClient != null)
             steamClient.Update();
         else if (!options.EnableSteamworks && steamClient != null)
@@ -90,13 +89,13 @@ public class Director : MonoBehaviour
         {
             winC.HideTaskbarIcon();
             winC.HideUnityWindow();
-            windowShowing = floorCamera.enabled = false;
+            windowShowing = menuCamera.enabled = false;
         }
         else if (!options.HideMainWindow && !windowShowing)
         {
             winC.ShowTaskbarIcon();
             winC.ShowUnityWindow();
-            windowShowing = floorCamera.enabled = true;
+            windowShowing = menuCamera.enabled = true;
         }
 
         if (turnsignalActive)
