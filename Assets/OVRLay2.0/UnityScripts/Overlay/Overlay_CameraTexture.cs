@@ -16,10 +16,6 @@ public class Overlay_CameraTexture : MonoBehaviour
     [Space(10)]
     public bool autoDisableCamera = true;
     public bool dontForceRenderTexture = false;
-    [Space(10)]
-
-    public int pwidth = 0;
-    public int pheight = 0;
 
 
     private RenderTexture targetTex;
@@ -29,8 +25,8 @@ public class Overlay_CameraTexture : MonoBehaviour
 
     void Start()
     {
-        int width = pwidth = (int)(targetCamera.pixelWidth * cameraPixelSizeMultiplier);
-        int height = pheight = (int)(targetCamera.pixelHeight * cameraPixelSizeMultiplier);
+        int width = (int)(targetCamera.pixelWidth * cameraPixelSizeMultiplier);
+        int height = (int)(targetCamera.pixelHeight * cameraPixelSizeMultiplier);
 
         targetTex = new RenderTexture(width, height, 24);
 

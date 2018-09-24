@@ -92,4 +92,28 @@ public class OpenVR_Unity : MonoBehaviour
         if (OVR.StartedUp)
             OVRLay.Pose.UpdatePoses();
     }
+
+    public Color GetChaperoneColor()
+    {
+        Color ret = new Color(1, 1, 1, 1);
+
+        if (OVR.Settings == null)
+            return ret;
+
+        var collSec = OpenVR.k_pch_CollisionBounds_Section;
+        var error = EVRSettingsError.None;
+
+        int r = 255, g = 255, b = 255, a = 255;
+        r = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaR_Int32, ref error);
+        g = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaG_Int32, ref error);
+        b = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaB_Int32, ref error);
+        a = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaA_Int32, ref error);
+
+        ret.r = (float)r / 255;
+        ret.g = (float)g / 255;
+        ret.b = (float)b / 255;
+        ret.a = (float)a / 255;
+
+        return ret;
+    }
 }

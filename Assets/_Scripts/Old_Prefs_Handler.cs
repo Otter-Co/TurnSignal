@@ -21,10 +21,7 @@ public class Old_Prefs_Handler : MonoBehaviour
 
     public float Scale
     {
-        get
-        {
-            return prefs.Scale;
-        }
+        get => prefs.Scale;
         set
         {
             prefs.Scale = value;
@@ -270,7 +267,6 @@ public class Old_Prefs_Handler : MonoBehaviour
 
         return File.Exists(fullP);
     }
-
 
     public bool SteamSave()
     {

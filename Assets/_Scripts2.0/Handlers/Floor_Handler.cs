@@ -54,8 +54,8 @@ public class Floor_Handler : MonoBehaviour
 
         currentTurnValue += diff;
 
-        float adjustedTurnValue = currentTurnValue / (360f * maxTurns);
-        turnObj.twist = (reversed) ? adjustedTurnValue : -adjustedTurnValue;
+        turnProgress = currentTurnValue / (360f * maxTurns);
+        turnObj.twist = (reversed) ? turnProgress : -turnProgress;
     }
 
     public void SetCurrentTrustPoint(int pointIndex)

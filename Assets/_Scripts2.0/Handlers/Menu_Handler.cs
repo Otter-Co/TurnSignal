@@ -6,76 +6,83 @@ using UnityEngine.Events;
 
 public class Menu_Handler : MonoBehaviour
 {
-	public Camera menuRigCamera;
+    public Slider scaleSlider;
+    public Slider opacitySlider;
+    public Slider twistRateSlider;
+    public Slider petalSlider;
+    public Slider heightSlider;
+    public Slider followSpeedSlider;
 
-	[Space(10)]
+    [Space(5)]
 
-	public Old_Prefs_Handler prefs;
+    public Toggle startWithVRToggle;
+    public Toggle enableSteamWorksToggle;
+    public Toggle hideMainWindowToggle;
+    public Toggle followPlayerToggle;
+    public Toggle useChapColorToggle;
+    public Toggle tieTwistToggle;
+    public Toggle onlyShowInDashToggle;
 
-	[Space(10)]
+    [Space(5)]
 
-	public Slider scaleSlider;
-	public Slider opacitySlider;
-	public Slider twistRateSlider;
-	public Slider petalSlider;
-	public Slider heightSlider;
-	public Slider followSpeedSlider;
+    public Toggle disableLinkToggle;
+    public Toggle rightLinkToggle;
+    public Toggle leftLinkToggle;
+    public Toggle flipSidesToggle;
 
-	[Space(5)]
+    public void SetUIValues(TurnSignalOptions opts)
+    {
+        startWithVRToggle.isOn = opts.StartWithSteamVR;
+        enableSteamWorksToggle.isOn = opts.EnableSteamworks;
+        hideMainWindowToggle.isOn = opts.HideMainWindow;
+        followPlayerToggle.isOn = opts.FollowPlayerHeadeset;
+        useChapColorToggle.isOn = opts.UseChaperoneColor;
+        tieTwistToggle.isOn = opts.LinkOpatWithTwist;
+        onlyShowInDashToggle.isOn = opts.OnlyShowInDashboard;
 
-	public Toggle startWithVRToggle;
-	public Toggle enableSteamWorksToggle;
-	public Toggle hideMainWindowToggle;
-	public Toggle followPlayerToggle;
-	public Toggle useChapColorToggle;
-	public Toggle tieTwistToggle;
-	public Toggle onlyShowInDashToggle;
+        scaleSlider.value = opts.Scale;
+        opacitySlider.value = opts.Opacity;
+        twistRateSlider.value = opts.TwistRate;
+        petalSlider.value = opts.PetalCount;
+        heightSlider.value = opts.Height;
+        followSpeedSlider.value = opts.FollowSpeed;
 
-	[Space(5)]
+        disableLinkToggle.isOn = opts.LinkOptions == TurnSignalLinkOpts.None;
+        rightLinkToggle.isOn = (opts.LinkOptions == TurnSignalLinkOpts.RightFront);
+        leftLinkToggle.isOn = (opts.LinkOptions == TurnSignalLinkOpts.LeftFront);
+        flipSidesToggle.isOn = (opts.LinkOptions & TurnSignalLinkOpts.Old_FlipSides) > 0;
+    }
 
-	public Toggle disableLinkToggle;
-	public Toggle rightLinkToggle;
-	public Toggle leftLinkToggle;
-	public Toggle flipSidesToggle;
+    public TurnSignalOptions GetUIValues()
+    {
+        TurnSignalLinkOpts linkOpts = TurnSignalLinkOpts.None;
 
+        if (rightLinkToggle.isOn)
+            linkOpts |= TurnSignalLinkOpts.RightFront;
+        else if (leftLinkToggle.isOn)
+            linkOpts |= TurnSignalLinkOpts.LeftFront;
 
-	public void SteamStart()
-	{
-		SetUIValues();
-	}
+        if ((rightLinkToggle.isOn || leftLinkToggle.isOn) && flipSidesToggle.isOn)
+            linkOpts |= TurnSignalLinkOpts.Old_FlipSides;
 
-	public void SetUIValues()
-	{
-		scaleSlider.value = prefs.Scale;
-		opacitySlider.value = prefs.Opacity;
-		twistRateSlider.value = prefs.TwistRate;
-		petalSlider.value = prefs.Petals;
-		heightSlider.value = prefs.Height;
-		followSpeedSlider.value = prefs.FollowSpeed;
+        return new TurnSignalOptions()
+        {
+            StartWithSteamVR = startWithVRToggle.isOn,
+            EnableSteamworks = enableSteamWorksToggle.isOn,
+            HideMainWindow = hideMainWindowToggle.isOn,
+            FollowPlayerHeadeset = followPlayerToggle.isOn,
+            UseChaperoneColor = useChapColorToggle.isOn,
+            LinkOpatWithTwist = tieTwistToggle.isOn,
+            OnlyShowInDashboard = onlyShowInDashToggle.isOn,
 
+            Scale = scaleSlider.value,
+            Opacity = opacitySlider.value,
+            TwistRate = twistRateSlider.value,
+            PetalCount = petalSlider.value,
+            Height = heightSlider.value,
+            FollowSpeed = followSpeedSlider.value,
 
-		startWithVRToggle.isOn = prefs.StartWithSteamVR;
-		enableSteamWorksToggle.isOn = prefs.EnableSteamWorks;
-
-		hideMainWindowToggle.isOn = prefs.HideMainWindow;
-
-		followPlayerToggle.isOn = prefs.FollowPlayerHeadset;
-		useChapColorToggle.isOn = prefs.UseChaperoneColor;
-		tieTwistToggle.isOn = prefs.LinkOpacityWithTwist;
-
-		onlyShowInDashToggle.isOn = prefs.OnlyShowInDashboard;
-
-		disableLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.None;
-
-		rightLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Right;
-		leftLinkToggle.isOn = prefs.LinkDevice == TurnSignalPrefsLinkDevice.Left;
-
-		flipSidesToggle.isOn = prefs.FlipSides;
-	}
-
-	public void ResetSettings()
-	{
-		prefs.Reset();
-		SetUIValues();
-	}
+            LinkOptions = linkOpts,
+        };
+    }
 }
