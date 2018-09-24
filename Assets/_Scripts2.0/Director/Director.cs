@@ -13,6 +13,9 @@ public class Director : MonoBehaviour
     public void SetIdleMode() => wantedFPS = idleFPS;
     public void SetActiceMode() => wantedFPS = activeFPS;
 
+    public void ShowWindow() => menuHandler.hideMainWindowToggle.isOn = false;
+    public void QuitApp() => Application.Quit();
+
 
     [Header("Object Refs")]
     public Menu_Handler menuHandler;
@@ -50,8 +53,8 @@ public class Director : MonoBehaviour
     private Client steamClient;
 
     private bool dashboardOpen = false;
-    private bool windowShowing = true;
     private bool turnsignalActive = true;
+
     void Start()
     {
         Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
@@ -75,6 +78,16 @@ public class Director : MonoBehaviour
         ApplyOptions(options);
     }
 
+    void OnApplicationQuit()
+    {
+        SaveLocalOpts(options);
+        if (options.EnableSteamworks)
+            SaveCloudOpts(options);
+
+        steamClient.Dispose();
+        openVR.DisconnectFromOpenVR();
+    }
+
     void Update()
     {
         if (currentFPS != wantedFPS)
@@ -94,17 +107,17 @@ public class Director : MonoBehaviour
             steamClient = null;
         }
 
-        if (options.HideMainWindow && windowShowing)
+        if (options.HideMainWindow && winC.windowVisible)
         {
             winC.HideTaskbarIcon();
             winC.HideUnityWindow();
-            windowShowing = menuCamera.enabled = false;
+            menuCamera.enabled = false;
         }
-        else if (!options.HideMainWindow && !windowShowing)
+        else if (!options.HideMainWindow && !winC.windowVisible)
         {
             winC.ShowTaskbarIcon();
             winC.ShowUnityWindow();
-            windowShowing = menuCamera.enabled = true;
+            menuCamera.enabled = true;
         }
 
         if (turnsignalActive)

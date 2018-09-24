@@ -15,6 +15,7 @@ namespace OVRLay
         public ulong Handle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
         public ulong IconHandle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
         public bool Created { get; private set; }
+        public bool Ready { get => OVR.Overlay != null && Created; }
         public EVROverlayError lastError { get; private set; } = EVROverlayError.None;
 
         public OVRLay(string name = null, string key = null, bool isDashboard = false, bool dontCreate = false)

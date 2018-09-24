@@ -1,54 +1,56 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
-
 using UnityEngine;
+using UnityEngine.Events;
 
 public class WindowController : MonoBehaviour
 {
-    public bool hasTrayIcon = false;
-    public Texture2D trayIconTex;
-
-    [HideInInspector] public bool windowVisible = true;
-
-
-    private Old_Director director;
-
     private const int GWL_EXSTYLE = -0x14;
     private const int WS_EX_TOOLWINDOW = 0x0080;
     private const int SWP_HIDEWINDOW = 0x0080;
 
+    [System.Serializable]
+    public class VoidEvent : UnityEvent { }
+
+    [Header("Tray Options")]
+    public bool hasTrayIcon = false;
+    public Texture2D trayIconTex;
+    [Space(10)]
+    public VoidEvent showWindowClicked;
+    public VoidEvent quitAppSelected;
+
+    [HideInInspector] public bool windowVisible = true;
+
     private IntPtr winHandle;
     private int oldWinStyle = 0;
-
     private TurnSignalTrayForm trayForm;
 
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-
     [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)] static extern IntPtr FindWindowByCaption(IntPtr zeroOnly, string lpWindowName);
     [DllImport("user32.dll", EntryPoint = "SetWindowPos")] private static extern bool SetWindowPos(IntPtr hwnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
     [DllImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool ShowWindow(IntPtr hWnd, uint nCmdShow);
     [DllImport("user32.dll")] static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
     [DllImport("user32.dll", SetLastError = true)] static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
 #else
-
     static IntPtr FindWindowByCaption(IntPtr zeroOnly, string lpWindowName) { return IntPtr.Zero; }
     static int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong) { return 0; }
     static int GetWindowLong(IntPtr hWnd, int nIndex) { return 0; }
     private static bool SetWindowPos(IntPtr hwnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags) { return true; }
     private static bool ShowWindow(IntPtr hWnd, uint nCmdShow) { return true; }
-
 #endif
     void Start()
     {
-        director = GetComponent<Old_Director>();
-
         winHandle = FindWindowByCaption(IntPtr.Zero, UnityEngine.Application.productName);
+
+        if (showWindowClicked == null)
+            showWindowClicked = new VoidEvent();
+
+        if (quitAppSelected == null)
+            quitAppSelected = new VoidEvent();
 
         if (hasTrayIcon)
             CreateTray();
@@ -60,20 +62,11 @@ public class WindowController : MonoBehaviour
             CreateTray();
     }
 
-    void OnDestroy()
-    {
-        DestroyTray();
-    }
+    void OnDestroy() => DestroyTray();
 
-    void OnApplicationQuit()
-    {
-        DestroyTray();
-    }
+    void OnApplicationQuit() => DestroyTray();
 
-    void OnDisable()
-    {
-        DestroyTray();
-    }
+    void OnDisable() => DestroyTray();
 
     public void CreateTray()
     {
@@ -97,15 +90,8 @@ public class WindowController : MonoBehaviour
         }
     }
 
-    public void OnExit()
-    {
-        UnityEngine.Application.Quit();
-    }
-
-    public void OnShowWindow()
-    {
-        director.OnShowWindow();
-    }
+    public void OnShowWindow() => showWindowClicked.Invoke();
+    public void OnExit() => quitAppSelected.Invoke();
 
     public void ShowTrayIcon()
     {

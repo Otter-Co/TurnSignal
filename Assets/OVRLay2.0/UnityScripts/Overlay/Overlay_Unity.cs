@@ -54,7 +54,7 @@ public class Overlay_Unity : MonoBehaviour
             return;
         }
 
-        if (overlay.Created)
+        if (overlay != null && overlay.Ready)
         {
             if (applySettingsEveryUpdate || !lastSettings.Equals(settings))
                 ApplySettings();
@@ -76,7 +76,7 @@ public class Overlay_Unity : MonoBehaviour
 
     void OnDestroy()
     {
-        if (overlay.Created)
+        if (overlay != null && overlay.Ready)
             overlay.DestroyOverlay();
 
         overlay = null;
@@ -84,19 +84,19 @@ public class Overlay_Unity : MonoBehaviour
 
     void OnEnable()
     {
-        if (overlay != null && overlay.Created && settings.Visible)
+        if (overlay != null && overlay.Ready && settings.Visible)
             overlay.Visible = true;
     }
 
     void OnDisable()
     {
-        if (overlay != null && overlay.Created)
+        if (overlay != null && overlay.Ready)
             overlay.Visible = false;
     }
 
     public void CreateOverlay()
     {
-        if (!overlay.Created)
+        if (overlay != null && !overlay.Ready)
         {
             overlay.CreateOverlay();
             overlayCreated = true;
@@ -105,7 +105,7 @@ public class Overlay_Unity : MonoBehaviour
 
     public void DestroyOverlay()
     {
-        if (overlay.Created)
+        if (overlay != null && overlay.Ready)
         {
             overlay.DestroyOverlay();
             overlayCreated = false;
@@ -114,6 +114,9 @@ public class Overlay_Unity : MonoBehaviour
 
     public void ApplySettings()
     {
+        if (overlay == null)
+            return;
+
         overlay.WidthInMeters = settings.WidthInMeters;
         overlay.Color = settings.Color;
         overlay.Alpha = settings.Alpha;
@@ -126,7 +129,7 @@ public class Overlay_Unity : MonoBehaviour
 
     public void PollForEvents()
     {
-        if (overlay.Created)
+        if (overlay != null && overlay.Ready)
             overlay.UpdateEvents();
     }
 }
