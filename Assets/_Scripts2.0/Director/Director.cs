@@ -114,17 +114,15 @@ public class Director : MonoBehaviour
 
     void ApplyOptions(TurnSignalOptions opts)
     {
-        if (opts.PetalCount != opts.PetalCount)
-        {
-            // DoSomething();
-        }
-
         OVRLay.OVR.Applications.SetApplicationAutoLaunch(
             pchAppKey,
             opts.StartWithSteamVR
         );
 
         floorHandler.maxTurns = (int)opts.TwistRate;
+
+        if ((int)opts.PetalCount != twister.petalCount)
+            twister.petalCount = (int)opts.PetalCount;
 
         if (opts.UseChaperoneColor)
             floorOverlay.settings.Color = openVR.GetChaperoneColor();

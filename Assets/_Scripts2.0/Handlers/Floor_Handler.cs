@@ -7,15 +7,9 @@ using OVRLay;
 
 public class Floor_Handler : MonoBehaviour
 {
-    // Methods to make UI easier;
-    public void ResetRotationTracking() => currentTurnValue = 0f;
-    public void AddMaxTurn() => maxTurns += 1;
-    public void SubMaxTurn() => maxTurns = Mathf.Max(1, maxTurns - 1);
-    public void SetMaxTurns(float t) => maxTurns = (int)t;
-
     public Transform hmd;
     [Space(10)]
-    public Old_Twister turnObj;
+    public Twister twister;
     [Space(10)]
     public bool reversed = false;
     [Space(10)]
@@ -55,7 +49,7 @@ public class Floor_Handler : MonoBehaviour
         currentTurnValue += diff;
 
         turnProgress = currentTurnValue / (360f * maxTurns);
-        turnObj.twist = (reversed) ? turnProgress : -turnProgress;
+        twister.twist = (reversed) ? -turnProgress : turnProgress;
     }
 
     public void SetCurrentTrustPoint(int pointIndex)
