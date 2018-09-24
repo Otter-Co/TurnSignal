@@ -30,23 +30,17 @@ public class Twister : MonoBehaviour
     private float lastRadius = 0f;
     private float lastInnerCirRad = 0f;
 
-    void Start()
-    {
-        CreateLineHolder();
-    }
-
     void Update()
     {
-        if (lineRends.Length != petalCount)
-        {
-            lastTwist = twist + 1;
-            GenerateLineRenderers();
-        }
-
         if (lastTwist != twist ||
             lastCoilStrength != coilStrength ||
             lastRadius != radius ||
-            lastInnerCirRad != innerCircleRatio)
+            lastInnerCirRad != innerCircleRatio ||
+
+            lineHolder == null ||
+            lineRends == null ||
+            petalCount != lineRends.Length
+            )
         {
             lastTwist = twist;
             lastCoilStrength = coilStrength;
@@ -61,18 +55,59 @@ public class Twister : MonoBehaviour
     {
         var lineP = GetBezierCirclePoints();
 
+        if (lineHolder == null ||
+            lineRends == null ||
+            lineRends.Length != petalCount)
+        {
+            CreateLineHolder();
+            lineRends = new LineRenderer[petalCount];
+
+            for (int i = 0; i < petalCount; i++)
+                lineRends[i] = GetLineRenderer(i + 1, lineHolder.transform);
+        }
+
         for (int i = 0; i < lineRends.Length; i++)
         {
             float prog = ((float)i / (float)petalCount);
 
-            lineRends[i].transform.localPosition =
+            lineRends[i].gameObject.transform.localPosition =
                 PositionOnCircle(prog) * radius;
 
-            lineRends[i].transform.LookAt(transform.position);
+            lineRends[i].gameObject.transform.LookAt(transform.position);
 
             lineRends[i].positionCount = lineResolution;
             lineRends[i].SetPositions(lineP);
         }
+    }
+
+    void CreateLineHolder()
+    {
+        var existing = transform.Find("LineHolder").gameObject;
+
+        if (Application.isEditor)
+        {
+            DestroyImmediate(existing);
+            DestroyImmediate(lineHolder);
+        }
+        else
+        {
+            Destroy(existing);
+            Destroy(lineHolder);
+        }
+
+        lineHolder = new GameObject("LineHolder");
+        lineHolder.transform.parent = transform;
+        lineHolder.transform.localPosition = Vector3.zero;
+    }
+
+    LineRenderer GetLineRenderer(int index, Transform parent)
+    {
+        var lineRend = Instantiate(baseLine).GetComponent<LineRenderer>();
+        lineRend.gameObject.name = "Line " + index;
+        lineRend.gameObject.SetActive(true);
+        lineRend.transform.parent = parent;
+
+        return lineRend;
     }
 
     Vector3 PositionOnCircle(float prog)
@@ -124,39 +159,5 @@ public class Twister : MonoBehaviour
                 );
 
         return bezierOptArray[0];
-    }
-
-    void CreateLineHolder()
-    {
-        var potentialLH = transform.Find("LineHolder");
-
-        if (potentialLH?.gameObject != null)
-            lineHolder = potentialLH.gameObject;
-        else
-            lineHolder = new GameObject("LineHolder");
-
-        lineHolder.transform.parent = transform;
-
-        lineHolder.transform.localPosition = Vector3.zero;
-    }
-
-    void GenerateLineRenderers()
-    {
-        lineRends = new LineRenderer[petalCount];
-
-        if (Application.isEditor && lineHolder != null)
-            DestroyImmediate(lineHolder);
-        else if (lineHolder != null)
-            Destroy(lineHolder);
-
-        CreateLineHolder();
-
-        for (int i = 0; i < petalCount; i++)
-        {
-            lineRends[i] = Instantiate(baseLine).GetComponent<LineRenderer>();
-            lineRends[i].gameObject.name = "Line " + (i + 1);
-            lineRends[i].gameObject.SetActive(true);
-            lineRends[i].transform.parent = lineHolder.transform;
-        }
     }
 }

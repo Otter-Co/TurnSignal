@@ -3,36 +3,25 @@ guid: 4e89b0b890f7ccd42953ad7edd5d215a
 timeCreated: 1499336485
 licenseType: Store
 PluginImporter:
-  externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   isPreloaded: 0
   isOverridable: 0
   platformData:
-  - first:
-      Any: 
-    second:
-      enabled: 0
-      settings: {}
-  - first:
-      Editor: Editor
-    second:
-      enabled: 1
-      settings:
-        CPU: x86
-        DefaultValueInitialized: true
-        OS: Linux
-  - first:
-      Standalone: Linux
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Standalone: LinuxUniversal
-    second:
-      enabled: 1
-      settings: {}
+    data:
+      first:
+        Any: 
+      second:
+        enabled: 1
+        settings: {}
+    data:
+      first:
+        Editor: Editor
+      second:
+        enabled: 0
+        settings:
+          DefaultValueInitialized: true
   userData: 
   assetBundleName: 
   assetBundleVariant: 

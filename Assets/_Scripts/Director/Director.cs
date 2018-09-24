@@ -28,6 +28,9 @@ public class Director : MonoBehaviour
     public Twister twister;
 
     [Header("App Internal Settings")]
+    public int targetWindowWidth = 1280;
+    public int targetWindowHeight = 800;
+    [Space(10)]
     public int activeFPS = 90;
     public int idleFPS = 5;
     [Space(10)]
@@ -48,48 +51,60 @@ public class Director : MonoBehaviour
     public int currentFPS = 0;
     public int wantedFPS = 0;
 
-    private WindowController winC;
-    private OpenVR_Unity openVR;
-    private Client steamClient;
+    public WindowController winC;
+    public OpenVR_Unity openVR;
+    public Client steamClient;
 
     private bool dashboardOpen = false;
     private bool turnsignalActive = true;
 
-    void Start()
-    {
-        Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
-
-        winC = GetComponent<WindowController>();
-        openVR = GetComponent<OpenVR_Unity>();
-        options = LoadLocalOpts();
-
-        winC.ShowTrayIcon();
-
-        if (options.EnableSteamworks)
-        {
-            steamClient = new Client(appID);
-
-            var cloudOpts = LoadCloudOpts();
-            if (cloudOpts.timestamp > options.timestamp)
-                options = cloudOpts;
-        }
-
-        menuHandler.SetUIValues(options);
-        ApplyOptions(options);
-    }
-
     void OnApplicationQuit()
     {
-        SaveLocalOpts(options);
-        if (options.EnableSteamworks)
-            SaveCloudOpts(options);
-
-        steamClient.Dispose();
-        openVR.DisconnectFromOpenVR();
+        if (steamClient != null)
+            steamClient.Dispose();
     }
 
     void Update()
     {
+        if (winC == null || openVR == null)
+        {
+            winC = GetComponent<WindowController>();
+            openVR = GetComponent<OpenVR_Unity>();
+
+            if (winC == null || openVR == null)
+                return;
+
+            SetWindowSize();
+            winC.ShowTrayIcon();
+
+            winC = GetComponent<WindowController>();
+            openVR = GetComponent<OpenVR_Unity>();
+
+            options = LoadLocalOpts();
+
+            if (options.EnableSteamworks)
+            {
+                try
+                {
+                    Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
+                    steamClient = new Client(appID);
+
+                    var cloudOpts = LoadCloudOpts();
+                    if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
+                        options = cloudOpts;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e);
+                }
+            }
+
+            menuHandler.SetUIValues(options);
+            ApplyOptions(options);
+
+            return;
+        }
+
         if (currentFPS != wantedFPS)
             Application.targetFrameRate = currentFPS = wantedFPS;
 
@@ -98,14 +113,29 @@ public class Director : MonoBehaviour
             ApplyOptions(curOpts);
 
         if (options.EnableSteamworks && steamClient == null)
-            steamClient = new Client(appID);
-        if (options.EnableSteamworks && steamClient != null)
+        {
+            try
+            {
+                Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
+                steamClient = new Client(appID);
+
+                var cloudOpts = LoadCloudOpts();
+                if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
+                    options = cloudOpts;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+        else if (options.EnableSteamworks && steamClient != null)
             steamClient.Update();
         else if (!options.EnableSteamworks && steamClient != null)
         {
             steamClient.Dispose();
             steamClient = null;
         }
+
 
         if (options.HideMainWindow && winC.windowVisible)
         {
@@ -135,7 +165,7 @@ public class Director : MonoBehaviour
 
     void ApplyOptions(TurnSignalOptions opts)
     {
-        if (openVR.connectedToOpenVR)
+        if (openVR != null && openVR.connectedToOpenVR)
         {
             OVRLay.OVR.Applications.SetApplicationAutoLaunch(
                         pchAppKey,
@@ -145,7 +175,7 @@ public class Director : MonoBehaviour
             floorHandler.maxTurns = (int)opts.TwistRate;
 
             if ((int)opts.PetalCount != twister.petalCount)
-                twister.petalCount = (int)opts.PetalCount;
+                twister.petalCount = opts.PetalCount > 0 ? (int)(opts.PetalCount) : twister.petalCount;
 
             if (opts.UseChaperoneColor)
                 floorOverlay.settings.Color = openVR.GetChaperoneColor();
@@ -174,6 +204,8 @@ public class Director : MonoBehaviour
             }
         }
 
+        opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
         bool localGood = SaveLocalOpts(opts),
             cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
 
@@ -197,7 +229,7 @@ public class Director : MonoBehaviour
 
     void UpdateFloorOverlay()
     {
-        if (!openVR.connectedToOpenVR)
+        if (openVR != null && !openVR.connectedToOpenVR)
             return;
 
         var fT = floorOverlay.transform;
@@ -240,6 +272,18 @@ public class Director : MonoBehaviour
                 fT.position = middleVec;
         }
     }
+    // Recursion DOOMSDAY
+    public void SetWindowSize(int lvl = 0, int maxLvl = 5)
+    {
+        if (Screen.width != targetWindowWidth || Screen.height != targetWindowHeight)
+            Screen.SetResolution(targetWindowWidth, targetWindowHeight, false);
+
+        if (Screen.width != targetWindowWidth || Screen.height != targetWindowHeight)
+        {
+            if (lvl < maxLvl)
+                SetWindowSize(lvl + 1, maxLvl);
+        }
+    }
 
 
     public enum RootDirOpt
@@ -276,7 +320,7 @@ public class Director : MonoBehaviour
     public TurnSignalOptions LoadCloudOpts()
     {
         if (
-            steamClient != null &&
+            steamClient?.RemoteStorage != null &&
             steamClient.RemoteStorage.IsCloudEnabledForAccount &&
             steamClient.RemoteStorage.IsCloudEnabledForApp &&
             steamClient.RemoteStorage.FileExists(optionsFilename)
@@ -285,7 +329,7 @@ public class Director : MonoBehaviour
                 steamClient.RemoteStorage.ReadString(optionsFilename)
             );
         else
-            return TurnSignalOptions.DefaultOptions;
+            return options;
     }
     public bool SaveLocalOpts(TurnSignalOptions opts)
     {
@@ -294,7 +338,6 @@ public class Director : MonoBehaviour
 
         string fullPath = GetRootDir() + optionsFilename;
 
-        opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         File.Delete(fullPath);
         if (File.Exists(fullPath))
             return false;
@@ -307,10 +350,8 @@ public class Director : MonoBehaviour
         if (rootDirectory == RootDirOpt.DontSave)
             return true;
 
-        opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-
         if (
-            steamClient != null &&
+            steamClient?.RemoteStorage != null &&
             steamClient.RemoteStorage.IsCloudEnabledForAccount &&
             steamClient.RemoteStorage.IsCloudEnabledForApp
         )

@@ -211,8 +211,8 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
     {
         MemoryStream memS = new MemoryStream(tex.EncodeToPNG());
         memS.Seek(0, System.IO.SeekOrigin.Begin);
-
         Bitmap bitmap = new Bitmap(memS);
+        memS.Dispose();
 
         return bitmap;
     }
@@ -250,10 +250,18 @@ public class TurnSignalTrayForm : System.Windows.Forms.Form
         onShowWindow.Invoke();
     }
 
+    public new void Dispose()
+    {
+        Dispose(true);
+    }
+
     protected override void Dispose(bool disposing)
     {
         if (disposing)
+        {
             trayIcon.Dispose();
+            trayMenu.Dispose();
+        }
 
         base.Dispose(disposing);
     }
