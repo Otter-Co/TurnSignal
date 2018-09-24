@@ -177,6 +177,21 @@ public class Director : MonoBehaviour
         bool localGood = SaveLocalOpts(opts),
             cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
 
+        if (localGood)
+            Debug.Log("Succesfully wrote Local Options File.");
+        else
+            Debug.Log(
+                "Error writing Local Options File: \n" +
+                GetRootDir() + optionsFilename
+            );
+
+        if (opts.EnableSteamworks && cloudGood)
+            Debug.Log("Succesfully Wrote Options to SteamCloud.");
+        else if (opts.EnableSteamworks)
+            Debug.Log("Error writing Options file to SteamCloud.");
+        else
+            Debug.Log("Skipping Options file SteamCloud Write.");
+
         options = opts;
     }
 
@@ -280,12 +295,12 @@ public class Director : MonoBehaviour
         string fullPath = GetRootDir() + optionsFilename;
 
         opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        File.Delete(fullPath);
+        if (File.Exists(fullPath))
+            return false;
         File.WriteAllText(fullPath, JsonUtility.ToJson(opts));
 
-        return (
-            File.Exists(fullPath) &&
-            LoadLocalOpts().timestamp == opts.timestamp
-        );
+        return (File.Exists(fullPath));
     }
     public bool SaveCloudOpts(TurnSignalOptions opts)
     {

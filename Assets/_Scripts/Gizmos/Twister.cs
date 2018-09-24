@@ -81,7 +81,7 @@ public class Twister : MonoBehaviour
         return new Vector3(Mathf.Sin(prog), 0, -Mathf.Cos(prog));
     }
 
-   Vector3[] GetBezierCirclePoints()
+    Vector3[] GetBezierCirclePoints()
     {
         Vector3[] curves = new Vector3[curvePointCount];
         curves[0] = new Vector3(0, 0, 0);
@@ -153,7 +153,6 @@ public class Twister : MonoBehaviour
 
         for (int i = 0; i < petalCount; i++)
         {
-            float prog = ((float)i / (float)petalCount);
             lineRends[i] = Instantiate(baseLine).GetComponent<LineRenderer>();
             lineRends[i].gameObject.name = "Line " + (i + 1);
             lineRends[i].gameObject.SetActive(true);
