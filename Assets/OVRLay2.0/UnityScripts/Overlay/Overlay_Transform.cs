@@ -20,6 +20,11 @@ public class Overlay_Transform : MonoBehaviour
     private Vector3 lastPos = Vector3.zero;
     private Vector3 lastRot = Vector3.zero;
 
+    private ETrackingUniverseOrigin lastTransformOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding;
+    private VROverlayTransformType lastTransformType = VROverlayTransformType.VROverlayTransform_Absolute;
+    private OpenVR_DeviceTracker.DeviceType lastRelativeDevice = OpenVR_DeviceTracker.DeviceType.Hmd;
+    private int lastCustomIndex = 0;
+
     void Update()
     {
         if (overlay == null)
@@ -32,11 +37,21 @@ public class Overlay_Transform : MonoBehaviour
             return;
         }
 
-        if (overlay.Created && (transform.eulerAngles != lastRot || transform.position != lastPos))
+        if (overlay.Created && (
+            transform.eulerAngles != lastRot ||
+            transform.position != lastPos ||
+            transformOrigin != lastTransformOrigin ||
+            transformType != lastTransformType ||
+            relativeDevice != lastRelativeDevice ||
+            customDeviceIndex != lastCustomIndex
+            ))
         {
             overlay.TransformType = transformType;
             overlay.TransformAbsoluteTrackingOrigin = transformOrigin;
-            overlay.TransformTrackedDeviceRelativeIndex = OpenVR_DeviceTracker.GetDeviceIndex(relativeDevice);
+            overlay.TransformTrackedDeviceRelativeIndex = OpenVR_DeviceTracker.GetDeviceIndex(
+                relativeDevice,
+                (uint)customDeviceIndex
+            );
 
             var mat = new OVRLay.Utility.RigidTransform(transform.position, transform.rotation).ToHmdMatrix34();
 
@@ -53,6 +68,10 @@ public class Overlay_Transform : MonoBehaviour
 
             lastRot = transform.eulerAngles;
             lastPos = transform.position;
+            lastTransformOrigin = transformOrigin;
+            lastTransformType = transformType;
+            lastCustomIndex = customDeviceIndex;
+            lastRelativeDevice = relativeDevice;
         }
     }
 }

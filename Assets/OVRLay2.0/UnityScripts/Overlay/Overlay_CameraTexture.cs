@@ -11,8 +11,7 @@ public class Overlay_CameraTexture : MonoBehaviour
     public Camera targetCamera;
     public int antialiasing = 8;
     public FilterMode filterMode = FilterMode.Trilinear;
-    [Space(10)]
-    public float cameraPixelSizeMultiplier = 1.0f;
+
     [Space(10)]
     public bool autoDisableCamera = true;
     public bool dontForceRenderTexture = false;
@@ -25,11 +24,7 @@ public class Overlay_CameraTexture : MonoBehaviour
 
     void Start()
     {
-        int width = (int)(targetCamera.pixelWidth * cameraPixelSizeMultiplier);
-        int height = (int)(targetCamera.pixelHeight * cameraPixelSizeMultiplier);
-
-        targetTex = new RenderTexture(width, height, 24);
-
+        targetTex = new RenderTexture(targetCamera.pixelWidth, targetCamera.pixelHeight, 24);
         targetTex.antiAliasing = antialiasing;
         targetTex.filterMode = filterMode;
 

@@ -59,7 +59,7 @@ public struct TurnSignalOptions
         TwistRate = 10f,
         PetalCount = 6,
         Height = 0,
-        FollowSpeed = 2.5f,
+        FollowSpeed = 10f,
         LinkOptions = TurnSignalLinkOpts.None
     };
 }

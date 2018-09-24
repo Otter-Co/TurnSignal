@@ -14,13 +14,21 @@ public class Director : MonoBehaviour
     [Header("Object Refs")]
     public Menu_Handler menuHandler;
     public Overlay_Unity menuOverlay;
+    public Camera menuCamera;
     [Space(10)]
     public Floor_Handler floorHandler;
     public Overlay_Unity floorOverlay;
+    public Camera floorCamera;
     public Twister twister;
+
+    [Header("App Internal Settings")]
+    public int targetFPS = 90;
+
+    public float handLinkSizeMultiplier = 0.2f;
 
     [Header("Steamworks Settings")]
     public uint appID = 0;
+    public string pchAppKey = "TurnSignal";
 
     [Header("App Options")]
     public TurnSignalOptions options =
@@ -30,8 +38,6 @@ public class Director : MonoBehaviour
     public RootDirOpt rootDirectory = RootDirOpt.UserDir;
     public string optionsFilename = "turnsignal_opts.json";
 
-    [Header("App Internal Settings")]
-    public float handLinkSizeMultiplier = 0.2f;
 
     private WindowController winC;
     private OpenVR_Unity openVR;
@@ -48,22 +54,19 @@ public class Director : MonoBehaviour
         openVR = GetComponent<OpenVR_Unity>();
         options = LoadLocalOpts();
 
-        menuHandler.SetUIValues(options);
-
-        winC.ShowTaskbarIcon();
-
-        if (options.HideMainWindow)
-            winC.HideUnityWindow();
+        winC.ShowTrayIcon();
 
         if (options.EnableSteamworks)
         {
             steamClient = new Client(appID);
 
             var cloudOpts = LoadCloudOpts();
-
             if (cloudOpts.timestamp > options.timestamp)
                 options = cloudOpts;
         }
+
+        menuHandler.SetUIValues(options);
+        ApplyOptions(options);
     }
 
     void Update()
@@ -74,7 +77,8 @@ public class Director : MonoBehaviour
 
         if (options.EnableSteamworks && steamClient == null)
             steamClient = new Client(appID);
-        else if (options.EnableSteamworks && steamClient != null)
+
+        if (options.EnableSteamworks && steamClient != null)
             steamClient.Update();
         else if (!options.EnableSteamworks && steamClient != null)
         {
@@ -86,13 +90,13 @@ public class Director : MonoBehaviour
         {
             winC.HideTaskbarIcon();
             winC.HideUnityWindow();
-            windowShowing = false;
+            windowShowing = floorCamera.enabled = false;
         }
         else if (!options.HideMainWindow && !windowShowing)
         {
             winC.ShowTaskbarIcon();
             winC.ShowUnityWindow();
-            windowShowing = true;
+            windowShowing = floorCamera.enabled = true;
         }
 
         if (turnsignalActive)
@@ -108,95 +112,50 @@ public class Director : MonoBehaviour
             floorOverlay.enabled = false;
     }
 
-    public void ApplyOptions(TurnSignalOptions opts)
+    void ApplyOptions(TurnSignalOptions opts)
     {
-        ApplyTransformOptions(opts);
-        ApplyVisualOptions(opts);
-
-        bool localGood = SaveLocalOpts(opts),
-            cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
-
-        options = opts;
-    }
-
-    void ApplyVisualOptions(TurnSignalOptions opts)
-    {
-        if (floorOverlay.settings.WidthInMeters != opts.Scale)
-            floorOverlay.settings.WidthInMeters = opts.Scale;
-
-        if (opts.TwistRate != floorHandler.maxTurns)
-            floorHandler.maxTurns = (int)opts.TwistRate;
-
         if (opts.PetalCount != opts.PetalCount)
         {
             // DoSomething();
         }
 
-        if (opts.UseChaperoneColor)
-        {
-            var chapColor = openVR.GetChaperoneColor();
-            if (floorOverlay.settings.Color != chapColor)
-                floorOverlay.settings.Color = openVR.GetChaperoneColor();
-        }
-    }
+        OVRLay.OVR.Applications.SetApplicationAutoLaunch(
+            pchAppKey,
+            opts.StartWithSteamVR
+        );
 
-    void ApplyTransformOptions(TurnSignalOptions opts)
-    {
+        floorHandler.maxTurns = (int)opts.TwistRate;
+
+        if (opts.UseChaperoneColor)
+            floorOverlay.settings.Color = openVR.GetChaperoneColor();
+        else
+            floorOverlay.settings.Color = UnityEngine.Color.white;
+
         var oT = floorOverlay.GetComponent<Overlay_Transform>();
         var fT = floorOverlay.transform;
 
         if (opts.LinkOptions == TurnSignalLinkOpts.None)
         {
-            if (oT.transformType != Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute)
-                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
-
-            if (fT.position.y != opts.Height)
-            {
-                var curOPos = fT.position;
-                curOPos.y = opts.Height;
-                fT.position = curOPos;
-            }
+            floorOverlay.settings.WidthInMeters = opts.Scale;
+            oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
         }
         else
         {
-            if (oT.transformType != Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative)
-                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
-
             OpenVR_DeviceTracker.DeviceType properIndex = 0;
-
             if ((opts.LinkOptions & TurnSignalLinkOpts.RightFront) > 0)
                 properIndex = OpenVR_DeviceTracker.DeviceType.RightController;
             else if ((opts.LinkOptions & TurnSignalLinkOpts.LeftFront) > 0)
                 properIndex = OpenVR_DeviceTracker.DeviceType.LeftController;
 
-            if (oT.relativeDevice != properIndex)
-                oT.relativeDevice = properIndex;
-
-            if (floorOverlay.settings.WidthInMeters != (opts.Scale * handLinkSizeMultiplier))
-                floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
-
-            float adjHeight = (opts.Height * handLinkSizeMultiplier) * (
-                (opts.LinkOptions & TurnSignalLinkOpts.Old_FlipSides) > 0 ? -1 : 1
-            );
-
-            if (fT.position.y != adjHeight)
-            {
-                var curOPos = fT.position;
-                curOPos.y = adjHeight;
-                fT.position = curOPos;
-            }
-
-            float curXRot = (opts.LinkOptions & TurnSignalLinkOpts.Old_FlipSides) > 0
-                ? 270f
-                : 90f;
-
-            if (fT.eulerAngles.x != 270f)
-            {
-                var curRot = fT.eulerAngles;
-                curRot.x = curXRot;
-                fT.eulerAngles = curRot;
-            }
+            floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
+            oT.relativeDevice = properIndex;
+            oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
         }
+
+        bool localGood = SaveLocalOpts(opts),
+            cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
+
+        options = opts;
     }
 
     void UpdateFloorOverlay()
@@ -205,6 +164,14 @@ public class Director : MonoBehaviour
         var hmdP = OVRLay.Pose.GetDevicePosition(OVRLay.Pose.HmdPoseIndex);
         var middleVec = new Vector3(0, options.Height, 0);
 
+        var properRot = (
+                (options.LinkOptions & TurnSignalLinkOpts.Old_FlipSides) > 0 ||
+                (options.LinkOptions == TurnSignalLinkOpts.None && fT.position.y > hmdP.y)
+            ) ? 270f : 90f;
+
+        if (fT.eulerAngles.x != properRot)
+            fT.eulerAngles = new Vector3(properRot, fT.eulerAngles.y, fT.eulerAngles.z);
+
         if (!options.LinkOpatWithTwist && floorOverlay.settings.Alpha != options.Opacity)
             floorOverlay.settings.Alpha = options.Opacity;
         else if (options.LinkOpatWithTwist)
@@ -212,36 +179,23 @@ public class Director : MonoBehaviour
 
         if (options.LinkOptions == TurnSignalLinkOpts.None)
         {
-            var properRot = fT.position.y > hmdP.y
-                ? 270f
-                : 90f;
-
-            if (fT.eulerAngles.x != properRot)
-            {
-                var curRot = fT.eulerAngles;
-                curRot.x = properRot;
-                fT.eulerAngles = curRot;
-            }
-
             floorHandler.reversed = (fT.position.y > hmdP.y);
 
             if (options.FollowPlayerHeadeset)
-            {
-                var newPos = new Vector3(
-                    hmdP.x,
-                    options.Height,
-                    hmdP.z
+                fT.position = Vector3.Lerp(
+                    fT.position,
+                    new Vector3(hmdP.x, options.Height, hmdP.z),
+                    (Time.deltaTime * options.FollowSpeed)
                 );
-
-                var speed = Time.deltaTime * options.FollowSpeed;
-
-                fT.position = fT.position - ((newPos - fT.position) * (speed));
-            }
             else if (fT.position != middleVec)
                 fT.position = middleVec;
         }
         else
         {
+            middleVec.y = (options.Height * handLinkSizeMultiplier) * (
+                (options.LinkOptions & TurnSignalLinkOpts.Old_FlipSides) > 0 ? -1 : 1
+            );
+
             if (fT.position != middleVec)
                 fT.position = middleVec;
         }

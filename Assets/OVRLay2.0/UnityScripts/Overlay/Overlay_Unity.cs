@@ -29,6 +29,9 @@ public class Overlay_Unity : MonoBehaviour
     public string overlayKey = "unity-overlay";
     public bool isDashboardOverlay = false;
     [Header("Overlay General Settings")]
+    public bool reportDebug = false;
+    public bool applySettingsEveryUpdate = false;
+
     public Overlay_Unity_Settings settings = new Overlay_Unity_Settings()
     {
         WidthInMeters = 1,
@@ -38,7 +41,7 @@ public class Overlay_Unity : MonoBehaviour
         Visible = true,
         HighQuality = false,
     };
-    public bool reportDebug = false;
+
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings();
 
     void Update()
@@ -53,11 +56,8 @@ public class Overlay_Unity : MonoBehaviour
 
         if (overlay.Created)
         {
-            if (!lastSettings.Equals(settings))
-            {
+            if (applySettingsEveryUpdate || !lastSettings.Equals(settings))
                 ApplySettings();
-                lastSettings = settings;
-            }
 
             PollForEvents();
         }
@@ -114,23 +114,14 @@ public class Overlay_Unity : MonoBehaviour
 
     public void ApplySettings()
     {
-        if (lastSettings.WidthInMeters != settings.WidthInMeters)
-            overlay.WidthInMeters = settings.WidthInMeters;
+        overlay.WidthInMeters = settings.WidthInMeters;
+        overlay.Color = settings.Color;
+        overlay.Alpha = settings.Alpha;
+        overlay.TexelAspect = settings.TexelAspect;
+        overlay.Visible = settings.Visible;
+        overlay.HighQuality = settings.HighQuality;
 
-        if (lastSettings.Color != settings.Color)
-            overlay.Color = settings.Color;
-
-        if (lastSettings.Alpha != settings.Alpha)
-            overlay.Alpha = settings.Alpha;
-
-        if (lastSettings.TexelAspect != settings.TexelAspect)
-            overlay.TexelAspect = settings.TexelAspect;
-
-        if (lastSettings.Visible != settings.Visible)
-            overlay.Visible = settings.Visible;
-
-        if (lastSettings.HighQuality != settings.HighQuality)
-            overlay.HighQuality = settings.HighQuality;
+        lastSettings = settings;
     }
 
     public void PollForEvents()

@@ -114,23 +114,20 @@ public class Floor_Handler : MonoBehaviour
         return diff;
     }
 
-    private static readonly float unit = 180f / Mathf.PI;
-    private float ClampSinCos(float num) => Mathf.Max(-1f, Mathf.Min(1f, num));
-    private float GetRadius(Vector3 point) => Vector3.Distance(point, new Vector3(0, point.y, 0));
     public float GetPointOnCircleProgress(Vector3 spot)
     {
         float radius = Vector3.Distance(spot, new Vector3(0, spot.y, 0));
 
-        float sin = (180 / Mathf.PI) * Mathf.Asin(
+        float sin = (180f / Mathf.PI) * Mathf.Asin(
             Mathf.Max(-1f, (Mathf.Min(1f, spot.z / radius)))
         );
 
-        float cos = (180 / Mathf.PI) * Mathf.Acos(
+        float cos = (180f / Mathf.PI) * Mathf.Acos(
             Mathf.Max(-1f, (Mathf.Min(1f, spot.x / radius)))
         );
 
-        float outSin = (cos > 90) ? 180 - sin : (sin < 0) ? 360 + sin : sin;
-        float outCos = (sin < 0) ? 360 - cos : cos;
+        float outSin = (cos > 90f) ? 180f - sin : (sin < 0f) ? 360f + sin : sin;
+        float outCos = (sin < 0f) ? 360f - cos : cos;
 
         return (outSin + outCos) / 2f;
     }
