@@ -10,6 +10,9 @@ public class Director : MonoBehaviour
 
     public void SetDashboardState(bool state) => dashboardOpen = state;
 
+    public void SetIdleMode() => wantedFPS = idleFPS;
+    public void SetActiceMode() => wantedFPS = activeFPS;
+
 
     [Header("Object Refs")]
     public Menu_Handler menuHandler;
@@ -22,8 +25,9 @@ public class Director : MonoBehaviour
     public Twister twister;
 
     [Header("App Internal Settings")]
-    public int targetFPS = 90;
-
+    public int activeFPS = 90;
+    public int idleFPS = 5;
+    [Space(10)]
     public float handLinkSizeMultiplier = 0.2f;
 
     [Header("Steamworks Settings")]
@@ -38,6 +42,8 @@ public class Director : MonoBehaviour
     public RootDirOpt rootDirectory = RootDirOpt.UserDir;
     public string optionsFilename = "turnsignal_opts.json";
 
+    public int currentFPS = 0;
+    public int wantedFPS = 0;
 
     private WindowController winC;
     private OpenVR_Unity openVR;
@@ -71,6 +77,9 @@ public class Director : MonoBehaviour
 
     void Update()
     {
+        if (currentFPS != wantedFPS)
+            Application.targetFrameRate = currentFPS = wantedFPS;
+
         var curOpts = menuHandler.GetUIValues();
         if (!curOpts.Equals(options.cleaned))
             ApplyOptions(curOpts);
@@ -113,40 +122,43 @@ public class Director : MonoBehaviour
 
     void ApplyOptions(TurnSignalOptions opts)
     {
-        OVRLay.OVR.Applications.SetApplicationAutoLaunch(
-            pchAppKey,
-            opts.StartWithSteamVR
-        );
-
-        floorHandler.maxTurns = (int)opts.TwistRate;
-
-        if ((int)opts.PetalCount != twister.petalCount)
-            twister.petalCount = (int)opts.PetalCount;
-
-        if (opts.UseChaperoneColor)
-            floorOverlay.settings.Color = openVR.GetChaperoneColor();
-        else
-            floorOverlay.settings.Color = UnityEngine.Color.white;
-
-        var oT = floorOverlay.GetComponent<Overlay_Transform>();
-        var fT = floorOverlay.transform;
-
-        if (opts.LinkOptions == TurnSignalLinkOpts.None)
+        if (openVR.connectedToOpenVR)
         {
-            floorOverlay.settings.WidthInMeters = opts.Scale;
-            oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
-        }
-        else
-        {
-            OpenVR_DeviceTracker.DeviceType properIndex = 0;
-            if ((opts.LinkOptions & TurnSignalLinkOpts.RightFront) > 0)
-                properIndex = OpenVR_DeviceTracker.DeviceType.RightController;
-            else if ((opts.LinkOptions & TurnSignalLinkOpts.LeftFront) > 0)
-                properIndex = OpenVR_DeviceTracker.DeviceType.LeftController;
+            OVRLay.OVR.Applications.SetApplicationAutoLaunch(
+                        pchAppKey,
+                        opts.StartWithSteamVR
+                    );
 
-            floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
-            oT.relativeDevice = properIndex;
-            oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
+            floorHandler.maxTurns = (int)opts.TwistRate;
+
+            if ((int)opts.PetalCount != twister.petalCount)
+                twister.petalCount = (int)opts.PetalCount;
+
+            if (opts.UseChaperoneColor)
+                floorOverlay.settings.Color = openVR.GetChaperoneColor();
+            else
+                floorOverlay.settings.Color = UnityEngine.Color.white;
+
+            var oT = floorOverlay.GetComponent<Overlay_Transform>();
+            var fT = floorOverlay.transform;
+
+            if (opts.LinkOptions == TurnSignalLinkOpts.None)
+            {
+                floorOverlay.settings.WidthInMeters = opts.Scale;
+                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
+            }
+            else
+            {
+                OpenVR_DeviceTracker.DeviceType properIndex = 0;
+                if ((opts.LinkOptions & TurnSignalLinkOpts.RightFront) > 0)
+                    properIndex = OpenVR_DeviceTracker.DeviceType.RightController;
+                else if ((opts.LinkOptions & TurnSignalLinkOpts.LeftFront) > 0)
+                    properIndex = OpenVR_DeviceTracker.DeviceType.LeftController;
+
+                floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
+                oT.relativeDevice = properIndex;
+                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
+            }
         }
 
         bool localGood = SaveLocalOpts(opts),
@@ -157,6 +169,9 @@ public class Director : MonoBehaviour
 
     void UpdateFloorOverlay()
     {
+        if (!openVR.connectedToOpenVR)
+            return;
+
         var fT = floorOverlay.transform;
         var hmdP = OVRLay.Pose.GetDevicePosition(OVRLay.Pose.HmdPoseIndex);
         var middleVec = new Vector3(0, options.Height, 0);
