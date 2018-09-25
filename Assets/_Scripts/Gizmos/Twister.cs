@@ -24,47 +24,55 @@ public class Twister : MonoBehaviour
 
     private GameObject lineHolder;
     private LineRenderer[] lineRends = new LineRenderer[0];
+    private Vector3[] linePoints = new Vector3[0];
 
-    private float lastTwist = 0f;
-    private float lastCoilStrength = 0f;
-    private float lastRadius = 0f;
-    private float lastInnerCirRad = 0f;
+    private int lastPetalCount = 0;
+    private int lastLineRes = 0;
+    private int lastCurveCount = 0;
+
+    void Start()
+    {
+        DestroyLineHolder();
+    }
 
     void Update()
     {
-        if (lastTwist != twist ||
-            lastCoilStrength != coilStrength ||
-            lastRadius != radius ||
-            lastInnerCirRad != innerCircleRatio ||
-
+        if (
             lineHolder == null ||
             lineRends == null ||
-            petalCount != lineRends.Length
-            )
-        {
-            lastTwist = twist;
-            lastCoilStrength = coilStrength;
-            lastRadius = radius;
-            lastInnerCirRad = innerCircleRatio;
+            petalCount != lastPetalCount
+        )
+            SetPetals(petalCount);
 
-            UpdateLinePoints();
-        }
+        if (
+            lineResolution != lastLineRes ||
+            curvePointCount != lastCurveCount
+        )
+            SetLineCurve(lineResolution, curvePointCount);
+
+        UpdateLinePoints();
+    }
+
+    public void SetLineCurve(int lineRes, int curveCount)
+    {
+        SetPetals(petalCount);
+
+        lineResolution = lastLineRes = lineRes;
+        curvePointCount = lastCurveCount = curveCount;
+    }
+
+    public void SetPetals(int count)
+    {
+        DestroyLineHolder();
+        lineHolder = CreateLineHolder();
+        CreateLineRenderers(count, lineHolder.transform);
+
+        petalCount = lastPetalCount = count;
     }
 
     void UpdateLinePoints()
     {
-        var lineP = GetBezierCirclePoints();
-
-        if (lineHolder == null ||
-            lineRends == null ||
-            lineRends.Length != petalCount)
-        {
-            CreateLineHolder();
-            lineRends = new LineRenderer[petalCount];
-
-            for (int i = 0; i < petalCount; i++)
-                lineRends[i] = GetLineRenderer(i + 1, lineHolder.transform);
-        }
+        linePoints = GetBezierCirclePoints();
 
         for (int i = 0; i < lineRends.Length; i++)
         {
@@ -76,44 +84,8 @@ public class Twister : MonoBehaviour
             lineRends[i].gameObject.transform.LookAt(transform.position);
 
             lineRends[i].positionCount = lineResolution;
-            lineRends[i].SetPositions(lineP);
+            lineRends[i].SetPositions(linePoints);
         }
-    }
-
-    void CreateLineHolder()
-    {
-        var existing = transform.Find("LineHolder").gameObject;
-
-        if (Application.isEditor)
-        {
-            DestroyImmediate(existing);
-            DestroyImmediate(lineHolder);
-        }
-        else
-        {
-            Destroy(existing);
-            Destroy(lineHolder);
-        }
-
-        lineHolder = new GameObject("LineHolder");
-        lineHolder.transform.parent = transform;
-        lineHolder.transform.localPosition = Vector3.zero;
-    }
-
-    LineRenderer GetLineRenderer(int index, Transform parent)
-    {
-        var lineRend = Instantiate(baseLine).GetComponent<LineRenderer>();
-        lineRend.gameObject.name = "Line " + index;
-        lineRend.gameObject.SetActive(true);
-        lineRend.transform.parent = parent;
-
-        return lineRend;
-    }
-
-    Vector3 PositionOnCircle(float prog)
-    {
-        prog = prog * (Mathf.PI * 2);
-        return new Vector3(Mathf.Sin(prog), 0, -Mathf.Cos(prog));
     }
 
     Vector3[] GetBezierCirclePoints()
@@ -142,8 +114,57 @@ public class Twister : MonoBehaviour
         return (PositionOnCircle(prog * twist) * localRadius) + offset;
     }
 
-    List<Vector3> bezierOptArray = new List<Vector3>();
-    Vector3 Bezier(Vector3[] points, float prog)
+    void CreateLineRenderers(int count, Transform parent)
+    {
+        lineRends = new LineRenderer[count];
+        for (int i = 0; i < count; i++)
+            lineRends[i] = GetLineRenderer(baseLine.gameObject, i, parent);
+    }
+
+    void DestroyLineHolder()
+    {
+        var existing = transform.Find("LineHolder")?.gameObject;
+
+        if (Application.isEditor)
+        {
+            DestroyImmediate(existing);
+            DestroyImmediate(lineHolder);
+        }
+        else
+        {
+            Destroy(existing);
+            Destroy(lineHolder);
+        }
+    }
+
+    GameObject CreateLineHolder()
+    {
+        var lineH = new GameObject("LineHolder");
+        lineH.transform.parent = transform;
+        lineH.transform.localPosition = Vector3.zero;
+        return lineH;
+    }
+
+
+    static LineRenderer GetLineRenderer(GameObject baseLine, int index, Transform parent)
+    {
+        var lineRend = Instantiate(baseLine).GetComponent<LineRenderer>();
+
+        lineRend.gameObject.name = "Line " + index;
+        lineRend.gameObject.SetActive(true);
+        lineRend.gameObject.transform.parent = parent;
+
+        return lineRend;
+    }
+
+    static Vector3 PositionOnCircle(float prog)
+    {
+        prog = prog * (Mathf.PI * 2);
+        return new Vector3(Mathf.Sin(prog), 0, -Mathf.Cos(prog));
+    }
+
+    static List<Vector3> bezierOptArray = new List<Vector3>();
+    static Vector3 Bezier(Vector3[] points, float prog)
     {
         bezierOptArray.Clear();
         bezierOptArray.AddRange(points);
