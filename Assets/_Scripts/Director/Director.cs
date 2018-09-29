@@ -48,8 +48,12 @@ public class Director : MonoBehaviour
     public RootDirOpt rootDirectory = RootDirOpt.UserDir;
     public string optionsFilename = "turnsignal_opts.json";
 
-    public int currentFPS = 0;
-    public int wantedFPS = 0;
+    [Header("App Log File Options")]
+    public int maxLogSizeInMB = 5;
+    public float timeInSecondsBetweenChecks = 10f;
+
+    private int currentFPS = 0;
+    private int wantedFPS = 0;
 
     public WindowController winC;
     public OpenVR_Unity openVR;
@@ -57,6 +61,13 @@ public class Director : MonoBehaviour
 
     private bool dashboardOpen = false;
     private bool turnsignalActive = true;
+
+    private float timeSinceLastLogCheck = 0f;
+
+    void Startup()
+    {
+        EnsureSaneLogsize();
+    }
 
     void OnApplicationQuit()
     {
@@ -66,6 +77,13 @@ public class Director : MonoBehaviour
 
     void Update()
     {
+        timeSinceLastLogCheck += Time.deltaTime;
+        if (timeSinceLastLogCheck >= timeInSecondsBetweenChecks)
+        {
+            EnsureSaneLogsize();
+            timeSinceLastLogCheck = 0;
+        }
+
         if (winC == null || openVR == null)
         {
             winC = GetComponent<WindowController>();
@@ -363,6 +381,36 @@ public class Director : MonoBehaviour
         }
 
         return false;
+    }
+
+    private const string _log_filename = "output_log.txt";
+    public void EnsureSaneLogsize()
+    {
+        int maxLogSize = 1024 * 1024 * maxLogSizeInMB;
+        string targetFilePath = Application.persistentDataPath + "/" + _log_filename;
+        try
+        {
+            if (
+                File.Exists(targetFilePath)
+            )
+            {
+                FileInfo fileI = new FileInfo(targetFilePath);
+
+                if (fileI.Length > maxLogSize)
+                {
+                    File.Delete(targetFilePath);
+                    Debug.Log("Deleted Insanly sized Log file. Sorry if this is an issue :( !");
+                }
+                else
+                    Debug.Log("Just checked, Log file size still sane :) !");
+
+                fileI = null;
+            }
+        }
+        catch (Exception err)
+        {
+            Debug.Log(err);
+        }
     }
 }
 
