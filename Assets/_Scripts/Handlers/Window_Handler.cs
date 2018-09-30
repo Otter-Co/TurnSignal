@@ -35,26 +35,21 @@ public class Window_Handler : MonoBehaviour
 
     public void HideWindow()
     {
+        bool wasVisible = Win_Handler_Extern.ShowWindow(
+            _windowHandle,
+            (int)Win_Handler_Extern.ShowWindowType.Minimize
+        );
+
         Win_Handler_Extern.SetWindowLong(
             _windowHandle,
             (int)Win_Handler_Extern.WindowLongType.EXSTYLE,
-            _originalWindowStyle | (int)Win_Handler_Extern.ExtWindowStyles.WS_EX_TOOLWINDOW
+            (int)Win_Handler_Extern.ExtWindowStyles.WS_EX_TOOLWINDOW
         );
 
-        bool goodResult = Win_Handler_Extern.ShowWindow(
-            _windowHandle,
-            (int)Win_Handler_Extern.ShowWindowType.Hide
-        );
+        windowHidden = true;
 
-        if (goodResult)
-        {
-            windowHidden = true;
-
-            if (_trayMenu_show != null)
-                _trayMenu_show.Text = _show_text;
-        }
-        else
-            Debug.Log("Error on ShowWindow!");
+        if (_trayMenu_show != null)
+            _trayMenu_show.Text = _show_text;
     }
 
     public void ShowWindow()
@@ -65,20 +60,15 @@ public class Window_Handler : MonoBehaviour
             _originalWindowStyle
         );
 
-        bool result = Win_Handler_Extern.ShowWindow(
+        bool wasHidden = Win_Handler_Extern.ShowWindow(
             _windowHandle,
-            (int)Win_Handler_Extern.ShowWindowType.Show_Normal
+            (int)Win_Handler_Extern.ShowWindowType.Restore
         );
 
-        if (result)
-        {
-            windowHidden = false;
+        windowHidden = false;
 
-            if (_trayMenu_show != null)
-                _trayMenu_show.Text = _hide_text;
-        }
-        else
-            Debug.Log("Error on ShowWindow!");
+        if (_trayMenu_show != null)
+            _trayMenu_show.Text = _hide_text;
     }
 
     #endregion
