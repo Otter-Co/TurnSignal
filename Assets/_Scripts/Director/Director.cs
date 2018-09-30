@@ -13,7 +13,8 @@ public class Director : MonoBehaviour
     public void SetIdleMode() => wantedFPS = idleFPS;
     public void SetActiceMode() => wantedFPS = activeFPS;
 
-    public void ShowWindow() => menuHandler.hideMainWindowToggle.isOn = false;
+    public void ToggleShowWindow() =>
+        menuHandler.hideMainWindowToggle.isOn = !menuHandler.hideMainWindowToggle.isOn;
     public void QuitApp() => Application.Quit();
 
 
@@ -55,7 +56,8 @@ public class Director : MonoBehaviour
     private int currentFPS = 0;
     private int wantedFPS = 0;
 
-    public WindowController winC;
+    public Window_Handler winH;
+
     public OpenVR_Unity openVR;
     public Client steamClient;
 
@@ -84,19 +86,15 @@ public class Director : MonoBehaviour
             timeSinceLastLogCheck = 0;
         }
 
-        if (winC == null || openVR == null)
+        if (winH == null || openVR == null)
         {
-            winC = GetComponent<WindowController>();
+            winH = GetComponent<Window_Handler>();
             openVR = GetComponent<OpenVR_Unity>();
 
-            if (winC == null || openVR == null)
+            if (winH == null || openVR == null)
                 return;
 
             SetWindowSize();
-            winC.ShowTrayIcon();
-
-            winC = GetComponent<WindowController>();
-            openVR = GetComponent<OpenVR_Unity>();
 
             options = LoadLocalOpts();
 
@@ -155,17 +153,15 @@ public class Director : MonoBehaviour
         }
 
 
-        if (options.HideMainWindow && winC.windowVisible)
+        if (options.HideMainWindow && !winH.windowHidden)
         {
-            winC.HideTaskbarIcon();
-            winC.HideUnityWindow();
             menuCamera.enabled = false;
+            winH.HideWindow();
         }
-        else if (!options.HideMainWindow && !winC.windowVisible)
+        else if (!options.HideMainWindow && winH.windowHidden)
         {
-            winC.ShowTaskbarIcon();
-            winC.ShowUnityWindow();
             menuCamera.enabled = true;
+            winH.ShowWindow();
         }
 
         if (turnsignalActive)
