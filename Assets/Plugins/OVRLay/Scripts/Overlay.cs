@@ -7,15 +7,18 @@ namespace OVRLay
 {
     public class OVRLay
     {
-        public static readonly uint EVENT_SIZE = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(Valve.VR.VREvent_t));
+        private static readonly uint EVENT_SIZE = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(Valve.VR.VREvent_t));
 
         public string Name { get; private set; } = "OpenVR Overlay";
         public string Key { get; private set; } = "openvr-overlay";
         public bool IsDashboard { get; private set; } = false;
         public ulong Handle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
+        public bool ValidHandle { get => Handle != OpenVR.k_ulOverlayHandleInvalid; }
         public ulong IconHandle { get; private set; } = OpenVR.k_ulOverlayHandleInvalid;
         public bool Created { get; private set; }
         public bool Ready { get => OVR.Overlay != null && Created; }
+        public bool HasFocus { get; private set; }
+
         public EVROverlayError lastError { get; private set; } = EVROverlayError.None;
 
         public OVRLay(string name = null, string key = null, bool isDashboard = false, bool dontCreate = false)
@@ -80,91 +83,188 @@ namespace OVRLay
                 return true;
         }
 
-        public delegate void D_OnFocusChange(bool hasFocus);
-        public D_OnFocusChange OnFocusChange = (hasFocus) => { };
-        public delegate void D_OnDashboardChange(bool active);
-        public D_OnDashboardChange OnDashboardChange = (active) => { };
-        public delegate void D_OnVisibilityChange(bool visible);
-        public D_OnVisibilityChange OnVisibilityChange = (visible) => { };
-        public delegate void D_OnKeyboardDone();
-        public D_OnKeyboardDone OnKeyboardDone = () => { };
-        public delegate void D_OnKeyboardClose();
-        public D_OnKeyboardClose OnKeyboardClose = () => { };
-        public delegate void D_OnKeyboardInput(string minimal, string full);
-        public D_OnKeyboardInput OnKeyboardInput = (minimal, full) => { };
-        public delegate void D_OnMouseMove(VREvent_Mouse_t data);
-        public D_OnMouseMove OnMouseMove = (data) => { };
-        public delegate void D_OnMouseDown(VREvent_Mouse_t data);
-        public D_OnMouseDown OnMouseDown = (data) => { };
-        public delegate void D_OnMouseUp(VREvent_Mouse_t data);
-        public D_OnMouseUp OnMouseUp = (data) => { };
+        public uint GetPrimaryDashboardDevice() =>
+            OVR.Overlay.GetPrimaryDashboardDevice();
 
+        private VROverlayIntersectionParams_t pParams;
+        private VROverlayIntersectionResults_t pResult;
+        public RaycastHit? ComputeRayIntersection(Vector3 source, Vector3 direction)
+        {
+            pParams.eOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding;
+            pParams.vSource = source.ToHMDVector();
+            pParams.vDirection = direction.ToHMDVector();
+
+            if (OVR.Overlay.ComputeOverlayIntersection(Handle, ref pParams, ref pResult))
+                return pResult.ToRayHit();
+            else
+                return null;
+        }
+
+        public delegate void D_OnFocusChange(VREvent_t eventT, bool hasFocus);
+        public D_OnFocusChange OnFocusChange = (eventT, hasFocus) => { };
+        public delegate void D_OnDashboardChange(VREvent_t eventT, bool active);
+        public D_OnDashboardChange OnDashboardChange = (eventT, active) => { };
+        public delegate void D_OnVisibilityChange(VREvent_t eventT, bool visible);
+        public D_OnVisibilityChange OnVisibilityChange = (eventT, visible) => { };
+        public delegate void D_OnKeyboardDone(VREvent_t eventT);
+        public D_OnKeyboardDone OnKeyboardDone = (eventT) => { };
+        public delegate void D_OnKeyboardClose(VREvent_t eventT);
+        public D_OnKeyboardClose OnKeyboardClose = (eventT) => { };
+        public delegate void D_OnKeyboardInput(VREvent_t eventT, string minimal, string full);
+        public D_OnKeyboardInput OnKeyboardInput = (eventT, minimal, full) => { };
+        public delegate void D_OnMouseMove(VREvent_t eventT);
+        public D_OnMouseMove OnMouseMove = (eventT) => { };
+        public delegate void D_OnMouseDown(VREvent_t eventT);
+        public D_OnMouseDown OnMouseDown = (eventT) => { };
+        public delegate void D_OnMouseUp(VREvent_t eventT);
+        public D_OnMouseUp OnMouseUp = (eventT) => { };
         public delegate void D_OnError(string error);
         public D_OnError OnError = (error) => { };
 
+        private VREvent_t event_T = new VREvent_t();
         public void UpdateEvents()
         {
-            VREvent_t event_T = new VREvent_t();
             while (OVR.Overlay.PollNextOverlayEvent(Handle, ref event_T, EVENT_SIZE))
             {
-                EVREventType eventType = (EVREventType)event_T.eventType;
-                switch (eventType)
+                switch ((EVREventType)event_T.eventType)
                 {
                     case EVREventType.VREvent_FocusEnter:
-                        OnFocusChange(true);
+                        Debug.Log("Has Focus!");
+                        HasFocus = true;
+                        OnFocusChange(event_T, true);
                         break;
                     case EVREventType.VREvent_FocusLeave:
-                        OnFocusChange(false);
+                        HasFocus = false;
+                        OnFocusChange(event_T, false);
                         break;
                     case EVREventType.VREvent_DashboardActivated:
-                        OnDashboardChange(true);
+                        OnDashboardChange(event_T, true);
                         break;
                     case EVREventType.VREvent_DashboardDeactivated:
-                        OnDashboardChange(false);
+                        OnDashboardChange(event_T, false);
                         break;
                     case EVREventType.VREvent_OverlayShown:
-                        OnVisibilityChange(true);
+                        OnVisibilityChange(event_T, true);
                         break;
                     case EVREventType.VREvent_OverlayHidden:
-                        OnVisibilityChange(false);
+                        OnVisibilityChange(event_T, false);
                         break;
-
                     case EVREventType.VREvent_KeyboardDone:
-                        OnKeyboardDone();
+                        OnKeyboardDone(event_T);
                         break;
                     case EVREventType.VREvent_KeyboardClosed:
-                        OnKeyboardClose();
+                        OnKeyboardClose(event_T);
                         break;
                     case EVREventType.VREvent_KeyboardCharInput:
                         {
-                            var kd = event_T.data.keyboard;
-                            byte[] bytes = new byte[] {
-                                kd.cNewInput0, kd.cNewInput1, kd.cNewInput2, kd.cNewInput3,
-                                kd.cNewInput4, kd.cNewInput5, kd.cNewInput6, kd.cNewInput7,
-                            };
-                            int len = 0;
-                            while (bytes[len++] != 0 && len < 7) ;
-                            string minTxt = System.Text.Encoding.UTF8.GetString(bytes, 0, len);
-
                             System.Text.StringBuilder txtB = new System.Text.StringBuilder(1024);
                             OVR.Overlay.GetKeyboardText(txtB, 1024);
                             string fullTxt = txtB.ToString();
 
-                            OnKeyboardInput(minTxt, fullTxt);
+                            OnKeyboardInput(event_T, event_T.data.keyboard.cNewInput, fullTxt);
                             break;
                         }
 
                     case EVREventType.VREvent_MouseMove:
-                        OnMouseMove(event_T.data.mouse);
+                        OnMouseMove(event_T);
                         break;
                     case EVREventType.VREvent_MouseButtonDown:
-                        OnMouseDown(event_T.data.mouse);
+                        OnMouseDown(event_T);
                         break;
                     case EVREventType.VREvent_MouseButtonUp:
-                        OnMouseUp(event_T.data.mouse);
+                        OnMouseUp(event_T);
+                        break;
+
+                    default:
+                        Debug.Log(((EVREventType)(event_T.eventType)).ToString());
                         break;
                 }
             }
+        }
+
+        public bool Flag_Curved
+        {
+            get => GetOverlayFlag(VROverlayFlags.Curved);
+            set => SetOverlayFlag(VROverlayFlags.Curved, value);
+        }
+
+        public bool Flag_RGSS4X
+        {
+            get => GetOverlayFlag(VROverlayFlags.RGSS4X);
+            set => SetOverlayFlag(VROverlayFlags.RGSS4X, value);
+        }
+        public bool Flag_NoDashboardTab
+        {
+            get => GetOverlayFlag(VROverlayFlags.NoDashboardTab);
+            set => SetOverlayFlag(VROverlayFlags.NoDashboardTab, value);
+        }
+        public bool Flag_AcceptsGamepadEvents
+        {
+            get => GetOverlayFlag(VROverlayFlags.AcceptsGamepadEvents);
+            set => SetOverlayFlag(VROverlayFlags.AcceptsGamepadEvents, value);
+        }
+        public bool Flag_ShowGamepadFocus
+        {
+            get => GetOverlayFlag(VROverlayFlags.ShowGamepadFocus);
+            set => SetOverlayFlag(VROverlayFlags.ShowGamepadFocus, value);
+        }
+        public bool Flag_SendVRScrollEvents
+        {
+            get => GetOverlayFlag(VROverlayFlags.SendVRScrollEvents);
+            set => SetOverlayFlag(VROverlayFlags.SendVRScrollEvents, value);
+        }
+        public bool Flag_SendVRTouchpadEvents
+        {
+            get => GetOverlayFlag(VROverlayFlags.SendVRTouchpadEvents);
+            set => SetOverlayFlag(VROverlayFlags.SendVRTouchpadEvents, value);
+        }
+        public bool Flag_ShowTouchPadScrollWheel
+        {
+            get => GetOverlayFlag(VROverlayFlags.ShowTouchPadScrollWheel);
+            set => SetOverlayFlag(VROverlayFlags.ShowTouchPadScrollWheel, value);
+        }
+        public bool Flag_TransferOwnershipToInternalProcess
+        {
+            get => GetOverlayFlag(VROverlayFlags.TransferOwnershipToInternalProcess);
+            set => SetOverlayFlag(VROverlayFlags.TransferOwnershipToInternalProcess, value);
+        }
+        public bool Flag_SideBySide_Parallel
+        {
+            get => GetOverlayFlag(VROverlayFlags.SideBySide_Parallel);
+            set => SetOverlayFlag(VROverlayFlags.SideBySide_Parallel, value);
+        }
+        public bool Flag_SideBySide_Crossed
+        {
+            get => GetOverlayFlag(VROverlayFlags.SideBySide_Crossed);
+            set => SetOverlayFlag(VROverlayFlags.SideBySide_Crossed, value);
+        }
+        public bool Flag_Panorama
+        {
+            get => GetOverlayFlag(VROverlayFlags.Panorama);
+            set => SetOverlayFlag(VROverlayFlags.Panorama, value);
+        }
+        public bool Flag_StereoPanorama
+        {
+            get => GetOverlayFlag(VROverlayFlags.StereoPanorama);
+            set => SetOverlayFlag(VROverlayFlags.StereoPanorama, value);
+        }
+        public bool Flag_SortWithNonSceneOverlays
+        {
+            get => GetOverlayFlag(VROverlayFlags.SortWithNonSceneOverlays);
+            set => SetOverlayFlag(VROverlayFlags.SortWithNonSceneOverlays, value);
+        }
+        public bool Flag_VisibleInDashboard
+        {
+            get => GetOverlayFlag(VROverlayFlags.VisibleInDashboard);
+            set => SetOverlayFlag(VROverlayFlags.VisibleInDashboard, value);
+        }
+
+        public void SetOverlayFlag(VROverlayFlags flag, bool toggle) { lastError = OVR.Overlay.SetOverlayFlag(Handle, flag, toggle); }
+        public bool GetOverlayFlag(VROverlayFlags flag)
+        {
+            bool ret = false;
+            lastError = OVR.Overlay.GetOverlayFlag(Handle, VROverlayFlags.Curved, ref ret);
+            return ret;
         }
 
         private float pubFloat = 0f;

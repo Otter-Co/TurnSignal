@@ -3,67 +3,66 @@ using UnityEngine;
 using Valve.VR;
 using OVRLay;
 
-[RequireComponent(typeof(Overlay_Unity))]
-[RequireComponent(typeof(Overlay_Texture))]
+[RequireComponent(typeof(Camera))]
+[ExecuteInEditMode]
 public class Overlay_CameraTexture : MonoBehaviour
 {
-    [Space(10)]
-    public Camera targetCamera;
-    public int antialiasing = 8;
-    public FilterMode filterMode = FilterMode.Trilinear;
+    [Header("Overlay for Camera")]
+    public Overlay_Unity targetOverlay;
 
-    [Space(10)]
-    public bool autoDisableCamera = true;
-    public bool dontForceRenderTexture = false;
+    [Header("Overlay Texture Settings")]
+    public bool forceCameraRenderTexture = false;
+    public int cameraWidthOverride = 0;
+    public int cameraHeightOverride = 0;
+    public int cameraAAOveride = 8;
 
-
-    private RenderTexture targetTex;
-    private Overlay_Unity u_overlay;
-    private Overlay_Texture u_oTex;
     private OVRLay.OVRLay overlay;
+    private RenderTexture renderTex;
+
+    private Camera cam;
 
     void Start()
     {
-        targetTex = new RenderTexture(targetCamera.pixelWidth, targetCamera.pixelHeight, 24);
-        targetTex.antiAliasing = antialiasing;
-        targetTex.filterMode = filterMode;
+        cam = GetComponent<Camera>();
 
-        if (!dontForceRenderTexture)
-            targetCamera.targetTexture = targetTex;
-
-        if (autoDisableCamera)
-            targetCamera.enabled = false;
+        if (cameraWidthOverride != 0 && cameraHeightOverride != 0)
+        {
+            renderTex = new RenderTexture(cameraWidthOverride, cameraHeightOverride, 24);
+            renderTex.antiAliasing = cameraAAOveride;
+        }
     }
 
-    void Update()
+    void OnRenderImage(RenderTexture source, RenderTexture dest)
     {
-        if (overlay == null)
+        if (renderTex == null)
+            renderTex = new RenderTexture(source.descriptor);
+
+        if (forceCameraRenderTexture && cam.targetTexture != renderTex)
+            cam.targetTexture = renderTex;
+        else
         {
-            u_overlay = GetComponent<Overlay_Unity>();
-            u_oTex = GetComponent<Overlay_Texture>();
-
-            if (u_overlay.overlay != null)
-                overlay = u_overlay.overlay;
-
-            u_oTex.currentTexture = targetTex;
-
-            return;
+            RenderTexture.active = renderTex;
+            Graphics.Blit(source, renderTex);
+            RenderTexture.active = dest;
+            Graphics.Blit(source, dest);
         }
 
-        if (overlay.Created)
+        if (overlay == null)
         {
-            var oldTex = targetCamera.targetTexture;
+            if (targetOverlay.overlay != null)
+                overlay = targetOverlay.overlay;
+        }
+        else
+        {
+            if (overlay.TextureType != ETextureType.DirectX)
+                overlay.TextureType = ETextureType.DirectX;
 
-            if (targetCamera.targetTexture != targetTex)
-                targetCamera.targetTexture = targetTex;
+            overlay.TextureBounds = Overlay_Unity.TextureBounds;
 
-            targetCamera.Render();
-
-            if (dontForceRenderTexture)
-                targetCamera.targetTexture = oldTex;
-
-            if (autoDisableCamera)
-                targetCamera.enabled = false;
+            if (forceCameraRenderTexture)
+                overlay.Texture = source;
+            else
+                overlay.Texture = renderTex;
         }
     }
 }

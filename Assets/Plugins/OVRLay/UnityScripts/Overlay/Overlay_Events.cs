@@ -61,12 +61,12 @@ public class Overlay_Events : MonoBehaviour
             else
                 return;
 
-            overlay.OnDashboardChange += (active) => OnDashboardChange.Invoke(active);
-            overlay.OnFocusChange += (hasFocus) => OnFocusChange.Invoke(hasFocus);
-            overlay.OnVisibilityChange += (visible) => OnVisibilityChange.Invoke(visible);
-            overlay.OnKeyboardDone += () => OnKeyboardDone.Invoke();
-            overlay.OnKeyboardClose += () => OnKeyboardClose.Invoke();
-            overlay.OnKeyboardInput += (m, f) => OnKeyboardInput.Invoke(m, f);
+            overlay.OnDashboardChange += (eventT, active) => OnDashboardChange.Invoke(active);
+            overlay.OnFocusChange += (eventT, hasFocus) => OnFocusChange.Invoke(hasFocus);
+            overlay.OnVisibilityChange += (eventT, visible) => OnVisibilityChange.Invoke(visible);
+            overlay.OnKeyboardDone += (eventT) => OnKeyboardDone.Invoke();
+            overlay.OnKeyboardClose += (eventT) => OnKeyboardClose.Invoke();
+            overlay.OnKeyboardInput += (eventT, m, f) => OnKeyboardInput.Invoke(m, f);
             overlay.OnError += (err) => OnError.Invoke(err);
 
             setup = true;

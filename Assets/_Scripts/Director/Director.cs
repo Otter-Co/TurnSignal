@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using UnityEngine;
 using Facepunch.Steamworks;
+using System.Collections.Generic;
+
 public class Director : MonoBehaviour
 {
     public void ResetRotation() => floorHandler.currentTurnValue = 0f;
@@ -10,8 +12,8 @@ public class Director : MonoBehaviour
 
     public void SetDashboardState(bool state) => dashboardOpen = state;
 
-    public void SetIdleMode() => wantedFPS = idleFPS;
-    public void SetActiceMode() => wantedFPS = activeFPS;
+    public void SetIdleMode() => targetFPS = idleFPS;
+    public void SetActiceMode() => targetFPS = activeFPS;
 
     public void ToggleShowWindow() =>
         menuHandler.hideMainWindowToggle.isOn = !menuHandler.hideMainWindowToggle.isOn;
@@ -21,11 +23,9 @@ public class Director : MonoBehaviour
     [Header("Object Refs")]
     public Menu_Handler menuHandler;
     public Overlay_Unity menuOverlay;
-    public Camera menuCamera;
     [Space(10)]
     public Floor_Handler floorHandler;
     public Overlay_Unity floorOverlay;
-    public Camera floorCamera;
     public Twister twister;
 
     [Header("App Internal Settings")]
@@ -40,6 +40,7 @@ public class Director : MonoBehaviour
     [Header("Steamworks Settings")]
     public uint appID = 0;
     public string pchAppKey = "TurnSignal";
+    public bool disableSteamworksInEditor = true;
 
     [Header("App Options")]
     public TurnSignalOptions options =
@@ -54,21 +55,69 @@ public class Director : MonoBehaviour
     public float timeInSecondsBetweenChecks = 10f;
 
     private int currentFPS = 0;
-    private int wantedFPS = 0;
+    private int targetFPS = 0;
 
+    [HideInInspector]
     public Window_Handler winH;
-
+    [HideInInspector]
     public OpenVR_Unity openVR;
+    [HideInInspector]
     public Client steamClient;
+
+    private Overlay_CameraTexture menuCamTex;
 
     private bool dashboardOpen = false;
     private bool turnsignalActive = true;
 
     private float timeSinceLastLogCheck = 0f;
 
-    void Startup()
+    private List<string> startupArgs;
+
+    private Rect screenRect;
+
+    void Start()
     {
-        EnsureSaneLogsize();
+        menuCamTex = menuOverlay.GetComponent<Overlay_CameraTexture>();
+
+        winH = GetComponent<Window_Handler>();
+        openVR = GetComponent<OpenVR_Unity>();
+
+        startupArgs = new List<string>(System.Environment.GetCommandLineArgs());
+        screenRect = new Rect(0, 0, targetWindowWidth, targetWindowHeight);
+
+        options = LoadLocalOpts();
+
+        if (disableSteamworksInEditor && Application.isEditor)
+        {
+            options.EnableSteamworks = false;
+        }
+
+        if (!options.EnableSteamworks && startupArgs.Find(arg => arg.ToLower().Equals("--steam")) != null)
+        {
+            winH.CloseAndRestartApp();
+            return;
+        }
+        else if (options.EnableSteamworks)
+        {
+            try
+            {
+                Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
+                steamClient = new Client(appID);
+
+                var cloudOpts = LoadCloudOpts();
+                if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
+                    options = cloudOpts;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        ApplyOptions(options);
+        menuHandler.SetUIValues(options);
+
+        SetWindowSize();
     }
 
     void OnApplicationQuit()
@@ -86,47 +135,14 @@ public class Director : MonoBehaviour
             timeSinceLastLogCheck = 0;
         }
 
-        if (winH == null || openVR == null)
-        {
-            winH = GetComponent<Window_Handler>();
-            openVR = GetComponent<OpenVR_Unity>();
-
-            if (winH == null || openVR == null)
-                return;
-
-            SetWindowSize();
-
-            options = LoadLocalOpts();
-
-            if (options.EnableSteamworks)
-            {
-                try
-                {
-                    Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
-                    steamClient = new Client(appID);
-
-                    var cloudOpts = LoadCloudOpts();
-                    if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
-                        options = cloudOpts;
-                }
-                catch (Exception e)
-                {
-                    Debug.Log(e);
-                }
-            }
-
-            menuHandler.SetUIValues(options);
-            ApplyOptions(options);
-
-            return;
-        }
-
-        if (currentFPS != wantedFPS)
-            Application.targetFrameRate = currentFPS = wantedFPS;
+        if (currentFPS != targetFPS)
+            Application.targetFrameRate = currentFPS = targetFPS;
 
         var curOpts = menuHandler.GetUIValues();
+
         if (!curOpts.Equals(options.cleaned))
             ApplyOptions(curOpts);
+
 
         if (options.EnableSteamworks && steamClient == null)
         {
@@ -152,18 +168,6 @@ public class Director : MonoBehaviour
             steamClient = null;
         }
 
-
-        if (options.HideMainWindow && !winH.windowHidden)
-        {
-            menuCamera.enabled = false;
-            winH.HideWindow();
-        }
-        else if (!options.HideMainWindow && winH.windowHidden)
-        {
-            menuCamera.enabled = true;
-            winH.ShowWindow();
-        }
-
         if (turnsignalActive)
         {
             if (options.OnlyShowInDashboard)
@@ -175,6 +179,11 @@ public class Director : MonoBehaviour
         }
         else if (floorOverlay.enabled)
             floorOverlay.enabled = false;
+
+        if (options.HideMainWindow && !winH.windowHidden)
+            winH.HideWindow();
+        else if (!options.HideMainWindow && winH.windowHidden)
+            winH.ShowWindow();
     }
 
     void ApplyOptions(TurnSignalOptions opts)
@@ -224,12 +233,9 @@ public class Director : MonoBehaviour
             cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
 
         if (localGood)
-            Debug.Log("Succesfully wrote Local Options File.");
+            Debug.Log("Succesfully wrote Local Options to File: \n" + GetRootDir() + optionsFilename);
         else
-            Debug.Log(
-                "Error writing Local Options File: \n" +
-                GetRootDir() + optionsFilename
-            );
+            Debug.Log("Error writing Local Options to File: \n" + GetRootDir() + optionsFilename);
 
         if (opts.EnableSteamworks && cloudGood)
             Debug.Log("Succesfully Wrote Options to SteamCloud.");
@@ -286,6 +292,7 @@ public class Director : MonoBehaviour
                 fT.position = middleVec;
         }
     }
+
     // Recursion DOOMSDAY
     public void SetWindowSize(int lvl = 0, int maxLvl = 5)
     {
@@ -298,7 +305,6 @@ public class Director : MonoBehaviour
                 SetWindowSize(lvl + 1, maxLvl);
         }
     }
-
 
     public enum RootDirOpt
     {

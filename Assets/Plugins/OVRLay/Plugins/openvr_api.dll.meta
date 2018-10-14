@@ -1,7 +1,5 @@
 fileFormatVersion: 2
-guid: f3d444e1e9666e4499a379b9b698bfb9
-timeCreated: 1524435662
-licenseType: Pro
+guid: 28e4a46f5a38e5548ba65a760a0d1dbb
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -23,18 +21,6 @@ PluginImporter:
         Exclude Win: 0
         Exclude Win64: 1
   - first:
-      '': OSXIntel
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      '': OSXIntel64
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
       Any: 
     second:
       enabled: 1
@@ -46,11 +32,11 @@ PluginImporter:
       settings:
         CPU: x86
         DefaultValueInitialized: true
-        OS: AnyOS
+        OS: Windows
   - first:
       Facebook: Win
     second:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
   - first:
@@ -70,7 +56,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: None
+        CPU: x86_64
   - first:
       Standalone: LinuxUniversal
     second:
@@ -82,7 +68,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: x86
+        CPU: AnyCPU
   - first:
       Standalone: Win
     second:

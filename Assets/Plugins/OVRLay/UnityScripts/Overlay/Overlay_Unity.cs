@@ -18,6 +18,25 @@ public class Overlay_Unity : MonoBehaviour
         public bool Visible;
         public bool HighQuality;
     }
+    [System.Serializable]
+    public struct Overlay_Unity_Flags
+    {
+        public bool Flag_Curved;
+        public bool Flag_RGSS4X;
+        public bool Flag_NoDashboardTab;
+        public bool Flag_AcceptsGamepadEvents;
+        public bool Flag_ShowGamepadFocus;
+        public bool Flag_SendVRScrollEvents;
+        public bool Flag_SendVRTouchpadEvents;
+        public bool Flag_ShowTouchPadScrollWheel;
+        public bool Flag_TransferOwnershipToInternalProcess;
+        public bool Flag_SideBySide_Parallel;
+        public bool Flag_SideBySide_Crossed;
+        public bool Flag_Panorama;
+        public bool Flag_StereoPanorama;
+        public bool Flag_SortWithNonSceneOverlays;
+        public bool Flag_VisibleInDashboard;
+    }
 
     [HideInInspector] public OVRLay.OVRLay overlay;
 
@@ -42,7 +61,10 @@ public class Overlay_Unity : MonoBehaviour
         HighQuality = false,
     };
 
+    public Overlay_Unity_Flags flags = new Overlay_Unity_Flags();
+
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings();
+    private Overlay_Unity_Flags lastFlags = new Overlay_Unity_Flags();
 
     void Update()
     {
@@ -58,6 +80,9 @@ public class Overlay_Unity : MonoBehaviour
         {
             if (applySettingsEveryUpdate || !lastSettings.Equals(settings))
                 ApplySettings();
+
+            if (!lastFlags.Equals(flags))
+                ApplyFlags();
 
             PollForEvents();
         }
@@ -125,6 +150,30 @@ public class Overlay_Unity : MonoBehaviour
         overlay.HighQuality = settings.HighQuality;
 
         lastSettings = settings;
+    }
+
+    public void ApplyFlags()
+    {
+        if (overlay == null)
+            return;
+
+        overlay.Flag_Curved = flags.Flag_Curved;
+        overlay.Flag_RGSS4X = flags.Flag_RGSS4X;
+        overlay.Flag_NoDashboardTab = flags.Flag_NoDashboardTab;
+        overlay.Flag_AcceptsGamepadEvents = flags.Flag_AcceptsGamepadEvents;
+        overlay.Flag_ShowGamepadFocus = flags.Flag_ShowGamepadFocus;
+        overlay.Flag_SendVRScrollEvents = flags.Flag_SendVRScrollEvents;
+        overlay.Flag_SendVRTouchpadEvents = flags.Flag_SendVRTouchpadEvents;
+        overlay.Flag_ShowTouchPadScrollWheel = flags.Flag_ShowTouchPadScrollWheel;
+        overlay.Flag_TransferOwnershipToInternalProcess = flags.Flag_TransferOwnershipToInternalProcess;
+        overlay.Flag_SideBySide_Parallel = flags.Flag_SideBySide_Parallel;
+        overlay.Flag_SideBySide_Crossed = flags.Flag_SideBySide_Crossed;
+        overlay.Flag_Panorama = flags.Flag_Panorama;
+        overlay.Flag_StereoPanorama = flags.Flag_StereoPanorama;
+        overlay.Flag_SortWithNonSceneOverlays = flags.Flag_SortWithNonSceneOverlays;
+        overlay.Flag_VisibleInDashboard = flags.Flag_VisibleInDashboard;
+
+        lastFlags = flags;
     }
 
     public void PollForEvents()

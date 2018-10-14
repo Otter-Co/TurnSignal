@@ -7,6 +7,23 @@ namespace OVRLay
 {
     public static class Utility
     {
+        public static HmdVector3_t ToHMDVector(this Vector3 targ) =>
+            new HmdVector3_t { v0 = targ.x, v1 = targ.y, v2 = targ.z };
+        public static HmdVector2_t ToHMDVector(this Vector2 targ) =>
+            new HmdVector2_t { v0 = targ.x, v1 = targ.y };
+        public static Vector3 ToVec3(this HmdVector3_t targ) =>
+            new Vector3(targ.v0, targ.v1, targ.v2);
+        public static Vector2 ToVec2(this HmdVector2_t targ) =>
+            new Vector2(targ.v0, targ.v1);
+
+        public static RaycastHit ToRayHit(this VROverlayIntersectionResults_t targ) =>
+            new RaycastHit
+            {
+                distance = targ.fDistance,
+                point = targ.vPoint.ToVec3(),
+                normal = targ.vNormal.ToVec3(),
+            };
+
         public static Quaternion Slerp(Quaternion A, Quaternion B, float t)
         {
             var cosom = Mathf.Clamp(A.x * B.x + A.y * B.y + A.z * B.z + A.w * B.w, -1.0f, 1.0f);
