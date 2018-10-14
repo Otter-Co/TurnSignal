@@ -34,7 +34,7 @@ public class Menu_Handler : MonoBehaviour
     {
         startWithVRToggle.isOn = opts.StartWithSteamVR;
         enableSteamWorksToggle.isOn = opts.EnableSteamworks;
-        hideMainWindowToggle.isOn = opts.HideMainWindow;
+        hideMainWindowToggle.isOn = opts.ShowMainWindow;
         followPlayerToggle.isOn = opts.FollowPlayerHeadeset;
         useChapColorToggle.isOn = opts.UseChaperoneColor;
         tieTwistToggle.isOn = opts.LinkOpatWithTwist;
@@ -69,7 +69,7 @@ public class Menu_Handler : MonoBehaviour
         {
             StartWithSteamVR = startWithVRToggle.isOn,
             EnableSteamworks = enableSteamWorksToggle.isOn,
-            HideMainWindow = hideMainWindowToggle.isOn,
+            ShowMainWindow = hideMainWindowToggle.isOn,
             FollowPlayerHeadeset = followPlayerToggle.isOn,
             UseChaperoneColor = useChapColorToggle.isOn,
             LinkOpatWithTwist = tieTwistToggle.isOn,

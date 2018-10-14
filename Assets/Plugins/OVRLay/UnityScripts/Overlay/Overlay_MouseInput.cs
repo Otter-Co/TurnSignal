@@ -1,46 +1,48 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Valve.VR;
-using OVRLay;
 
 [RequireComponent(typeof(Overlay_Unity))]
 public class Overlay_MouseInput : MonoBehaviour
 {
     [Header("Overlay Mouse Input Settings")]
     public VROverlayInputMethod inputMethod = VROverlayInputMethod.None;
+
     [Space(10)]
     public bool simulateUnityInput = false;
-    public EventSystem eventSystem;
-    public float mouseDownTimeUntilDrag = 0.1f;
-    public Vector2 textureSize;
+    public EventSystem targetEventSystem;
+    public Vector2 mouseScreenPixelSize;
+    [Space(10)]
+    public Vector2 lastAdjustedMousePos;
 
     [Header("Overlay Mouse Values")]
+    public Vector2 rawScrollValue;
     [Space(10)]
     public Vector2 rawMousePosition;
     [Space(10)]
-    public Vector2 lastAdjustedMousePos;
+    public bool leftMouseDown = false;
+    public bool middleMouseDown = false;
+    public bool rightMouseDown = false;
     [Space(10)]
-    public bool mouseDown = false;
-    public float mouseDownTime = 0f;
+    public Vector2 dualAnalogRightPosition;
+    public Vector2 dualAnalogLeftPosition;
     [Space(10)]
-    public float lastMoveUpdate = 0f;
-    public float lastButtonUpdate = 0f;
+    public bool dualAnalogRightTouch = false;
+    public bool dualAnalogLeftTouch = false;
     [Space(10)]
+    public bool dualAnalogRightPress = false;
+    public bool dualAnalogLeftPress = false;
 
-    private Overlay_MouseBaseInput inputOverride;
-    private HashSet<Selectable> lastTargs = new HashSet<Selectable>();
-    private HashSet<Selectable> currentTargs = new HashSet<Selectable>();
     private HmdVector2_t mouseScale = new HmdVector2_t() { v0 = 1f, v1 = 1f };
-
     private float reverseAspect = 0f;
+
     private int widthMulti = 0;
     private int heightMulti = 0;
 
     private Overlay_Unity u_overlay;
     public OVRLay.OVRLay overlay;
+
+    private Overlay_MouseBaseInput inputOverride;
 
     public Vector2 GetAdjustMousePos()
     {
@@ -52,31 +54,77 @@ public class Overlay_MouseInput : MonoBehaviour
         return new Vector2(mouseX, mouseY);
     }
 
+
+    void UpdateScroll(VREvent_t eventT)
+    {
+        rawScrollValue.x = eventT.data.scroll.xdelta;
+        rawScrollValue.y = eventT.data.scroll.ydelta;
+        // rawScrollValue.z = eventT.data.scroll.repeatCount;
+    }
+
     void UpdateRawMousePosition(VREvent_t eventT)
     {
-        var mD = eventT.data.mouse;
-        Debug.Log(mD.x + "," + mD.y);
-
-        rawMousePosition.x = mD.x;
-        rawMousePosition.y = mD.y;
-
-        lastMoveUpdate = 0;
+        rawMousePosition.x = eventT.data.mouse.x;
+        rawMousePosition.y = eventT.data.mouse.y;
     }
 
     void UpdateRawMouseButton(VREvent_t eventT, bool state)
     {
-        // UpdateRawMousePosition(mD);
-        var mD = eventT.data.mouse;
-        Debug.Log(mD.x + "," + mD.y);
-
-        switch ((EVRMouseButton)mD.button)
+        switch ((EVRMouseButton)eventT.data.mouse.button)
         {
             case EVRMouseButton.Left:
-                mouseDown = state;
+                leftMouseDown = state;
+                break;
+            case EVRMouseButton.Middle:
+                middleMouseDown = state;
+                break;
+            case EVRMouseButton.Right:
+                rightMouseDown = state;
                 break;
         }
+    }
 
-        lastButtonUpdate = 0;
+    void UpdateDAPosition(VREvent_t eventT)
+    {
+        var pos = new Vector2(
+            eventT.data.dualAnalog.x,
+            eventT.data.dualAnalog.y
+        );
+
+        switch (eventT.data.dualAnalog.which)
+        {
+            case EDualAnalogWhich.k_EDualAnalog_Right:
+                dualAnalogRightPosition = pos;
+                break;
+            case EDualAnalogWhich.k_EDualAnalog_Left:
+                dualAnalogLeftPosition = pos;
+                break;
+        }
+    }
+    void UpdateDATouch(VREvent_t eventT, bool state)
+    {
+        switch (eventT.data.dualAnalog.which)
+        {
+            case EDualAnalogWhich.k_EDualAnalog_Right:
+                dualAnalogRightTouch = state;
+                break;
+            case EDualAnalogWhich.k_EDualAnalog_Left:
+                dualAnalogLeftTouch = state;
+                break;
+        }
+    }
+
+    void UpdateDAPress(VREvent_t eventT, bool state)
+    {
+        switch (eventT.data.dualAnalog.which)
+        {
+            case EDualAnalogWhich.k_EDualAnalog_Right:
+                dualAnalogRightPress = state;
+                break;
+            case EDualAnalogWhich.k_EDualAnalog_Left:
+                dualAnalogLeftPress = state;
+                break;
+        }
     }
 
     void Update()
@@ -90,20 +138,27 @@ public class Overlay_MouseInput : MonoBehaviour
             else
                 return;
 
+            overlay.OnScroll += (data) => UpdateScroll(data);
+
             overlay.OnMouseMove += (data) => UpdateRawMousePosition(data);
             overlay.OnMouseDown += (data) => UpdateRawMouseButton(data, true);
             overlay.OnMouseUp += (data) => UpdateRawMouseButton(data, false);
 
+            overlay.OnDualAnalogMove += (data) => UpdateDAPosition(data);
+            overlay.OnDualAnalogTouch += (data, state) => UpdateDATouch(data, state);
+            overlay.OnDualAnalogPress += (data, state) => UpdateDAPress(data, state);
+
+
             inputOverride = gameObject.AddComponent<Overlay_MouseBaseInput>().SetOverlayInput(this);
-            eventSystem.currentInputModule.inputOverride = inputOverride;
+            targetEventSystem.currentInputModule.inputOverride = inputOverride;
 
             return;
         }
 
         if (overlay.Created)
         {
-            int ttW = widthMulti = (int)textureSize.x,
-                ttH = heightMulti = (int)textureSize.y;
+            int ttW = widthMulti = (int)mouseScreenPixelSize.x,
+                ttH = heightMulti = (int)mouseScreenPixelSize.y;
 
             reverseAspect = (float)ttH / (float)ttW;
             mouseScale.v1 = reverseAspect;
@@ -111,15 +166,10 @@ public class Overlay_MouseInput : MonoBehaviour
             overlay.InputMethod = inputMethod;
             overlay.MouseScale = mouseScale;
 
-            lastMoveUpdate += Time.deltaTime;
-            lastButtonUpdate += Time.deltaTime;
-
-            if (mouseDown)
-                mouseDownTime += Time.deltaTime;
-            else if (mouseDownTime > 0f)
-                mouseDownTime = 0f;
-
             lastAdjustedMousePos = GetAdjustMousePos();
+
+            if (simulateUnityInput && !targetEventSystem.isFocused)
+                targetEventSystem.SendMessage("OnApplicationFocus", true);
         }
     }
 }

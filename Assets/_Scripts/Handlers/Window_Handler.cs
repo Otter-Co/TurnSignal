@@ -1,10 +1,13 @@
 using System;
+
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 public class Window_Handler : MonoBehaviour
 {
@@ -26,29 +29,22 @@ public class Window_Handler : MonoBehaviour
     public TrayEvent onExitClicked;
 
     [HideInInspector]
-    public bool trayHidden = false;
+    public bool TrayVisible { get => (trayIcon != null) ? trayIcon.Visible : true; }
 
     [HideInInspector]
-    public bool windowHidden = false;
+    public bool WindowVisible { get => (windowO != null) ? windowO.Visible : true; }
 
+    private NewWheelWindow windowO;
 
-    private Form windowForm;
     private NotifyIcon trayIcon;
     private Bitmap iconBitmap;
     private Icon icon;
-    private System.Windows.Forms.ContextMenu contextMenu;
-    private MenuItem hideShowItem;
-    private MenuItem quitItem;
 
-    private void _onShowClicked(object o, EventArgs e) =>
-        onShowClicked.Invoke();
-    private void _onQuitClicked(object o, EventArgs e) =>
-        onExitClicked.Invoke();
-
+    private ContextMenuStrip contextMenu;
+    private ToolStripItem hideShowItem;
 
     void OnDestroy() => CleanUp();
     void OnApplicationQuit() => CleanUp();
-
 
     void CleanUp()
     {
@@ -73,8 +69,11 @@ public class Window_Handler : MonoBehaviour
         if (onExitClicked == null)
             onExitClicked = new TrayEvent();
 
-        WindowStart();
+
+#if !UNITY_EDITOR
+        windowO = NewWheelWindow.CreateFromWindowFromCaption(UnityEngine.Application.productName);
         TrayIconStart();
+#endif
 
         if (showTrayOnStart)
             ShowTrayIcon();
@@ -83,82 +82,57 @@ public class Window_Handler : MonoBehaviour
             HideWindow();
     }
 
-    private void WindowStart()
-    {
-        if (UnityEngine.Application.isEditor)
-            return;
-
-        windowForm = GetCurrentWindowForm();
-    }
-
     private void TrayIconStart()
     {
-        if (UnityEngine.Application.isEditor)
-            return;
-
         iconBitmap = GetBitmapFromTex(trayIconTexture);
         icon = Icon.FromHandle(iconBitmap.GetHicon());
 
-        trayIcon = new NotifyIcon();
-        trayIcon.Text = _taskbar_text;
-        trayIcon.Icon = icon;
+        trayIcon = new NotifyIcon
+        {
+            Text = _taskbar_text,
+            Icon = icon
+        };
 
-        contextMenu = new System.Windows.Forms.ContextMenu();
+        contextMenu = new System.Windows.Forms.ContextMenuStrip();
+        trayIcon.ContextMenuStrip = contextMenu;
 
-        hideShowItem = new MenuItem(_hide_text, _onShowClicked);
-        quitItem = new MenuItem(_quit_text, _onQuitClicked);
-
-        contextMenu.MenuItems.Add(hideShowItem);
-        contextMenu.MenuItems.Add(quitItem);
-
-        trayIcon.ContextMenu = contextMenu;
+        hideShowItem = contextMenu.Items.Add(_hide_text, null, (object o, EventArgs e) => onShowClicked.Invoke());
+        contextMenu.Items.Add(_quit_text, null, (object o, EventArgs e) => onExitClicked.Invoke());
     }
 
     public void CloseAndRestartApp()
     {
-        string appPath = System.Reflection.Assembly.GetEntryAssembly().Location;
-        var p = Process.Start(appPath);
+        string appPath = $"{UnityEngine.Application.dataPath}\\..\\turnsignal.exe";
         UnityEngine.Application.Quit();
+        Process.Start(appPath).Dispose();
     }
 
     public void HideTrayIcon()
     {
-        if (trayIcon == null)
+        if (trayIcon != null)
             trayIcon.Visible = false;
     }
     public void ShowTrayIcon()
     {
-        if (trayIcon == null)
-            return;
-
-        trayIcon.Visible = true;
+        if (trayIcon != null)
+            trayIcon.Visible = true;
     }
 
     public void HideWindow()
     {
-        if (windowForm == null)
-            return;
+        if (hideShowItem != null)
+            hideShowItem.Text = _show_text;
 
-        windowForm.Visible = false;
-        windowForm.ShowInTaskbar = false;
-
-        hideShowItem.Text = _show_text;
+        windowO?.Hide();
     }
 
     public void ShowWindow()
     {
-        if (windowForm == null)
-            return;
+        if (hideShowItem != null)
+            hideShowItem.Text = _hide_text;
 
-        windowForm.ShowInTaskbar = true;
-        windowForm.Visible = true;
-
-        hideShowItem.Text = _hide_text;
+        windowO?.Show();
     }
-
-
-    public static Form GetCurrentWindowForm() =>
-        Control.FromHandle(Process.GetCurrentProcess().MainWindowHandle) as Form;
 
     public static Bitmap GetBitmapFromTex(Texture2D tex)
     {
@@ -172,4 +146,82 @@ public class Window_Handler : MonoBehaviour
 
         return ret;
     }
+}
+
+public class NewWheelWindow
+{
+    public bool Visible { get; private set; } = true;
+
+    private IntPtr _hWnd { get; set; } = IntPtr.Zero;
+
+    private readonly int initialExStyle = 0;
+
+    public NewWheelWindow(IntPtr hWnd)
+    {
+        this._hWnd = hWnd;
+
+        if (hWnd == IntPtr.Zero)
+            UnityEngine.Debug.Log("Bad Window Pointer!");
+        else
+            UnityEngine.Debug.Log("Good Window Pointer: " + hWnd);
+
+        initialExStyle = GetWindowExStyle(hWnd);
+    }
+
+    public void Hide()
+    {
+        NativeMethods.ShowWindow(_hWnd, (int)ShowWindowOptions.Minimize);
+        SetWindowExtStyle(_hWnd, WindowExtStyles.ToolWindow);
+        Visible = false;
+    }
+
+    public void Show()
+    {
+        SetWindowExtStyle(_hWnd, initialExStyle);
+        NativeMethods.ShowWindow(_hWnd, (int)ShowWindowOptions.Restore);
+        Visible = true;
+    }
+
+    public static NewWheelWindow CreateFromWindowFromCaption(string caption) => new NewWheelWindow(NativeMethods.FindWindowByCaption(IntPtr.Zero, caption));
+
+    public static int SetWindowExtStyle(IntPtr hWnd, int newStyleValue) => NativeMethods.SetWindowLong(hWnd, -20, newStyleValue);
+    public static int SetWindowExtStyle(IntPtr hWnd, WindowExtStyles newStyleValue) => NativeMethods.SetWindowLong(hWnd, -20, (int)newStyleValue);
+    public static int GetWindowExStyle(IntPtr hWnd) => NativeMethods.GetWindowLong(hWnd, -20);
+
+    #region Externs
+    static class NativeMethods
+    {
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern IntPtr FindWindowByCaption(IntPtr zeroOnly, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    }
+
+    public enum ShowWindowOptions
+    {
+        Hide = 0,
+        Maximize = 3,
+        Show = 5,
+        Minimize = 6,
+        Restore = 9,
+    }
+
+    public enum WindowStyles
+    {
+        Unset = 0,
+        DLGFRAME = (int)0x00400000L,
+    }
+    public enum WindowExtStyles
+    {
+        ToolWindow = (int)0x00000080L,
+    }
+    #endregion
 }

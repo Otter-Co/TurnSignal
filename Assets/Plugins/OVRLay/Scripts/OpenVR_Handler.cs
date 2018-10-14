@@ -39,7 +39,7 @@ namespace OVRLay
         {
             if (StartedUp)
             {
-                OpenVR.Shutdown();
+                // OpenVR.Shutdown();
                 StartedUp = false;
             }
         }

@@ -28,7 +28,9 @@ public class Overlay_CameraTexture : MonoBehaviour
         if (cameraWidthOverride != 0 && cameraHeightOverride != 0)
         {
             renderTex = new RenderTexture(cameraWidthOverride, cameraHeightOverride, 24);
-            renderTex.antiAliasing = cameraAAOveride;
+    
+            if (cameraAAOveride > 0)
+                renderTex.antiAliasing = cameraAAOveride;
         }
     }
 
@@ -43,8 +45,6 @@ public class Overlay_CameraTexture : MonoBehaviour
         {
             RenderTexture.active = renderTex;
             Graphics.Blit(source, renderTex);
-            RenderTexture.active = dest;
-            Graphics.Blit(source, dest);
         }
 
         if (overlay == null)
@@ -64,5 +64,8 @@ public class Overlay_CameraTexture : MonoBehaviour
             else
                 overlay.Texture = renderTex;
         }
+
+        RenderTexture.active = dest;
+        Graphics.Blit(source, dest);
     }
 }

@@ -64,26 +64,18 @@ public class Director : MonoBehaviour
     [HideInInspector]
     public Client steamClient;
 
-    private Overlay_CameraTexture menuCamTex;
+    private List<string> startupArgs;
 
     private bool dashboardOpen = false;
     private bool turnsignalActive = true;
-
     private float timeSinceLastLogCheck = 0f;
-
-    private List<string> startupArgs;
-
-    private Rect screenRect;
 
     void Start()
     {
-        menuCamTex = menuOverlay.GetComponent<Overlay_CameraTexture>();
-
         winH = GetComponent<Window_Handler>();
         openVR = GetComponent<OpenVR_Unity>();
 
         startupArgs = new List<string>(System.Environment.GetCommandLineArgs());
-        screenRect = new Rect(0, 0, targetWindowWidth, targetWindowHeight);
 
         options = LoadLocalOpts();
 
@@ -120,12 +112,6 @@ public class Director : MonoBehaviour
         SetWindowSize();
     }
 
-    void OnApplicationQuit()
-    {
-        if (steamClient != null)
-            steamClient.Dispose();
-    }
-
     void Update()
     {
         timeSinceLastLogCheck += Time.deltaTime;
@@ -143,6 +129,10 @@ public class Director : MonoBehaviour
         if (!curOpts.Equals(options.cleaned))
             ApplyOptions(curOpts);
 
+        if (!options.ShowMainWindow && winH.WindowVisible)
+            winH.HideWindow();
+        else if (options.ShowMainWindow && !winH.WindowVisible)
+            winH.ShowWindow();
 
         if (options.EnableSteamworks && steamClient == null)
         {
@@ -163,10 +153,7 @@ public class Director : MonoBehaviour
         else if (options.EnableSteamworks && steamClient != null)
             steamClient.Update();
         else if (!options.EnableSteamworks && steamClient != null)
-        {
-            steamClient.Dispose();
-            steamClient = null;
-        }
+            winH.CloseAndRestartApp();
 
         if (turnsignalActive)
         {
@@ -179,11 +166,6 @@ public class Director : MonoBehaviour
         }
         else if (floorOverlay.enabled)
             floorOverlay.enabled = false;
-
-        if (options.HideMainWindow && !winH.windowHidden)
-            winH.HideWindow();
-        else if (!options.HideMainWindow && winH.windowHidden)
-            winH.ShowWindow();
     }
 
     void ApplyOptions(TurnSignalOptions opts)

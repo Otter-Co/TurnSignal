@@ -6083,7 +6083,9 @@ namespace Valve.VR
             {
                 VRToken = InitInternal2(ref peError, eApplicationType, pchStartupInfo);
             }
+#pragma warning disable CS0168 // The variable 'e' is declared but never used
             catch (EntryPointNotFoundException e)
+#pragma warning restore CS0168 // The variable 'e' is declared but never used
             {
                 VRToken = InitInternal(ref peError, eApplicationType);
             }

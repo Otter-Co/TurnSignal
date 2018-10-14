@@ -39,6 +39,12 @@ public class OpenVR_Unity : MonoBehaviour
             ConnectToOpenVR();
     }
 
+    void OnApplicationQuit()
+    {
+        if (connectedToOpenVR)
+            OpenVR.Shutdown();
+    }
+
     void Update()
     {
         if (!OVR.StartedUp && tryUntilConnect)

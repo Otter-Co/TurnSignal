@@ -17,7 +17,7 @@ public struct TurnSignalOptions
     public float? timestamp;
     public bool StartWithSteamVR;
     public bool EnableSteamworks;
-    public bool HideMainWindow;
+    public bool ShowMainWindow;
 
     public bool FollowPlayerHeadeset;
     public bool UseChaperoneColor;
@@ -48,7 +48,7 @@ public struct TurnSignalOptions
         timestamp = null,
         StartWithSteamVR = true,
         EnableSteamworks = true,
-        HideMainWindow = true,
+        ShowMainWindow = true,
         FollowPlayerHeadeset = false,
         UseChaperoneColor = false,
         LinkOpatWithTwist = false,

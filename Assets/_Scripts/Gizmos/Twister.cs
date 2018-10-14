@@ -91,6 +91,10 @@ public class Twister : MonoBehaviour
     Vector3[] GetBezierCirclePoints()
     {
         Vector3[] curves = new Vector3[curvePointCount];
+
+        if (bezierOptArray == null || bezierOptArray.Length != curvePointCount)
+            bezierOptArray = new Vector3[curvePointCount];
+
         curves[0] = new Vector3(0, 0, 0);
 
         for (int i = 1; i < curvePointCount; i++)
@@ -163,14 +167,12 @@ public class Twister : MonoBehaviour
         return new Vector3(Mathf.Sin(prog), 0, -Mathf.Cos(prog));
     }
 
-    static List<Vector3> bezierOptArray = new List<Vector3>();
+    static Vector3[] bezierOptArray = null;
     static Vector3 Bezier(Vector3[] points, float prog)
     {
-        bezierOptArray.Clear();
-        bezierOptArray.AddRange(points);
-
-        int indOffset = bezierOptArray.Count;
-
+        points.CopyTo(bezierOptArray, 0);
+        
+        int indOffset = bezierOptArray.Length;
         while ((indOffset -= 1) > 1)
             for (int i = 0; i < indOffset; i++)
                 bezierOptArray[i] = Vector3.Lerp(

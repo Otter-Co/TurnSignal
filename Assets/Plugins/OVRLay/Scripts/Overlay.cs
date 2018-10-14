@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
@@ -112,12 +110,27 @@ namespace OVRLay
         public D_OnKeyboardClose OnKeyboardClose = (eventT) => { };
         public delegate void D_OnKeyboardInput(VREvent_t eventT, string minimal, string full);
         public D_OnKeyboardInput OnKeyboardInput = (eventT, minimal, full) => { };
+
+        public delegate void D_OnScroll(VREvent_t eventT);
+        public D_OnScroll OnScroll = (eventT) => { };
         public delegate void D_OnMouseMove(VREvent_t eventT);
         public D_OnMouseMove OnMouseMove = (eventT) => { };
         public delegate void D_OnMouseDown(VREvent_t eventT);
         public D_OnMouseDown OnMouseDown = (eventT) => { };
         public delegate void D_OnMouseUp(VREvent_t eventT);
         public D_OnMouseUp OnMouseUp = (eventT) => { };
+
+        public delegate void D_OnDualAnalogMove(VREvent_t eventT);
+        public D_OnDualAnalogMove OnDualAnalogMove = (eventT) => { };
+        public delegate void D_OnDualAnalogTouch(VREvent_t eventT, bool state);
+        public D_OnDualAnalogTouch OnDualAnalogTouch = (eventT, state) => { };
+        public delegate void D_OnDualAnalogPress(VREvent_t eventT, bool state);
+        public D_OnDualAnalogPress OnDualAnalogPress = (eventT, state) => { };
+        public delegate void D_OnDualAnalogModeSwitch(VREvent_t eventT, int oneOrtwo);
+        public D_OnDualAnalogModeSwitch OnDualAnalogModeSwitch = (eventT, oneOrTwo) => { };
+        public delegate void D_OnDualAnalogCancel(VREvent_t eventT);
+        public D_OnDualAnalogCancel OnDualAnalogCancel = (eventT) => { };
+
         public delegate void D_OnError(string error);
         public D_OnError OnError = (error) => { };
 
@@ -129,7 +142,6 @@ namespace OVRLay
                 switch ((EVREventType)event_T.eventType)
                 {
                     case EVREventType.VREvent_FocusEnter:
-                        Debug.Log("Has Focus!");
                         HasFocus = true;
                         OnFocusChange(event_T, true);
                         break;
@@ -164,6 +176,9 @@ namespace OVRLay
                             OnKeyboardInput(event_T, event_T.data.keyboard.cNewInput, fullTxt);
                             break;
                         }
+                    case EVREventType.VREvent_Scroll:
+                        OnScroll(event_T);
+                        break;
 
                     case EVREventType.VREvent_MouseMove:
                         OnMouseMove(event_T);
@@ -173,6 +188,31 @@ namespace OVRLay
                         break;
                     case EVREventType.VREvent_MouseButtonUp:
                         OnMouseUp(event_T);
+                        break;
+
+                    case EVREventType.VREvent_DualAnalog_Move:
+                        OnDualAnalogMove(event_T);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_Touch:
+                        OnDualAnalogTouch(event_T, true);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_Untouch:
+                        OnDualAnalogTouch(event_T, false);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_Press:
+                        OnDualAnalogPress(event_T, false);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_Unpress:
+                        OnDualAnalogPress(event_T, false);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_ModeSwitch1:
+                        OnDualAnalogModeSwitch(event_T, 1);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_ModeSwitch2:
+                        OnDualAnalogModeSwitch(event_T, 2);
+                        break;
+                    case EVREventType.VREvent_DualAnalog_Cancel:
+                        OnDualAnalogCancel(event_T);
                         break;
 
                     default:

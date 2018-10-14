@@ -76,7 +76,7 @@ PlayerSettings:
   submitAnalytics: 1
   usePlayerLog: 1
   bakeCollisionMeshes: 0
-  forceSingleInstance: 1
+  forceSingleInstance: 0
   resizableWindow: 0
   useMacAppStoreValidation: 0
   macAppStoreCategory: public.app-category.games
@@ -639,5 +639,5 @@ PlayerSettings:
   projectName: TurnSignal
   organizationId: otter-co
   cloudEnabled: 0
-  enableNativePlatformBackendsForNewInputSystem: 1
-  disableOldInputManagerSupport: 1
+  enableNativePlatformBackendsForNewInputSystem: 0
+  disableOldInputManagerSupport: 0
