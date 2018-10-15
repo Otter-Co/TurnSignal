@@ -14,30 +14,24 @@ public class Overlay_Transform : MonoBehaviour
     public OpenVR_DeviceTracker.DeviceType relativeDevice = OpenVR_DeviceTracker.DeviceType.Hmd;
     public int customDeviceIndex;
 
-    private Overlay_Unity u_overlay;
-    private OVRLay.OVRLay overlay;
-
-    private Vector3 lastPos = Vector3.zero;
-    private Vector3 lastRot = Vector3.zero;
-
     private ETrackingUniverseOrigin lastTransformOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding;
     private VROverlayTransformType lastTransformType = VROverlayTransformType.VROverlayTransform_Absolute;
     private OpenVR_DeviceTracker.DeviceType lastRelativeDevice = OpenVR_DeviceTracker.DeviceType.Hmd;
+
     private int lastCustomIndex = 0;
+
+    private Vector3 lastPos = Vector3.zero;
+    private Vector3 lastRot = Vector3.zero;
+    
+    private OVRLay.OVRLay overlay;
 
     void Update()
     {
         if (overlay == null)
-        {
-            u_overlay = GetComponent<Overlay_Unity>();
+            if ((overlay = GetComponent<Overlay_Unity>()?.overlay) == null)
+                return;
 
-            if (u_overlay.overlay != null)
-                overlay = u_overlay.overlay;
-
-            return;
-        }
-
-        if (overlay.Created && (
+        if (overlay.Ready && (
             transform.eulerAngles != lastRot ||
             transform.position != lastPos ||
             transformOrigin != lastTransformOrigin ||
@@ -46,6 +40,14 @@ public class Overlay_Transform : MonoBehaviour
             customDeviceIndex != lastCustomIndex
             ))
         {
+            lastRot = transform.eulerAngles;
+            lastPos = transform.position;
+            lastTransformOrigin = transformOrigin;
+            lastTransformType = transformType;
+            lastCustomIndex = customDeviceIndex;
+            lastRelativeDevice = relativeDevice;
+
+
             overlay.TransformType = transformType;
             overlay.TransformAbsoluteTrackingOrigin = transformOrigin;
             overlay.TransformTrackedDeviceRelativeIndex = OpenVR_DeviceTracker.GetDeviceIndex(
@@ -53,8 +55,7 @@ public class Overlay_Transform : MonoBehaviour
                 (uint)customDeviceIndex
             );
 
-            var mat = new OVRLay.Utility.RigidTransform(transform.position, transform.rotation).ToHmdMatrix34();
-
+            var mat = OVRLay.Utility.RigidTransform.FromLocal(transform).ToHmdMatrix34();
             switch (transformType)
             {
                 default:
@@ -65,13 +66,6 @@ public class Overlay_Transform : MonoBehaviour
                     overlay.TransformTrackedDeviceRelative = mat;
                     break;
             }
-
-            lastRot = transform.eulerAngles;
-            lastPos = transform.position;
-            lastTransformOrigin = transformOrigin;
-            lastTransformType = transformType;
-            lastCustomIndex = customDeviceIndex;
-            lastRelativeDevice = relativeDevice;
         }
     }
 }

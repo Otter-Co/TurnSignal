@@ -15,6 +15,14 @@ public class Director : MonoBehaviour
     public void SetIdleMode() => targetFPS = idleFPS;
     public void SetActiceMode() => targetFPS = activeFPS;
 
+    public void ToggleMode(bool active)
+    {
+        if (active)
+            SetActiceMode();
+        else
+            SetIdleMode();
+    }
+
     public void ToggleShowWindow() =>
         menuHandler.hideMainWindowToggle.isOn = !menuHandler.hideMainWindowToggle.isOn;
     public void QuitApp() => Application.Quit();
@@ -29,9 +37,6 @@ public class Director : MonoBehaviour
     public Twister twister;
 
     [Header("App Internal Settings")]
-    public int targetWindowWidth = 1280;
-    public int targetWindowHeight = 800;
-    [Space(10)]
     public int activeFPS = 90;
     public int idleFPS = 5;
     [Space(10)]
@@ -54,21 +59,18 @@ public class Director : MonoBehaviour
     public int maxLogSizeInMB = 5;
     public float timeInSecondsBetweenChecks = 10f;
 
-    private int currentFPS = 0;
     private int targetFPS = 0;
+    private int currentFPS = 0;
 
-    [HideInInspector]
-    public Window_Handler winH;
-    [HideInInspector]
-    public OpenVR_Unity openVR;
-    [HideInInspector]
-    public Client steamClient;
-
+    private Window_Handler winH;
+    private OpenVR_Unity openVR;
     private List<string> startupArgs;
 
     private bool dashboardOpen = false;
     private bool turnsignalActive = true;
     private float timeSinceLastLogCheck = 0f;
+
+    private bool steamConfigured = false;
 
     void Start()
     {
@@ -77,12 +79,10 @@ public class Director : MonoBehaviour
 
         startupArgs = new List<string>(System.Environment.GetCommandLineArgs());
 
-        options = LoadLocalOpts();
+        ApplyOptions(LoadLocalOpts());
 
         if (disableSteamworksInEditor && Application.isEditor)
-        {
             options.EnableSteamworks = false;
-        }
 
         if (!options.EnableSteamworks && startupArgs.Find(arg => arg.ToLower().Equals("--steam")) != null)
         {
@@ -91,25 +91,11 @@ public class Director : MonoBehaviour
         }
         else if (options.EnableSteamworks)
         {
-            try
-            {
-                Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
-                steamClient = new Client(appID);
+            var cloudOpts = LoadCloudOpts();
 
-                var cloudOpts = LoadCloudOpts();
-                if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
-                    options = cloudOpts;
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
+            if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
+                ApplyOptions(cloudOpts);
         }
-
-        ApplyOptions(options);
-        menuHandler.SetUIValues(options);
-
-        SetWindowSize();
     }
 
     void Update()
@@ -125,35 +111,13 @@ public class Director : MonoBehaviour
             Application.targetFrameRate = currentFPS = targetFPS;
 
         var curOpts = menuHandler.GetUIValues();
-
-        if (!curOpts.Equals(options.cleaned))
+        if (!curOpts.cleaned.Equals(options.cleaned))
             ApplyOptions(curOpts);
 
         if (!options.ShowMainWindow && winH.WindowVisible)
             winH.HideWindow();
         else if (options.ShowMainWindow && !winH.WindowVisible)
             winH.ShowWindow();
-
-        if (options.EnableSteamworks && steamClient == null)
-        {
-            try
-            {
-                Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
-                steamClient = new Client(appID);
-
-                var cloudOpts = LoadCloudOpts();
-                if (cloudOpts.timestamp != null && cloudOpts.timestamp > options.timestamp)
-                    options = cloudOpts;
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-        }
-        else if (options.EnableSteamworks && steamClient != null)
-            steamClient.Update();
-        else if (!options.EnableSteamworks && steamClient != null)
-            winH.CloseAndRestartApp();
 
         if (turnsignalActive)
         {
@@ -166,67 +130,6 @@ public class Director : MonoBehaviour
         }
         else if (floorOverlay.enabled)
             floorOverlay.enabled = false;
-    }
-
-    void ApplyOptions(TurnSignalOptions opts)
-    {
-        if (openVR != null && openVR.connectedToOpenVR)
-        {
-            OVRLay.OVR.Applications.SetApplicationAutoLaunch(
-                        pchAppKey,
-                        opts.StartWithSteamVR
-                    );
-
-            floorHandler.maxTurns = (int)opts.TwistRate;
-
-            if ((int)opts.PetalCount != twister.petalCount)
-                twister.petalCount = opts.PetalCount > 0 ? (int)(opts.PetalCount) : twister.petalCount;
-
-            if (opts.UseChaperoneColor)
-                floorOverlay.settings.Color = openVR.GetChaperoneColor();
-            else
-                floorOverlay.settings.Color = UnityEngine.Color.white;
-
-            var oT = floorOverlay.GetComponent<Overlay_Transform>();
-            var fT = floorOverlay.transform;
-
-            if (opts.LinkOptions == TurnSignalLinkOpts.None)
-            {
-                floorOverlay.settings.WidthInMeters = opts.Scale;
-                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
-            }
-            else
-            {
-                OpenVR_DeviceTracker.DeviceType properIndex = 0;
-                if ((opts.LinkOptions & TurnSignalLinkOpts.RightFront) > 0)
-                    properIndex = OpenVR_DeviceTracker.DeviceType.RightController;
-                else if ((opts.LinkOptions & TurnSignalLinkOpts.LeftFront) > 0)
-                    properIndex = OpenVR_DeviceTracker.DeviceType.LeftController;
-
-                floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
-                oT.relativeDevice = properIndex;
-                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
-            }
-        }
-
-        opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-
-        bool localGood = SaveLocalOpts(opts),
-            cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
-
-        if (localGood)
-            Debug.Log("Succesfully wrote Local Options to File: \n" + GetRootDir() + optionsFilename);
-        else
-            Debug.Log("Error writing Local Options to File: \n" + GetRootDir() + optionsFilename);
-
-        if (opts.EnableSteamworks && cloudGood)
-            Debug.Log("Succesfully Wrote Options to SteamCloud.");
-        else if (opts.EnableSteamworks)
-            Debug.Log("Error writing Options file to SteamCloud.");
-        else
-            Debug.Log("Skipping Options file SteamCloud Write.");
-
-        options = opts;
     }
 
     void UpdateFloorOverlay()
@@ -275,17 +178,68 @@ public class Director : MonoBehaviour
         }
     }
 
-    // Recursion DOOMSDAY
-    public void SetWindowSize(int lvl = 0, int maxLvl = 5)
+    void ApplyOptions(TurnSignalOptions opts)
     {
-        if (Screen.width != targetWindowWidth || Screen.height != targetWindowHeight)
-            Screen.SetResolution(targetWindowWidth, targetWindowHeight, false);
-
-        if (Screen.width != targetWindowWidth || Screen.height != targetWindowHeight)
+        if (openVR != null && openVR.connectedToOpenVR)
         {
-            if (lvl < maxLvl)
-                SetWindowSize(lvl + 1, maxLvl);
+            OVRLay.OVR.Applications.SetApplicationAutoLaunch(
+                        pchAppKey,
+                        opts.StartWithSteamVR
+                    );
+
+            floorHandler.maxTurns = (int)opts.TwistRate;
+
+            if ((int)opts.PetalCount != twister.petalCount)
+                twister.petalCount = opts.PetalCount > 0 ? (int)(opts.PetalCount) : twister.petalCount;
+
+            if (opts.UseChaperoneColor)
+                floorOverlay.settings.Color = openVR.GetChaperoneColor();
+            else
+                floorOverlay.settings.Color = UnityEngine.Color.white;
+
+            var oT = floorOverlay.GetComponent<Overlay_Transform>();
+            var fT = floorOverlay.transform;
+
+            if (opts.LinkOptions == TurnSignalLinkOpts.None)
+            {
+                floorOverlay.settings.WidthInMeters = opts.Scale;
+                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_Absolute;
+            }
+            else
+            {
+                OpenVR_DeviceTracker.DeviceType properIndex = 0;
+
+                if ((opts.LinkOptions & TurnSignalLinkOpts.RightFront) > 0)
+                    properIndex = OpenVR_DeviceTracker.DeviceType.RightController;
+                else if ((opts.LinkOptions & TurnSignalLinkOpts.LeftFront) > 0)
+                    properIndex = OpenVR_DeviceTracker.DeviceType.LeftController;
+
+                floorOverlay.settings.WidthInMeters = (opts.Scale * handLinkSizeMultiplier);
+                oT.relativeDevice = properIndex;
+                oT.transformType = Valve.VR.VROverlayTransformType.VROverlayTransform_TrackedDeviceRelative;
+            }
         }
+
+        opts.timestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+        bool localGood = SaveLocalOpts(opts);
+
+        if (localGood)
+            Debug.Log("Succesfully wrote Local Options to File: \n" + GetRootDir() + optionsFilename);
+        else
+            Debug.Log("Error writing Local Options to File: \n" + GetRootDir() + optionsFilename);
+
+        bool cloudGood = (opts.EnableSteamworks) ? SaveCloudOpts(opts) : true;
+
+        if (opts.EnableSteamworks && cloudGood)
+            Debug.Log("Succesfully Wrote Options to SteamCloud.");
+        else if (opts.EnableSteamworks)
+            Debug.Log("Error writing Options file to SteamCloud.");
+        else
+            Debug.Log("Skipping Options file SteamCloud Write.");
+
+        options = opts;
+        menuHandler.SetUIValues(opts);
     }
 
     public enum RootDirOpt
@@ -312,27 +266,21 @@ public class Director : MonoBehaviour
     }
     public TurnSignalOptions LoadLocalOpts()
     {
+        if (rootDirectory == RootDirOpt.DontSave)
+            return TurnSignalOptions.DefaultOptions;
+
         string fullPath = GetRootDir() + optionsFilename;
 
         if (File.Exists(fullPath))
             return JsonUtility.FromJson<TurnSignalOptions>(File.ReadAllText(fullPath));
         else
+        {
+            Debug.Log("Could not find Preferences File!");
             return TurnSignalOptions.DefaultOptions;
+        }
+
     }
-    public TurnSignalOptions LoadCloudOpts()
-    {
-        if (
-            steamClient?.RemoteStorage != null &&
-            steamClient.RemoteStorage.IsCloudEnabledForAccount &&
-            steamClient.RemoteStorage.IsCloudEnabledForApp &&
-            steamClient.RemoteStorage.FileExists(optionsFilename)
-        )
-            return JsonUtility.FromJson<TurnSignalOptions>(
-                steamClient.RemoteStorage.ReadString(optionsFilename)
-            );
-        else
-            return options;
-    }
+
     public bool SaveLocalOpts(TurnSignalOptions opts)
     {
         if (rootDirectory == RootDirOpt.DontSave)
@@ -347,21 +295,72 @@ public class Director : MonoBehaviour
 
         return (File.Exists(fullPath));
     }
+
+    public TurnSignalOptions LoadCloudOpts()
+    {
+        if (rootDirectory == RootDirOpt.DontSave)
+            return options;
+
+        if (!steamConfigured)
+        {
+            Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
+            steamConfigured = true;
+        }
+
+        using (Client steam = new Client(appID))
+        {
+            try
+            {
+                if (
+                    steam?.RemoteStorage != null &&
+                    steam.RemoteStorage.IsCloudEnabledForAccount &&
+                    steam.RemoteStorage.IsCloudEnabledForApp &&
+                    steam.RemoteStorage.FileExists(optionsFilename)
+                )
+                    return JsonUtility.FromJson<TurnSignalOptions>(
+                        steam.RemoteStorage.ReadString(optionsFilename)
+                    );
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        return options;
+    }
+
     public bool SaveCloudOpts(TurnSignalOptions opts)
     {
         if (rootDirectory == RootDirOpt.DontSave)
             return true;
 
-        if (
-            steamClient?.RemoteStorage != null &&
-            steamClient.RemoteStorage.IsCloudEnabledForAccount &&
-            steamClient.RemoteStorage.IsCloudEnabledForApp
-        )
+        if (!steamConfigured)
         {
-            if (!steamClient.RemoteStorage.FileExists(optionsFilename))
-                steamClient.RemoteStorage.CreateFile(optionsFilename);
+            Facepunch.Steamworks.Config.ForUnity(Application.platform.ToString());
+            steamConfigured = true;
+        }
 
-            return steamClient.RemoteStorage.WriteString(optionsFilename, JsonUtility.ToJson(opts));
+        using (Client steam = new Client(appID))
+        {
+            try
+            {
+                if (
+                steam?.RemoteStorage != null &&
+                steam.RemoteStorage.IsCloudEnabledForAccount &&
+                steam.RemoteStorage.IsCloudEnabledForApp
+                )
+                {
+                    if (!steam.RemoteStorage.FileExists(optionsFilename))
+                        steam.RemoteStorage.CreateFile(optionsFilename);
+
+                    return steam.RemoteStorage.WriteString(optionsFilename, JsonUtility.ToJson(opts));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
         }
 
         return false;
@@ -396,5 +395,7 @@ public class Director : MonoBehaviour
             Debug.Log(err);
         }
     }
+
+
 }
 

@@ -39,32 +39,29 @@ public class OpenVR_Unity : MonoBehaviour
             ConnectToOpenVR();
     }
 
-    void OnApplicationQuit()
-    {
-        if (connectedToOpenVR)
-            OpenVR.Shutdown();
-    }
-
     void Update()
     {
         if (!OVR.StartedUp && tryUntilConnect)
         {
-            if (timeSinceLastTry < timeBetweenTries)
-                timeSinceLastTry += Time.deltaTime;
-            else
+            if (timeSinceLastTry >= timeBetweenTries)
             {
                 ConnectToOpenVR();
                 timeSinceLastTry = 0f;
             }
-
-            return;
+            else
+                timeSinceLastTry += Time.deltaTime;
         }
+        else if (OVR.StartedUp)
+        {
+            OVR.UpdateEvents();
+            OVRLay.Pose.UpdatePoses();
+        }
+    }
 
-        if (autoUpdatePoses)
-            UpdatePoses();
-
-        if (pollForEvents)
-            PollForEvents();
+    void OnApplicationQuit()
+    {
+        if (connectedToOpenVR)
+            DisconnectFromOpenVR();
     }
 
     public void ConnectToOpenVR()
@@ -74,7 +71,6 @@ public class OpenVR_Unity : MonoBehaviour
             connectedToOpenVR = true;
             OpenVRConnected.Invoke();
         }
-
     }
 
     public void DisconnectFromOpenVR()
@@ -87,39 +83,18 @@ public class OpenVR_Unity : MonoBehaviour
         }
     }
 
-    public void PollForEvents()
-    {
-        if (OVR.StartedUp)
-            OVR.UpdateEvents();
-    }
-
-    public void UpdatePoses()
-    {
-        if (OVR.StartedUp)
-            OVRLay.Pose.UpdatePoses();
-    }
-
+    private Color _chapColor = Color.white;
+    private EVRSettingsError _chapColorError = EVRSettingsError.None;
     public Color GetChaperoneColor()
     {
-        Color ret = new Color(1, 1, 1, 1);
-
         if (OVR.Settings == null)
-            return ret;
+            return _chapColor;
 
-        var collSec = OpenVR.k_pch_CollisionBounds_Section;
-        var error = EVRSettingsError.None;
+        _chapColor.r = (int)(OVR.Settings.GetInt32(OpenVR.k_pch_CollisionBounds_Section, OpenVR.k_pch_CollisionBounds_ColorGammaR_Int32, ref _chapColorError) / 255);
+        _chapColor.g = (OVR.Settings.GetInt32(OpenVR.k_pch_CollisionBounds_Section, OpenVR.k_pch_CollisionBounds_ColorGammaG_Int32, ref _chapColorError) / 255);
+        _chapColor.b = (OVR.Settings.GetInt32(OpenVR.k_pch_CollisionBounds_Section, OpenVR.k_pch_CollisionBounds_ColorGammaB_Int32, ref _chapColorError) / 255);
+        _chapColor.a = (OVR.Settings.GetInt32(OpenVR.k_pch_CollisionBounds_Section, OpenVR.k_pch_CollisionBounds_ColorGammaA_Int32, ref _chapColorError) / 255);
 
-        int r = 255, g = 255, b = 255, a = 255;
-        r = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaR_Int32, ref error);
-        g = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaG_Int32, ref error);
-        b = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaB_Int32, ref error);
-        a = OVR.Settings.GetInt32(collSec, OpenVR.k_pch_CollisionBounds_ColorGammaA_Int32, ref error);
-
-        ret.r = (float)r / 255;
-        ret.g = (float)g / 255;
-        ret.b = (float)b / 255;
-        ret.a = (float)a / 255;
-
-        return ret;
+        return _chapColor;
     }
 }

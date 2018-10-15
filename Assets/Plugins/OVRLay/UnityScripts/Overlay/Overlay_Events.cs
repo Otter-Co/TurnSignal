@@ -6,13 +6,13 @@ using Valve.VR;
 [RequireComponent(typeof(Overlay_Unity))]
 public class Overlay_Events : MonoBehaviour
 {
-    private Overlay_Unity u_overlay;
-    private OVRLay.OVRLay overlay;
+
 
     [Serializable] public class BoolEvent : UnityEvent<bool> { }
     [Serializable] public class VoidEvent : UnityEvent { }
     [Serializable] public class StringEvent : UnityEvent<string> { };
     [Serializable] public class DoubleStringEvent : UnityEvent<string, string> { }
+    [Serializable] public class VREventEvent : UnityEvent<VREvent_t> { }
 
     public BoolEvent OnDashboardChange;
     public BoolEvent OnFocusChange;
@@ -21,13 +21,13 @@ public class Overlay_Events : MonoBehaviour
     public VoidEvent OnKeyboardClose;
     public DoubleStringEvent OnKeyboardInput;
     public StringEvent OnError;
+    public VREventEvent OnOtherEvent;
 
     private bool setup = false;
+    private OVRLay.OVRLay overlay;
 
     void Start()
     {
-        u_overlay = GetComponent<Overlay_Unity>();
-
         if (OnDashboardChange == null)
             OnDashboardChange = new BoolEvent();
 
@@ -48,17 +48,16 @@ public class Overlay_Events : MonoBehaviour
 
         if (OnError == null)
             OnError = new StringEvent();
+
+        if (OnOtherEvent == null)
+            OnOtherEvent = new VREventEvent();
     }
 
     void Update()
     {
-        if (!setup && u_overlay.overlay != null)
+        if (!setup && overlay == null)
         {
-            u_overlay = GetComponent<Overlay_Unity>();
-
-            if (u_overlay.overlay != null)
-                overlay = u_overlay.overlay;
-            else
+            if ((overlay = GetComponent<Overlay_Unity>()?.overlay) == null)
                 return;
 
             overlay.OnDashboardChange += (eventT, active) => OnDashboardChange.Invoke(active);
@@ -68,6 +67,7 @@ public class Overlay_Events : MonoBehaviour
             overlay.OnKeyboardClose += (eventT) => OnKeyboardClose.Invoke();
             overlay.OnKeyboardInput += (eventT, m, f) => OnKeyboardInput.Invoke(m, f);
             overlay.OnError += (err) => OnError.Invoke(err);
+            overlay.OnOtherEvent += (eventT) => OnOtherEvent.Invoke(eventT);
 
             setup = true;
         }

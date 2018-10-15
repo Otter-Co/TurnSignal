@@ -1,8 +1,8 @@
-using UnityEngine;
-using Valve.VR;
-
 namespace OVRLay
 {
+    using UnityEngine;
+    using Valve.VR;
+
     public class OVRLay
     {
         private static readonly uint EVENT_SIZE = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(Valve.VR.VREvent_t));
@@ -16,6 +16,9 @@ namespace OVRLay
         public bool Created { get; private set; }
         public bool Ready { get => OVR.Overlay != null && Created; }
         public bool HasFocus { get; private set; }
+
+        public int CurrentTextureWidth = 0;
+        public int CurrentTextureHeight = 0;
 
         public EVROverlayError lastError { get; private set; } = EVROverlayError.None;
 
@@ -134,10 +137,15 @@ namespace OVRLay
         public delegate void D_OnError(string error);
         public D_OnError OnError = (error) => { };
 
+        public delegate void D_OnOtherEvent(VREvent_t eventT);
+        public D_OnOtherEvent OnOtherEvent = (eventT) => { };
+
         private VREvent_t event_T = new VREvent_t();
+        private const int _eventLoopMaxSaftey = 100;
         public void UpdateEvents()
         {
-            while (OVR.Overlay.PollNextOverlayEvent(Handle, ref event_T, EVENT_SIZE))
+            int currentLoops = 0;
+            while (currentLoops++ <= _eventLoopMaxSaftey && OVR.Overlay.PollNextOverlayEvent(Handle, ref event_T, EVENT_SIZE))
             {
                 switch ((EVREventType)event_T.eventType)
                 {
@@ -214,9 +222,8 @@ namespace OVRLay
                     case EVREventType.VREvent_DualAnalog_Cancel:
                         OnDualAnalogCancel(event_T);
                         break;
-
                     default:
-                        Debug.Log(((EVREventType)(event_T.eventType)).ToString());
+                        OnOtherEvent(event_T);
                         break;
                 }
             }
@@ -391,6 +398,9 @@ namespace OVRLay
                     eColorSpace = EColorSpace.Auto,
                     eType = TextureType
                 };
+
+                CurrentTextureWidth = value.width;
+                CurrentTextureHeight = value.height;
 
                 ErrorCheck(lastError = OVR.Overlay.SetOverlayTexture(Handle, ref t));
             }

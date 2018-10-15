@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -88,6 +91,49 @@ public class Twister : MonoBehaviour
         }
     }
 
+    void CreateLineRenderers(int count, Transform parent)
+    {
+        lineRends = new LineRenderer[count];
+        for (int i = 0; i < count; i++)
+            lineRends[i] = CreateLineRenderer(baseLine.gameObject, i, parent);
+    }
+
+    void DestroyLineHolder()
+    {
+        var existing = transform.Find("LineHolder")?.gameObject;
+
+        if (Application.isEditor)
+        {
+            DestroyImmediate(existing);
+            DestroyImmediate(lineHolder);
+        }
+        else
+        {
+            Destroy(existing);
+            Destroy(lineHolder);
+        }
+    }
+
+    GameObject CreateLineHolder()
+    {
+        var lineH = new GameObject("LineHolder");
+        lineH.transform.parent = transform;
+        lineH.transform.localPosition = Vector3.zero;
+        return lineH;
+    }
+
+
+    static LineRenderer CreateLineRenderer(GameObject baseLine, int index, Transform parent)
+    {
+        var lineRend = Instantiate(baseLine).GetComponent<LineRenderer>();
+
+        lineRend.gameObject.name = "Line " + index;
+        lineRend.gameObject.SetActive(true);
+        lineRend.gameObject.transform.parent = parent;
+
+        return lineRend;
+    }
+
     Vector3[] GetBezierCirclePoints()
     {
         Vector3[] curves = new Vector3[curvePointCount];
@@ -118,49 +164,6 @@ public class Twister : MonoBehaviour
         return (PositionOnCircle(prog * twist) * localRadius) + offset;
     }
 
-    void CreateLineRenderers(int count, Transform parent)
-    {
-        lineRends = new LineRenderer[count];
-        for (int i = 0; i < count; i++)
-            lineRends[i] = GetLineRenderer(baseLine.gameObject, i, parent);
-    }
-
-    void DestroyLineHolder()
-    {
-        var existing = transform.Find("LineHolder")?.gameObject;
-
-        if (Application.isEditor)
-        {
-            DestroyImmediate(existing);
-            DestroyImmediate(lineHolder);
-        }
-        else
-        {
-            Destroy(existing);
-            Destroy(lineHolder);
-        }
-    }
-
-    GameObject CreateLineHolder()
-    {
-        var lineH = new GameObject("LineHolder");
-        lineH.transform.parent = transform;
-        lineH.transform.localPosition = Vector3.zero;
-        return lineH;
-    }
-
-
-    static LineRenderer GetLineRenderer(GameObject baseLine, int index, Transform parent)
-    {
-        var lineRend = Instantiate(baseLine).GetComponent<LineRenderer>();
-
-        lineRend.gameObject.name = "Line " + index;
-        lineRend.gameObject.SetActive(true);
-        lineRend.gameObject.transform.parent = parent;
-
-        return lineRend;
-    }
-
     static Vector3 PositionOnCircle(float prog)
     {
         prog = prog * (Mathf.PI * 2);
@@ -171,7 +174,7 @@ public class Twister : MonoBehaviour
     static Vector3 Bezier(Vector3[] points, float prog)
     {
         points.CopyTo(bezierOptArray, 0);
-        
+
         int indOffset = bezierOptArray.Length;
         while ((indOffset -= 1) > 1)
             for (int i = 0; i < indOffset; i++)
@@ -182,5 +185,17 @@ public class Twister : MonoBehaviour
                 );
 
         return bezierOptArray[0];
+    }
+
+    private struct BezierJob : IJob
+    {
+        public float progress;
+
+        public NativeArray<Vector3> outputs;
+
+        public void Execute()
+        {
+
+        }
     }
 }

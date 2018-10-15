@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using Valve.VR;
-
 namespace OVRLay
 {
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Valve.VR;
+
     public static class Utility
     {
         public static HmdVector3_t ToHMDVector(this Vector3 targ) =>

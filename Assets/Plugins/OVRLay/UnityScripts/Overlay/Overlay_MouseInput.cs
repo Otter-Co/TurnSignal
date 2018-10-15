@@ -3,15 +3,13 @@ using UnityEngine.EventSystems;
 using Valve.VR;
 
 [RequireComponent(typeof(Overlay_Unity))]
-public class Overlay_MouseInput : MonoBehaviour
+public class Overlay_MouseInput : BaseInput
 {
     [Header("Overlay Mouse Input Settings")]
     public VROverlayInputMethod inputMethod = VROverlayInputMethod.None;
-
     [Space(10)]
     public bool simulateUnityInput = false;
     public EventSystem targetEventSystem;
-    public Vector2 mouseScreenPixelSize;
     [Space(10)]
     public Vector2 lastAdjustedMousePos;
 
@@ -34,27 +32,66 @@ public class Overlay_MouseInput : MonoBehaviour
     public bool dualAnalogLeftPress = false;
 
     private HmdVector2_t mouseScale = new HmdVector2_t() { v0 = 1f, v1 = 1f };
-    private float reverseAspect = 0f;
-
-    private int widthMulti = 0;
-    private int heightMulti = 0;
-
-    private Overlay_Unity u_overlay;
     public OVRLay.OVRLay overlay;
+    private bool overlayValid { get => (overlay != null && overlay.Ready && overlay.Visible && overlay.HasFocus); }
 
-    private Overlay_MouseBaseInput inputOverride;
-
-    public Vector2 GetAdjustMousePos()
+    void Update()
     {
-        float mouseX = widthMulti * rawMousePosition.x;
-        float mouseY = heightMulti * (1f - (rawMousePosition.y / reverseAspect));
+        if (overlay == null)
+        {
+            if ((overlay = GetComponent<Overlay_Unity>()?.overlay) == null)
+                return;
+
+            overlay.OnScroll += (data) => UpdateScroll(data);
+
+            overlay.OnMouseMove += (data) => UpdateRawMousePosition(data);
+            overlay.OnMouseDown += (data) => UpdateRawMouseButton(data, true);
+            overlay.OnMouseUp += (data) => UpdateRawMouseButton(data, false);
+
+            overlay.OnDualAnalogMove += (data) => UpdateDAPosition(data);
+            overlay.OnDualAnalogTouch += (data, state) => UpdateDATouch(data, state);
+            overlay.OnDualAnalogPress += (data, state) => UpdateDAPress(data, state);
+        }
+
+        if (overlay.Ready)
+        {
+            mouseScale.v1 = overlay.CurrentTextureWidth != 0f ? (float)((float)overlay.CurrentTextureHeight / (float)overlay.CurrentTextureWidth) : 1f;
+
+            if (!overlay.MouseScale.Equals(mouseScale))
+                overlay.MouseScale = mouseScale;
+
+            if (overlay.InputMethod != inputMethod)
+                overlay.InputMethod = inputMethod;
+
+            if (simulateUnityInput)
+            {
+                if (targetEventSystem.currentInputModule.inputOverride != this)
+                    targetEventSystem.currentInputModule.inputOverride = this;
+
+                if (!targetEventSystem.isFocused)
+                    targetEventSystem.SendMessage("OnApplicationFocus", true);
+            }
+            else if (targetEventSystem.currentInputModule.inputOverride == this)
+                targetEventSystem.currentInputModule.inputOverride = null;
+        }
+    }
+
+    public Vector2 GetCurrentAdjustedMousePos()
+    {
+        if (!overlayValid)
+            return Vector2.zero;
+
+        float mouseX = overlay.CurrentTextureWidth * rawMousePosition.x;
+        float mouseY = overlay.CurrentTextureHeight * (1f - (
+            rawMousePosition.y / mouseScale.v1
+        ));
 
         mouseY = !float.IsNaN(mouseY) ? mouseY : 0;
 
         return new Vector2(mouseX, mouseY);
     }
 
-
+    #region Event Handlers
     void UpdateScroll(VREvent_t eventT)
     {
         rawScrollValue.x = eventT.data.scroll.xdelta;
@@ -126,51 +163,34 @@ public class Overlay_MouseInput : MonoBehaviour
                 break;
         }
     }
+    #endregion
 
-    void Update()
+    #region BaseInput Overrides
+    public override bool mousePresent { get => overlayValid ? inputMethod == VROverlayInputMethod.Mouse : base.mousePresent; }
+    public override Vector2 mouseScrollDelta { get => overlayValid ? rawScrollValue : base.mouseScrollDelta; }
+
+    public override Vector2 mousePosition { get => overlayValid ? GetCurrentAdjustedMousePos() : base.mousePosition; }
+
+    public override bool GetMouseButtonUp(int button) => !GetMouseButton(button);
+    public override bool GetMouseButtonDown(int button) => GetMouseButton(button);
+
+    public override bool GetMouseButton(int button)
     {
-        if (overlay == null)
+        if (!overlayValid)
+            return base.GetMouseButtonDown(button);
+
+        switch (button)
         {
-            u_overlay = GetComponent<Overlay_Unity>();
-
-            if (u_overlay.overlay != null)
-                overlay = u_overlay.overlay;
-            else
-                return;
-
-            overlay.OnScroll += (data) => UpdateScroll(data);
-
-            overlay.OnMouseMove += (data) => UpdateRawMousePosition(data);
-            overlay.OnMouseDown += (data) => UpdateRawMouseButton(data, true);
-            overlay.OnMouseUp += (data) => UpdateRawMouseButton(data, false);
-
-            overlay.OnDualAnalogMove += (data) => UpdateDAPosition(data);
-            overlay.OnDualAnalogTouch += (data, state) => UpdateDATouch(data, state);
-            overlay.OnDualAnalogPress += (data, state) => UpdateDAPress(data, state);
-
-
-            inputOverride = gameObject.AddComponent<Overlay_MouseBaseInput>().SetOverlayInput(this);
-            targetEventSystem.currentInputModule.inputOverride = inputOverride;
-
-            return;
-        }
-
-        if (overlay.Created)
-        {
-            int ttW = widthMulti = (int)mouseScreenPixelSize.x,
-                ttH = heightMulti = (int)mouseScreenPixelSize.y;
-
-            reverseAspect = (float)ttH / (float)ttW;
-            mouseScale.v1 = reverseAspect;
-
-            overlay.InputMethod = inputMethod;
-            overlay.MouseScale = mouseScale;
-
-            lastAdjustedMousePos = GetAdjustMousePos();
-
-            if (simulateUnityInput && !targetEventSystem.isFocused)
-                targetEventSystem.SendMessage("OnApplicationFocus", true);
+            case 0:
+                return leftMouseDown;
+            case 1:
+                return rightMouseDown;
+            case 2:
+                return middleMouseDown;
+            default:
+                return false;
         }
     }
+    #endregion
 }
 

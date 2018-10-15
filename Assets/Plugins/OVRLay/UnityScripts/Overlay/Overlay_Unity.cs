@@ -66,25 +66,28 @@ public class Overlay_Unity : MonoBehaviour
     private Overlay_Unity_Settings lastSettings = new Overlay_Unity_Settings();
     private Overlay_Unity_Flags lastFlags = new Overlay_Unity_Flags();
 
+    void Start()
+    {
+        overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, true);
+    }
+
     void Update()
     {
-        if (overlay == null && createWhenReady && OVRLay.OVR.StartedUp)
+        if (!overlay.Created && createWhenReady && OVRLay.OVR.StartedUp)
         {
-            overlay = new OVRLay.OVRLay(overlayName, overlayKey, isDashboardOverlay, !createWhenReady);
+            CreateOverlay();
             overlayCreated = overlay.Created;
-
-            return;
         }
 
-        if (overlay != null && overlay.Ready)
+        if (overlay.Ready)
         {
-            if (applySettingsEveryUpdate || !lastSettings.Equals(settings))
-                ApplySettings();
+            overlay.UpdateEvents();
 
             if (!lastFlags.Equals(flags))
                 ApplyFlags();
 
-            PollForEvents();
+            if (applySettingsEveryUpdate || !lastSettings.Equals(settings))
+                ApplySettings();
         }
 
         if (reportDebug)
@@ -142,12 +145,24 @@ public class Overlay_Unity : MonoBehaviour
         if (overlay == null)
             return;
 
-        overlay.WidthInMeters = settings.WidthInMeters;
-        overlay.Color = settings.Color;
-        overlay.Alpha = settings.Alpha;
-        overlay.TexelAspect = settings.TexelAspect;
-        overlay.Visible = settings.Visible;
-        overlay.HighQuality = settings.HighQuality;
+        if (overlay.WidthInMeters != settings.WidthInMeters)
+            overlay.WidthInMeters = settings.WidthInMeters;
+
+        if (overlay.Color != settings.Color)
+            overlay.Color = settings.Color;
+
+        if (overlay.Alpha != settings.Alpha)
+            overlay.Alpha = settings.Alpha;
+
+        if (overlay.TexelAspect != settings.TexelAspect)
+            overlay.TexelAspect = settings.TexelAspect;
+
+        if (overlay.Visible != settings.Visible)
+            overlay.Visible = settings.Visible;
+
+        if (overlay.HighQuality != settings.HighQuality)
+            overlay.HighQuality = settings.HighQuality;
+
 
         lastSettings = settings;
     }
@@ -157,29 +172,56 @@ public class Overlay_Unity : MonoBehaviour
         if (overlay == null)
             return;
 
-        overlay.Flag_Curved = flags.Flag_Curved;
-        overlay.Flag_RGSS4X = flags.Flag_RGSS4X;
-        overlay.Flag_NoDashboardTab = flags.Flag_NoDashboardTab;
-        overlay.Flag_AcceptsGamepadEvents = flags.Flag_AcceptsGamepadEvents;
-        overlay.Flag_ShowGamepadFocus = flags.Flag_ShowGamepadFocus;
-        overlay.Flag_SendVRScrollEvents = flags.Flag_SendVRScrollEvents;
-        overlay.Flag_SendVRTouchpadEvents = flags.Flag_SendVRTouchpadEvents;
-        overlay.Flag_ShowTouchPadScrollWheel = flags.Flag_ShowTouchPadScrollWheel;
-        overlay.Flag_TransferOwnershipToInternalProcess = flags.Flag_TransferOwnershipToInternalProcess;
-        overlay.Flag_SideBySide_Parallel = flags.Flag_SideBySide_Parallel;
-        overlay.Flag_SideBySide_Crossed = flags.Flag_SideBySide_Crossed;
-        overlay.Flag_Panorama = flags.Flag_Panorama;
-        overlay.Flag_StereoPanorama = flags.Flag_StereoPanorama;
-        overlay.Flag_SortWithNonSceneOverlays = flags.Flag_SortWithNonSceneOverlays;
-        overlay.Flag_VisibleInDashboard = flags.Flag_VisibleInDashboard;
+        if (overlay.Flag_Curved != flags.Flag_Curved) overlay.Flag_Curved = flags.Flag_Curved;
+
+        if (overlay.Flag_RGSS4X != flags.Flag_RGSS4X)
+            overlay.Flag_RGSS4X = flags.Flag_RGSS4X;
+
+        if (overlay.Flag_NoDashboardTab != flags.Flag_NoDashboardTab)
+            overlay.Flag_NoDashboardTab = flags.Flag_NoDashboardTab;
+
+        if (overlay.Flag_AcceptsGamepadEvents != flags.Flag_AcceptsGamepadEvents)
+            overlay.Flag_AcceptsGamepadEvents = flags.Flag_AcceptsGamepadEvents;
+
+        if (overlay.Flag_ShowGamepadFocus != flags.Flag_ShowGamepadFocus)
+            overlay.Flag_ShowGamepadFocus = flags.Flag_ShowGamepadFocus;
+
+        if (overlay.Flag_SendVRScrollEvents != flags.Flag_SendVRScrollEvents)
+            overlay.Flag_SendVRScrollEvents = flags.Flag_SendVRScrollEvents;
+
+        if (overlay.Flag_SendVRTouchpadEvents != flags.Flag_SendVRTouchpadEvents)
+            overlay.Flag_SendVRTouchpadEvents = flags.Flag_SendVRTouchpadEvents;
+
+        if (overlay.Flag_ShowTouchPadScrollWheel != flags.Flag_ShowTouchPadScrollWheel)
+            overlay.Flag_ShowTouchPadScrollWheel = flags.Flag_ShowTouchPadScrollWheel;
+
+        if (overlay.Flag_TransferOwnershipToInternalProcess != flags.Flag_TransferOwnershipToInternalProcess)
+            overlay.Flag_TransferOwnershipToInternalProcess = flags.Flag_TransferOwnershipToInternalProcess;
+
+        if (overlay.Flag_SideBySide_Parallel != flags.Flag_SideBySide_Parallel)
+            overlay.Flag_SideBySide_Parallel = flags.Flag_SideBySide_Parallel;
+
+        if (overlay.Flag_SideBySide_Crossed != flags.Flag_SideBySide_Crossed)
+            overlay.Flag_SideBySide_Crossed = flags.Flag_SideBySide_Crossed;
+
+        if (overlay.Flag_Panorama != flags.Flag_Panorama)
+            overlay.Flag_Panorama = flags.Flag_Panorama;
+
+        if (overlay.Flag_StereoPanorama != flags.Flag_StereoPanorama)
+            overlay.Flag_StereoPanorama = flags.Flag_StereoPanorama;
+
+        if (overlay.Flag_SortWithNonSceneOverlays != flags.Flag_SortWithNonSceneOverlays)
+            overlay.Flag_SortWithNonSceneOverlays = flags.Flag_SortWithNonSceneOverlays;
+
+        if (overlay.Flag_VisibleInDashboard != flags.Flag_VisibleInDashboard)
+            overlay.Flag_VisibleInDashboard = flags.Flag_VisibleInDashboard;
 
         lastFlags = flags;
     }
 
     public void PollForEvents()
     {
-        if (overlay != null && overlay.Ready)
-            overlay.UpdateEvents();
+
     }
 }
 

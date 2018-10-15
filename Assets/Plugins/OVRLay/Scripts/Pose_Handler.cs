@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using Valve.VR;
-
 namespace OVRLay
 {
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Valve.VR;
+
     public static class Pose
     {
         public static TrackedDevicePose_t[] devicesPoses =

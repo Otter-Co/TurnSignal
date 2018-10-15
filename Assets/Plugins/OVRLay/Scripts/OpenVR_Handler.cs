@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using Valve.VR;
-
 namespace OVRLay
 {
+    using System;
+    using System.Collections.Generic;
+    using Valve.VR;
+
     public static class OVR
     {
         private static readonly uint EVENT_SIZE =
@@ -20,9 +20,7 @@ namespace OVRLay
         public static EVRInitError LastStartupError { get; private set; } = EVRInitError.None;
         public static bool StartedUp { get; private set; } = false;
 
-        public static bool Startup(
-            EVRApplicationType appType = EVRApplicationType.VRApplication_Background
-        )
+        public static bool Startup(EVRApplicationType appType = EVRApplicationType.VRApplication_Background)
         {
             if (StartedUp)
                 return true;
@@ -30,16 +28,14 @@ namespace OVRLay
             EVRInitError startupError = EVRInitError.None;
             VR_Sys = OpenVR.Init(ref startupError, appType);
 
-            LastStartupError = startupError;
-
-            return StartedUp = (startupError == EVRInitError.None);
+            return StartedUp = ((LastStartupError = startupError) == EVRInitError.None);
         }
 
         public static void Shutdown()
         {
             if (StartedUp)
             {
-                // OpenVR.Shutdown();
+                OpenVR.Shutdown();
                 StartedUp = false;
             }
         }
@@ -53,11 +49,12 @@ namespace OVRLay
         public delegate void D_OnDashboardChange(bool open);
         public static D_OnVRAppQuit OnVRAppQuit = () => { };
 
+        private static VREvent_t event_T;
+        private const int _eventLoopMaxSaftey = 100;
         public static void UpdateEvents()
         {
-            VREvent_t event_T = new VREvent_t();
-
-            while (VR_Sys.PollNextEvent(ref event_T, EVENT_SIZE))
+            int currentLoops = 0;
+            while (currentLoops++ <= _eventLoopMaxSaftey && VR_Sys.PollNextEvent(ref event_T, EVENT_SIZE))
                 switch ((EVREventType)event_T.eventType)
                 {
                     case EVREventType.VREvent_DashboardActivated:
