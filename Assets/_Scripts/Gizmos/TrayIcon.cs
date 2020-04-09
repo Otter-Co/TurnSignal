@@ -31,8 +31,8 @@ public class TrayIcon : MonoBehaviour
 
     private System.ComponentModel.IContainer ctx;
     private NotifyIcon trayIcon;
-    private Bitmap iconBitmap;
-    private Icon icon;
+    private System.Drawing.Bitmap iconBitmap;
+    private System.Drawing.Icon icon;
 
     private ContextMenuStrip contextMenu;
     private ToolStripItem hideShowItem;

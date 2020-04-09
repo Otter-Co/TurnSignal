@@ -12,6 +12,15 @@ public class Menu_Handler : MonoBehaviour
     public Slider petalSlider;
     public Slider heightSlider;
     public Slider followSpeedSlider;
+    public Slider forwardArrowAngle;
+
+    public ValueButtonUI scaleButtonUI;
+    public ValueButtonUI opacityButtonUI;
+    public ValueButtonUI twistRateButtonUI;
+    public ValueButtonUI petalButtonUI;
+    public ValueButtonUI heightButtonUI;
+    public ValueButtonUI followButtonUI;
+    public ValueButtonUI forwardButtonUI;
 
     [Space(5)]
 
@@ -22,6 +31,7 @@ public class Menu_Handler : MonoBehaviour
     public Toggle useChapColorToggle;
     public Toggle tieTwistToggle;
     public Toggle onlyShowInDashToggle;
+    public Toggle forwardArrow;
 
     [Space(5)]
 
@@ -40,12 +50,23 @@ public class Menu_Handler : MonoBehaviour
         tieTwistToggle.isOn = opts.LinkOpatWithTwist;
         onlyShowInDashToggle.isOn = opts.OnlyShowInDashboard;
 
+        forwardArrow.isOn = opts.ForwardArrow;
+
         scaleSlider.value = opts.Scale;
         opacitySlider.value = opts.Opacity;
         twistRateSlider.value = opts.TwistRate;
         petalSlider.value = opts.PetalCount;
         heightSlider.value = opts.Height;
         followSpeedSlider.value = opts.FollowSpeed;
+
+        forwardButtonUI.CurrentValue = opts.ForwardArrowAngle;
+        scaleButtonUI.CurrentValue = opts.Scale;
+        opacityButtonUI.CurrentValue = opts.Opacity;
+        twistRateButtonUI.CurrentValue = opts.TwistRate;
+        petalButtonUI.CurrentValue = opts.PetalCount;
+        heightButtonUI.CurrentValue = opts.Height;
+        followButtonUI.CurrentValue = opts.FollowSpeed;
+
 
         disableLinkToggle.isOn = opts.LinkOptions == TurnSignalLinkOpts.None;
         rightLinkToggle.isOn = (opts.LinkOptions == TurnSignalLinkOpts.RightFront);
@@ -65,8 +86,7 @@ public class Menu_Handler : MonoBehaviour
         if ((rightLinkToggle.isOn || leftLinkToggle.isOn) && flipSidesToggle.isOn)
             linkOpts |= TurnSignalLinkOpts.Old_FlipSides;
 
-        return new TurnSignalOptions()
-        {
+        return new TurnSignalOptions() {
             StartWithSteamVR = startWithVRToggle.isOn,
             EnableSteamworks = enableSteamWorksToggle.isOn,
             ShowMainWindow = hideMainWindowToggle.isOn,
@@ -74,13 +94,16 @@ public class Menu_Handler : MonoBehaviour
             UseChaperoneColor = useChapColorToggle.isOn,
             LinkOpatWithTwist = tieTwistToggle.isOn,
             OnlyShowInDashboard = onlyShowInDashToggle.isOn,
+            ForwardArrow = forwardArrow.isOn,
 
-            Scale = scaleSlider.value,
-            Opacity = opacitySlider.value,
-            TwistRate = twistRateSlider.value,
-            PetalCount = petalSlider.value,
-            Height = heightSlider.value,
-            FollowSpeed = followSpeedSlider.value,
+
+            ForwardArrowAngle = forwardButtonUI.CurrentValue,
+            Scale = scaleButtonUI.CurrentValue,
+            Opacity = opacityButtonUI.CurrentValue,
+            TwistRate = twistRateButtonUI.CurrentValue,
+            PetalCount = petalButtonUI.CurrentValue,
+            Height = heightButtonUI.CurrentValue,
+            FollowSpeed = followButtonUI.CurrentValue,
 
             LinkOptions = linkOpts,
         };
