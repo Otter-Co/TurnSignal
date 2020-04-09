@@ -23,6 +23,8 @@ public struct TurnSignalOptions
     public bool UseChaperoneColor;
     public bool LinkOpatWithTwist;
     public bool OnlyShowInDashboard;
+    public bool ForwardArrow;
+    public float ForwardArrowAngle;
 
     public float Scale;
     public float Opacity;
@@ -43,8 +45,7 @@ public struct TurnSignalOptions
         }
     }
 
-    public static TurnSignalOptions DefaultOptions = new TurnSignalOptions()
-    {
+    public static TurnSignalOptions DefaultOptions = new TurnSignalOptions() {
         timestamp = null,
         StartWithSteamVR = true,
         EnableSteamworks = true,
@@ -53,6 +54,8 @@ public struct TurnSignalOptions
         UseChaperoneColor = false,
         LinkOpatWithTwist = false,
         OnlyShowInDashboard = false,
+        ForwardArrow = true,
+        ForwardArrowAngle = 0,
 
         Scale = 1f,
         Opacity = 0.3f,

@@ -35,6 +35,7 @@ public class Director : MonoBehaviour
     public Floor_Handler floorHandler;
     public Overlay_Unity floorOverlay;
     public Twister twister;
+    public GameObject ForwardArrow;
 
     [Header("App Internal Settings")]
     public int activeFPS = 90;
@@ -127,6 +128,9 @@ public class Director : MonoBehaviour
                 floorOverlay.enabled = true;
 
             UpdateFloorOverlay();
+
+            ForwardArrow.SetActive(options.ForwardArrow);
+            ForwardArrow.transform.localEulerAngles = new Vector3(0, options.ForwardArrowAngle, 0);
         }
         else if (floorOverlay.enabled)
             floorOverlay.enabled = false;

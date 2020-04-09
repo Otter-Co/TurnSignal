@@ -12,6 +12,7 @@ public class Menu_Handler : MonoBehaviour
     public Slider petalSlider;
     public Slider heightSlider;
     public Slider followSpeedSlider;
+    public Slider forwardArrowAngle;
 
     [Space(5)]
 
@@ -22,6 +23,7 @@ public class Menu_Handler : MonoBehaviour
     public Toggle useChapColorToggle;
     public Toggle tieTwistToggle;
     public Toggle onlyShowInDashToggle;
+    public Toggle forwardArrow;
 
     [Space(5)]
 
@@ -39,6 +41,9 @@ public class Menu_Handler : MonoBehaviour
         useChapColorToggle.isOn = opts.UseChaperoneColor;
         tieTwistToggle.isOn = opts.LinkOpatWithTwist;
         onlyShowInDashToggle.isOn = opts.OnlyShowInDashboard;
+
+        forwardArrow.isOn = opts.ForwardArrow;
+        forwardArrowAngle.value = opts.ForwardArrowAngle;
 
         scaleSlider.value = opts.Scale;
         opacitySlider.value = opts.Opacity;
@@ -65,8 +70,7 @@ public class Menu_Handler : MonoBehaviour
         if ((rightLinkToggle.isOn || leftLinkToggle.isOn) && flipSidesToggle.isOn)
             linkOpts |= TurnSignalLinkOpts.Old_FlipSides;
 
-        return new TurnSignalOptions()
-        {
+        return new TurnSignalOptions() {
             StartWithSteamVR = startWithVRToggle.isOn,
             EnableSteamworks = enableSteamWorksToggle.isOn,
             ShowMainWindow = hideMainWindowToggle.isOn,
@@ -74,7 +78,10 @@ public class Menu_Handler : MonoBehaviour
             UseChaperoneColor = useChapColorToggle.isOn,
             LinkOpatWithTwist = tieTwistToggle.isOn,
             OnlyShowInDashboard = onlyShowInDashToggle.isOn,
+            ForwardArrow = forwardArrow.isOn,
 
+
+            ForwardArrowAngle = forwardArrowAngle.value,
             Scale = scaleSlider.value,
             Opacity = opacitySlider.value,
             TwistRate = twistRateSlider.value,
