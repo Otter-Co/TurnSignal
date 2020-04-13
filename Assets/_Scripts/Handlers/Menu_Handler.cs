@@ -14,6 +14,14 @@ public class Menu_Handler : MonoBehaviour
     public Slider followSpeedSlider;
     public Slider forwardArrowAngle;
 
+    public ValueButtonUI scaleButtonUI;
+    public ValueButtonUI opacityButtonUI;
+    public ValueButtonUI twistRateButtonUI;
+    public ValueButtonUI petalButtonUI;
+    public ValueButtonUI heightButtonUI;
+    public ValueButtonUI followButtonUI;
+    public ValueButtonUI forwardButtonUI;
+
     [Space(5)]
 
     public Toggle startWithVRToggle;
@@ -43,7 +51,6 @@ public class Menu_Handler : MonoBehaviour
         onlyShowInDashToggle.isOn = opts.OnlyShowInDashboard;
 
         forwardArrow.isOn = opts.ForwardArrow;
-        forwardArrowAngle.value = opts.ForwardArrowAngle;
 
         scaleSlider.value = opts.Scale;
         opacitySlider.value = opts.Opacity;
@@ -51,6 +58,15 @@ public class Menu_Handler : MonoBehaviour
         petalSlider.value = opts.PetalCount;
         heightSlider.value = opts.Height;
         followSpeedSlider.value = opts.FollowSpeed;
+
+        forwardButtonUI.currentValue = opts.ForwardArrowAngle;
+        scaleButtonUI.currentValue = opts.Scale;
+        opacityButtonUI.currentValue = opts.Opacity;
+        twistRateButtonUI.currentValue = opts.TwistRate;
+        petalButtonUI.currentValue = opts.PetalCount;
+        heightButtonUI.currentValue = opts.Height;
+        followButtonUI.currentValue = opts.FollowSpeed;
+
 
         disableLinkToggle.isOn = opts.LinkOptions == TurnSignalLinkOpts.None;
         rightLinkToggle.isOn = (opts.LinkOptions == TurnSignalLinkOpts.RightFront);
@@ -81,13 +97,13 @@ public class Menu_Handler : MonoBehaviour
             ForwardArrow = forwardArrow.isOn,
 
 
-            ForwardArrowAngle = forwardArrowAngle.value,
-            Scale = scaleSlider.value,
-            Opacity = opacitySlider.value,
-            TwistRate = twistRateSlider.value,
-            PetalCount = petalSlider.value,
-            Height = heightSlider.value,
-            FollowSpeed = followSpeedSlider.value,
+            ForwardArrowAngle = forwardButtonUI.currentValue,
+            Scale = scaleButtonUI.currentValue,
+            Opacity = opacityButtonUI.currentValue,
+            TwistRate = twistRateButtonUI.currentValue,
+            PetalCount = petalButtonUI.currentValue,
+            Height = heightButtonUI.currentValue,
+            FollowSpeed = followButtonUI.currentValue,
 
             LinkOptions = linkOpts,
         };
