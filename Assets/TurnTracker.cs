@@ -16,15 +16,11 @@ public class TurnTracker : MonoBehaviour
     float currentAngle;
     float currentTwist;
 
-    public float currentTwistValue;
-
+    float lastAngle = 0f;
 
     public int[] TurnTrackerArray = new int[362];
     public int currentIntAngle;
     public int NumberOfTurns;
-
-
-    public float LastY = 0;
 
     public Twister twister;
 
@@ -33,15 +29,14 @@ public class TurnTracker : MonoBehaviour
     public float twistRate = 10f;
     public float MaxTwistForOpacity = 2f;
 
-    //  public Text currentTwistText;
-    //  public Text currentIntText;
-    //  public Text NumberOfTurnsText;
-    //  public Text TurnTotal;
+      public Text NumberOfTurnsText;
 
-    //  public Text OriginalValueDebug;
-    //  public Text OriginalValueDebug2;
+      public Text currentAngleText;
+      public Text currentOffsetText;
 
     // Start is called before the first frame update
+
+    private bool firstRun = true;
     void Start()
     {
         
@@ -51,9 +46,7 @@ public class TurnTracker : MonoBehaviour
     void Update() {
 
 
-        //Debug Text
-  //      OriginalValueDebug.text = hmd.localRotation.eulerAngles.ToString();
-  //      OriginalValueDebug2.text = hmd.localRotation.ToString();
+
 
 
         //First we calculate the position of the 3 points, one above your head, one in front of you, and one below your head.
@@ -82,38 +75,27 @@ public class TurnTracker : MonoBehaviour
         currentAngle = Angle(new Vector2(forwardTarget.x, forwardTarget.z));
         float targetAngle = Mathf.Repeat(currentAngle - twistOffSet,360);
 
+        //Debug Text
+              currentAngleText.text = currentAngle.ToString();
+             currentOffsetText.text = twistOffSet.ToString();
 
-        int targetYint = Mathf.FloorToInt(targetAngle);
-
-        while (currentIntAngle != targetYint) {
-            int upOrDown = Mathf.DeltaAngle(currentIntAngle, targetYint)>=0 ? 1 :-1 ;
-            if (upOrDown == -1) {
-                TurnTrackerArray[currentIntAngle] -= 1;
-            }
-            currentIntAngle += upOrDown;
-            if (currentIntAngle < 0)
-                currentIntAngle += 360;
-            else if (currentIntAngle >= 360)
-                currentIntAngle = 0;
-            if (upOrDown == 1) {
-                TurnTrackerArray[currentIntAngle] += 1;
-            }
+        if (lastAngle<90 && targetAngle > 270) {
+            NumberOfTurns--;
+        } else if( lastAngle>270 && targetAngle < 90) {
+            NumberOfTurns++;
         }
-        
 
-  //      currentTwistText.text = currentAngle.ToString();
-  //      currentIntText.text = currentIntAngle.ToString();
-       
-      
 
-        int i = currentIntAngle + 1;
-        if (i >= 360)
-            i = 0;
+        currentTwist = (NumberOfTurns + targetAngle / 360f);
 
-        currentTwist = (TurnTrackerArray[i] + currentAngle/360f );
         twister.twist = (-currentTwist +twistOffSet)*twistRate/10f;
+        if (firstRun) {
+            ZeroRotation();
+            firstRun = false;
+        }
+        lastAngle = targetAngle;
 
-  //      NumberOfTurnsText.text = TurnTrackerArray[i].ToString();
+        NumberOfTurnsText.text = currentTwist.ToString();
   //      TurnTotal.text = currentTwist.ToString();
 
     }
