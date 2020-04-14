@@ -59,13 +59,13 @@ public class Menu_Handler : MonoBehaviour
         heightSlider.value = opts.Height;
         followSpeedSlider.value = opts.FollowSpeed;
 
-        forwardButtonUI.currentValue = opts.ForwardArrowAngle;
-        scaleButtonUI.currentValue = opts.Scale;
-        opacityButtonUI.currentValue = opts.Opacity;
-        twistRateButtonUI.currentValue = opts.TwistRate;
-        petalButtonUI.currentValue = opts.PetalCount;
-        heightButtonUI.currentValue = opts.Height;
-        followButtonUI.currentValue = opts.FollowSpeed;
+        forwardButtonUI.CurrentValue = opts.ForwardArrowAngle;
+        scaleButtonUI.CurrentValue = opts.Scale;
+        opacityButtonUI.CurrentValue = opts.Opacity;
+        twistRateButtonUI.CurrentValue = opts.TwistRate;
+        petalButtonUI.CurrentValue = opts.PetalCount;
+        heightButtonUI.CurrentValue = opts.Height;
+        followButtonUI.CurrentValue = opts.FollowSpeed;
 
 
         disableLinkToggle.isOn = opts.LinkOptions == TurnSignalLinkOpts.None;
@@ -97,13 +97,13 @@ public class Menu_Handler : MonoBehaviour
             ForwardArrow = forwardArrow.isOn,
 
 
-            ForwardArrowAngle = forwardButtonUI.currentValue,
-            Scale = scaleButtonUI.currentValue,
-            Opacity = opacityButtonUI.currentValue,
-            TwistRate = twistRateButtonUI.currentValue,
-            PetalCount = petalButtonUI.currentValue,
-            Height = heightButtonUI.currentValue,
-            FollowSpeed = followButtonUI.currentValue,
+            ForwardArrowAngle = forwardButtonUI.CurrentValue,
+            Scale = scaleButtonUI.CurrentValue,
+            Opacity = opacityButtonUI.CurrentValue,
+            TwistRate = twistRateButtonUI.CurrentValue,
+            PetalCount = petalButtonUI.CurrentValue,
+            Height = heightButtonUI.CurrentValue,
+            FollowSpeed = followButtonUI.CurrentValue,
 
             LinkOptions = linkOpts,
         };

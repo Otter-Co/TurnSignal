@@ -58,9 +58,9 @@ public struct TurnSignalOptions
         ForwardArrowAngle = 0,
 
         Scale = 1f,
-        Opacity = 0.3f,
-        TwistRate = 10f,
-        PetalCount = 6,
+        Opacity = 0.15f,
+        TwistRate = 7f,
+        PetalCount = 3,
         Height = 0,
         FollowSpeed = 10f,
         LinkOptions = TurnSignalLinkOpts.None
