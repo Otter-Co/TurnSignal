@@ -49,7 +49,7 @@ public class Floor_Handler : MonoBehaviour
         currentTurnValue += diff;
 
         turnProgress = currentTurnValue / (360f * maxTurns);
-        twister.twist = (reversed) ? -turnProgress : turnProgress;
+      //  twister.twist = (reversed) ? -turnProgress : turnProgress;
     }
 
     public void SetCurrentTrustPoint(int pointIndex)

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class Director : MonoBehaviour
 {
-    public void ResetRotation() => floorHandler.currentTurnValue = 0f;
+    public void ResetRotation() => turnTracker.ZeroRotation();
     public void ResetOptions() => menuHandler.SetUIValues(TurnSignalOptions.DefaultOptions);
     public void ToggleEnabled() => turnsignalActive = !turnsignalActive;
 
@@ -32,9 +32,12 @@ public class Director : MonoBehaviour
     public Menu_Handler menuHandler;
     public Overlay_Unity menuOverlay;
     [Space(10)]
-    public Floor_Handler floorHandler;
+  //  public Floor_Handler floorHandler;
     public Overlay_Unity floorOverlay;
+    public TurnTracker turnTracker;
     public Twister twister;
+    public GameObject ForwardArrow;
+    public GameObject FloorHolder;
 
     [Header("App Internal Settings")]
     public int activeFPS = 90;
@@ -127,6 +130,9 @@ public class Director : MonoBehaviour
                 floorOverlay.enabled = true;
 
             UpdateFloorOverlay();
+
+            ForwardArrow.SetActive(options.ForwardArrow);
+            FloorHolder.transform.localEulerAngles = new Vector3(0, options.ForwardArrowAngle, 0);
         }
         else if (floorOverlay.enabled)
             floorOverlay.enabled = false;
@@ -152,11 +158,11 @@ public class Director : MonoBehaviour
         if (!options.LinkOpatWithTwist && floorOverlay.settings.Alpha != options.Opacity)
             floorOverlay.settings.Alpha = options.Opacity;
         else if (options.LinkOpatWithTwist)
-            floorOverlay.settings.Alpha = options.Opacity * Mathf.Abs(floorHandler.turnProgress);
+            floorOverlay.settings.Alpha = options.Opacity * Mathf.Clamp(Mathf.Abs(twister.twist),0, turnTracker.MaxTwistForOpacity) / turnTracker.MaxTwistForOpacity;
 
         if (options.LinkOptions == TurnSignalLinkOpts.None)
         {
-            floorHandler.reversed = (fT.position.y > hmdP.y);
+           // floorHandler.reversed = (fT.position.y > hmdP.y);
 
             if (options.FollowPlayerHeadeset)
                 fT.position = Vector3.Lerp(
@@ -187,7 +193,8 @@ public class Director : MonoBehaviour
                         opts.StartWithSteamVR
                     );
 
-            floorHandler.maxTurns = (int)opts.TwistRate;
+          
+            turnTracker.twistRate = (int)opts.TwistRate;
 
             if ((int)opts.PetalCount != twister.petalCount)
                 twister.petalCount = opts.PetalCount > 0 ? (int)(opts.PetalCount) : twister.petalCount;

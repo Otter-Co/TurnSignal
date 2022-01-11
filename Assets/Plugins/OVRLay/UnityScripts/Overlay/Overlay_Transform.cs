@@ -40,7 +40,7 @@ public class Overlay_Transform : MonoBehaviour
             customDeviceIndex != lastCustomIndex
             ))
         {
-            lastRot = transform.eulerAngles;
+            //lastRot = transform.eulerAngles;
             lastPos = transform.position;
             lastTransformOrigin = transformOrigin;
             lastTransformType = transformType;
